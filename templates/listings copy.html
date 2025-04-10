@@ -1,0 +1,51 @@
+{# templates/listings.html #}
+{% extends "base.html" %}
+{% block title %}Ons Aanbod | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 2rem 1rem;">
+  <h1 style="color: #4c37c6; font-size: 2rem; margin-bottom: 1rem;">Ons aanbod</h1>
+  
+  <div class="car-grid" style="
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  ">
+    {% for car in cars %}
+      <div class="car-card" style="border:1px solid #ddd; padding:1rem; border-radius:6px;">
+        {# Show first image if available #}
+        {% if car.images and car.images|length > 0 %}
+          <img src="{{ car.images[0].image_url }}" alt="Car Image"
+               style="width: 100%; height: auto; margin-bottom: 0.5rem;">
+        {% else %}
+          <div style="background:#ccc; width:100%; height:150px; margin-bottom:0.5rem;">
+            No Image
+          </div>
+        {% endif %}
+
+        <h3 style="font-size:1.2rem; color:#4c37c6;">{{ car.title or 'Onbekend' }}</h3>
+        <p style="color:#999; margin-bottom:0.5rem;">{{ car.subtitle }}</p>
+        <p style="margin-bottom: 0.5rem;">
+          <strong>{{ car.financial_lease_price }}</strong> / {{ car.financial_lease_term }}
+        </p>
+        <p>Merk: {{ car.merk }}, Model: {{ car.model }}</p>
+        
+        <a href="{{ url_for('car_detail', car_id=car.id) }}"
+           style="display:inline-block; margin-top:1rem;" class="btn border">
+           Meer info
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div style="text-align:center; margin-top:2rem;">
+    {% if page > 1 %}
+      <a href="{{ url_for('listings', page=page-1) }}">&laquo; Vorige</a>
+    {% endif %}
+    <span style="margin:0 1rem;">Pagina {{ page }} van {{ total_pages }}</span>
+    {% if page < total_pages %}
+      <a href="{{ url_for('listings', page=page+1) }}">Volgende &raquo;</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

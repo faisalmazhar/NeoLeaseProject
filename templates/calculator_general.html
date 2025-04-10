@@ -1,0 +1,189 @@
+{# templates/calculator_general.html #}
+{% extends "base.html" %}
+{% block title %}Calculator | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 1rem;">
+  
+  <h1 style="color: #4c37c6; margin-bottom:1rem;">
+    Bereken hieronder jouw maandbedrag
+  </h1>
+  <h2 style="font-size:1.5rem; margin-bottom:2rem;">
+    Lease Maandelijkse Betaling Calculator
+  </h2>
+  
+  <!-- Main wrapper: left = form, right = results box -->
+  <div style="display:flex; flex-wrap:wrap; gap:2rem;">
+    
+    <!-- LEFT: Input fields -->
+    <div style="flex:1; min-width:300px;">
+      <!-- Aanschafprijs -->
+      <label for="purchasePrice" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Aanschafprijs
+      </label>
+      <input
+        type="number"
+        id="purchasePrice"
+        placeholder="30.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Vul de totale aanschafprijs van het object in (excl. btw)
+      </p>
+
+      <!-- Aanbetaling -->
+      <label for="downPayment" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Aanbetaling
+      </label>
+      <input
+        type="number"
+        id="downPayment"
+        placeholder="5.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Voer het bedrag van de aanbetaling in.
+      </p>
+
+      <!-- Slottermijn -->
+      <label for="balloon" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Slottermijn
+      </label>
+      <input
+        type="number"
+        id="balloon"
+        placeholder="10.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Voer het bedrag van de slottermijn in.
+      </p>
+
+      <!-- Looptijd Slider -->
+      <label for="monthsRange" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Looptijd in maanden
+      </label>
+      <input
+        type="range"
+        id="monthsRange"
+        min="12"
+        max="72"
+        value="60"
+        step="12"
+        style="width:100%"
+      />
+      <div style="
+        display:flex; 
+        justify-content:space-between; 
+        margin-top:0.5rem; 
+        font-size:0.85rem;"
+      >
+        <span>12</span>
+        <span id="monthsValue">60</span>
+        <span>72</span>
+      </div>
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Selecteer de looptijd van de leaseovereenkomst.
+      </p>
+
+    </div>
+    
+    <!-- RIGHT: Big result box -->
+    <div style="
+      flex:1; 
+      min-width:250px; 
+      background:#4c37c6; 
+      color:#fff; 
+      border-radius:8px; 
+      padding:1.5rem;
+    ">
+      <h3 style="font-size:1.2rem; margin-bottom:1rem;">
+        Maandbedrag
+        <span id="monthlyPayment" style="font-size:1.5rem; display:block;">
+          €250
+        </span>
+      </h3>
+      <p style="margin-bottom:2rem;">
+        Jouw maandelijkse leasebedrag.
+      </p>
+      
+      <p style="margin-bottom:1rem;">
+        <strong>Start met leasen!</strong><br>
+        Neem contact op voor een offerte op maat.
+      </p>
+      
+      <button 
+        id="applyNowBtn"
+        style="
+          background:#000; 
+          color:#fff; 
+          border:none; 
+          padding:0.8rem 1.2rem; 
+          border-radius:4px; 
+          cursor:pointer; 
+          font-weight:600;
+        "
+      >
+        Nu aanvragen
+      </button>
+    </div>
+    
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Grab references to the fields
+  const purchasePriceInput = document.getElementById('purchasePrice');
+  const downPaymentInput   = document.getElementById('downPayment');
+  const balloonInput       = document.getElementById('balloon');
+  const monthsRange        = document.getElementById('monthsRange');
+  const monthsValueLabel   = document.getElementById('monthsValue');
+  const monthlyPayment     = document.getElementById('monthlyPayment');
+  
+  function recalc() {
+    const purchase = parseFloat(purchasePriceInput.value) || 30000;
+    const down     = parseFloat(downPaymentInput.value)   || 5000;
+    const balloon  = parseFloat(balloonInput.value)       || 10000;
+    const months   = parseInt(monthsRange.value)          || 60;
+
+    // Basic formula example:
+    //  financed = (purchase - down - balloon)
+    //  monthly = financed / months + (some interest factor)
+    //  We'll do a super simplified approach:
+    const financed = purchase - down - balloon;
+    // Suppose interest is ~10% APR => monthly rate ~ 0.0083
+    const monthlyRate = 0.0083;
+    // monthly interest portion:
+    const interestPart = financed * monthlyRate;
+    // principal:
+    const principalPart = financed / months;
+    const totalMonth = interestPart + principalPart;
+
+    // Round to 2 decimals
+    monthlyPayment.textContent = "€" + totalMonth.toFixed(2);
+
+    // Show the slider label
+    monthsValueLabel.textContent = months;
+  }
+
+  // Listen for changes
+  purchasePriceInput.addEventListener('input', recalc);
+  downPaymentInput.addEventListener('input', recalc);
+  balloonInput.addEventListener('input', recalc);
+  monthsRange.addEventListener('input', recalc);
+
+  // Initial calc
+  recalc();
+
+  // “Nu aanvragen” button => maybe link to contact?
+  const applyBtn = document.getElementById('applyNowBtn');
+  applyBtn.addEventListener('click', () => {
+    window.location.href = "{{ url_for('contact') }}";
+  });
+});
+</script>
+{% endblock %}

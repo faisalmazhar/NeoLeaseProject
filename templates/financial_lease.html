@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Financial Lease | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 1rem;">
+
+  <h1 style="color: #4c37c6; margin-bottom:1rem;">Financial Lease</h1>
+  
+  <p>
+    Ideaal voor ondernemers die eigenaar willen worden van hun auto. Je betaalt in termijnen,
+    zonder grote investering vooraf. De auto komt op jouw balans te staan – jij bent economisch eigenaar.
+  </p>
+
+  <h2 style="margin-top:2rem;">Waarom Financial Lease?</h2>
+  <ul style="list-style: disc; margin-left:1.5rem; margin-top:1rem;">
+    <li>Eigenaar van de auto vanaf dag één</li>
+    <li>Geen grote investering vooraf</li>
+    <li>Vaste looptijd en maandlasten</li>
+    <li>Voordeel bij afschrijving</li>
+    <li>Auto op de balans van je onderneming</li>
+  </ul>
+
+  <p style="margin-top:1rem;">
+    Wil je een offerte of heb je vragen? 
+    <a href="{{ url_for('contact') }}">Neem gerust contact met ons op</a>.
+  </p>
+</section>
+{% endblock %}

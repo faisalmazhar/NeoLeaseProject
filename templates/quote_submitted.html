@@ -1,0 +1,29 @@
+{# templates/quote_submitted.html #}
+{% extends "base.html" %}
+{% block title %}Offerte verzonden | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 0;">
+  <h2 style="color:#4c37c6; font-size:2rem; margin-bottom:1.5rem;">
+    Bedankt voor je offerteaanvraag!
+  </h2>
+  <p>We hebben jouw gegevens ontvangen en nemen spoedig contact met je op.</p>
+
+  <div style="margin-top:2rem; background:#f9f9f9; padding:1rem; border-radius:4px; max-width:500px;">
+    <h4>Samenvatting:</h4>
+    <ul style="list-style:none; padding-left:0;">
+      <li><strong>Auto: </strong>{{ car_title }}</li>
+      <li><strong>Maandbedrag: </strong>{{ monthly_payment }}</li>
+      <li><strong>Telefoon: </strong>{{ phone }}</li>
+      <li><strong>E-mailadres: </strong>{{ email }}</li>
+      {% if message %}
+      <li style="margin-top:1rem;"><strong>Bericht:</strong> {{ message }}</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <p style="margin-top:1rem;">
+    <a href="{{ url_for('index') }}" class="btn border">Terug naar Home</a>
+  </p>
+</section>
+{% endblock %}

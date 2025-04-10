@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Diensten | Neo Lease{% endblock %}
+
+{% block content %}
+
+<!-- FIRST SPLIT SECTION -->
+<section class="dienst-split">
+  <div class="dienst-image" style="background-image: url('{{ url_for('static', filename='images/deinsten1.jpg') }}');"></div>
+  <div class="dienst-text">
+    <h2>Financial Lease of Passenger Cars</h2>
+    <p>
+      Do you want to finance a new or used passenger car without paying the entire purchase
+      price at once? Financial lease from Neo Lease offers a solution. You pay a fixed monthly amount
+      based on the term of the lease and the amount you want to finance...
+    </p>
+  </div>
+</section>
+
+<!-- SECOND SPLIT SECTION -->
+<section class="dienst-split reverse">
+  <div class="dienst-image" style="background-image: url('{{ url_for('static', filename='images/deinsten2.jpg') }}');"></div>
+  <div class="dienst-text">
+    <h2>Financial Lease of Commercial Vehicles</h2>
+    <p>
+      For companies that need multiple vehicles, such as vans or trucks, Neo Lease offers an excellent
+      solution. By leasing a company car, you do not have to make a large investment at once, but you can
+      easily spread the costs over a period that best suits your business operations...
+    </p>
+  </div>
+</section>
+
+<!-- THIRD SPLIT SECTION -->
+<section class="dienst-split">
+  <div class="dienst-image" style="background-image: url('{{ url_for('static', filename='images/deinsten3.jpg') }}');"></div>
+  <div class="dienst-text">
+    <h2>Financial Lease of Equipment</h2>
+    <p>
+      Not only vehicles, but also machines and equipment can be financed through Neo Lease. Whether you need
+      new equipment for your company or want to replace your existing machines, financial lease offers the
+      possibility to spread the costs and make the investment without large capital investments...
+    </p>
+  </div>
+</section>
+
+<!-- FOURTH SPLIT SECTION -->
+<section class="dienst-split reverse">
+  <div class="dienst-image" style="background-image: url('{{ url_for('static', filename='images/deinsten4.jpg') }}');"></div>
+  <div class="dienst-text">
+    <h2>What is Financial Lease?</h2>
+    <p>
+      Financial lease is a flexible financing solution that allows you to use a vehicle or equipment
+      directly with your company or private assets, without having to pay the full purchase price in one go...
+    </p>
+  </div>
+</section>
+
+<!-- BENEFITS SECTION -->
+<section class="dienst-benefits container">
+  <h2>Benefits of Leasing with Neo Lease</h2>
+  <ul>
+    <li><strong>Fixed monthly costs:</strong> A set amount makes it easier to plan your finances.</li>
+    <li><strong>Flexibility:</strong> Choose the term and object that suit your needs.</li>
+    <li><strong>Tax benefit:</strong> In many cases, you can deduct the lease costs from your taxes.</li>
+    <li><strong>Ownership:</strong> You immediately become the owner of the object.</li>
+    <li><strong>No large investment:</strong> You do not have to pay a large sum of money at once.</li>
+  </ul>
+</section>
+
+<!-- CTA SECTION -->
+<section class="dienst-cta container">
+  <h2>Get started today</h2>
+  <div class="cta-buttons">
+    <a href="{{ url_for('aanbod') }}" class="btn border">Request a no-obligation quote</a>
+    <a href="https://api.whatsapp.com/send?phone=31616118086" target="_blank" class="btn border">Send a WhatsApp message</a>
+    <a href="{{ url_for('contact') }}" class="btn border">Request a callback</a>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{# templates/request_quote.html #}
+{% extends "base.html" %}
+{% block title %}Offerte aanvragen | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 0;">
+  <h2 style="color:#4c37c6; font-size:2rem; margin-bottom:1.5rem;">
+    Vraag een offerte aan
+  </h2>
+  
+  <div style="display:flex; flex-wrap:wrap; gap:2rem;">
+    <!-- LEFT: The form -->
+    <div style="flex:1; min-width:280px; background:#fff; padding:1rem; border-radius:4px;">
+      <!-- 
+        ACTION => your new Flask route: 'submit_quote'
+        METHOD => POST
+      -->
+      <form action="{{ url_for('submit_quote') }}" method="POST" style="max-width:450px;">
+        
+        <!-- 1) Car ID (hidden) -->
+        <input type="hidden" name="car_id" value="{{ car.id }}">
+
+        <!-- 2) Car Title (readonly) -->
+        <label for="carTitle" style="display:block; margin-bottom:0.3rem;">
+          Auto:
+        </label>
+        <input 
+          id="carTitle"
+          name="car_title"
+          value="{{ car.title }}"
+          readonly
+          style="width:100%; margin-bottom:1rem; padding:0.5rem;"
+        />
+
+        <!-- 3) Monthly Payment (readonly) -->
+        <label for="monthlyPayment" style="display:block; margin-bottom:0.3rem;">
+          Maandbedrag:
+        </label>
+        <input 
+          id="monthlyPayment"
+          name="monthly_payment"
+          value="{{ monthly_payment }}"
+          readonly
+          style="width:100%; margin-bottom:1rem; padding:0.5rem;"
+        />
+
+        <!-- 4) Telephone Number -->
+        <label for="phone" style="display:block; margin-bottom:0.3rem;">
+          Telefoonnummer *
+        </label>
+        <input 
+          type="tel"
+          id="phone"
+          name="phone"
+          required
+          placeholder="Bijv. 06-12345678"
+          style="width:100%; margin-bottom:1rem; padding:0.5rem;"
+        />
+
+        <!-- 5) Email Address -->
+        <label for="email" style="display:block; margin-bottom:0.3rem;">
+          E-mailadres *
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder="naam@domein.nl"
+          style="width:100%; margin-bottom:1rem; padding:0.5rem;"
+        />
+
+        <!-- 6) Optional Message -->
+        <label for="message" style="display:block; margin-bottom:0.3rem;">
+          Eventuele opmerkingen
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          placeholder="Wil je iets specifieks vragen of melden?"
+          style="width:100%; margin-bottom:1rem; padding:0.5rem;"
+        ></textarea>
+
+        <!-- 7) Submit -->
+        <button 
+          type="submit"
+          class="btn purple"
+          style="border:none; cursor:pointer;"
+        >
+          Verzenden
+        </button>
+      </form>
+    </div>
+    
+    <!-- RIGHT: Show the car image -->
+    <div style="flex:1; min-width:250px;">
+      {% if car.images and car.images|length > 0 %}
+        <img 
+          src="{{ car.images[0].image_url }}" 
+          alt="Car" 
+          style="border-radius:8px; width:100%; height:auto;"
+        >
+      {% else %}
+        <div style="width:100%; height:200px; background:#ccc; border-radius:8px;">
+          Geen foto
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

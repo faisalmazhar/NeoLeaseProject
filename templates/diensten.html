@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Diensten | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container">
+
+  <h1 class="diensten-heading">Welke leasevorm past bij jou?</h1>
+  <p class="diensten-intro">
+    Bij Neo Lease kies je eenvoudig de financieringsvorm die bij jou past.
+    Of je nu ondernemer bent of particulier, wij helpen je snel en transparant op weg.
+    Klik op één van de opties voor meer informatie:
+  </p>
+
+  <!-- 3-CARD CONTAINER -->
+  <div class="diensten-cards">
+    
+    <!-- CARD 1: FINANCIAL LEASE -->
+    <div class="diensten-card">
+      <h3 class="diensten-card-title">Financial Lease</h3>
+      <p class="diensten-card-text">
+        Wij vergelijken diverse aanbieders en 
+        regelen voor jou het beste voorstel!
+      </p>
+      <!-- ICON ROW -->
+      <div class="diensten-icon-row">
+        <img 
+          src="{{ url_for('static', filename='images/car.png') }}" 
+          alt="Car"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/sportbike.png') }}" 
+          alt="Motor"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/van.png') }}" 
+          alt="Van"
+        >
+      </div>
+      <!-- GREEN BUTTON -->
+      <a href="{{ url_for('financial_lease') }}" class="diensten-card-btn">
+        Naar Financial Lease
+      </a>
+    </div>
+
+    <!-- CARD 2: EQUIPMENT LEASE -->
+    <div class="diensten-card">
+      <h3 class="diensten-card-title">Equipment Lease</h3>
+      <p class="diensten-card-text">
+        Bedrijfsmiddelen leasen tegen
+        uitstekende voorwaarden!
+      </p>
+      <div class="diensten-icon-row">
+        <img 
+          src="{{ url_for('static', filename='images/excavator.png') }}" 
+          alt="Excavator"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/cargo-truck.png') }}" 
+          alt="Cargo Truck"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/forklift.png') }}" 
+          alt="Forklift"
+        >
+      </div>
+      <a href="{{ url_for('operational_lease') }}" class="diensten-card-btn">
+        Naar Equipment Lease
+      </a>
+    </div>
+
+    <!-- CARD 3: HUURKOOP -->
+    <div class="diensten-card">
+      <h3 class="diensten-card-title">Huurkoop</h3>
+      <p class="diensten-card-text">
+        Als particulier kun je ook eenvoudig 
+        een lening aanvragen voor bijvoorbeeld 
+        een auto, motor of een caravan/camper.
+      </p>
+      <div class="diensten-icon-row">
+        <img 
+          src="{{ url_for('static', filename='images/car.png') }}" 
+          alt="Car"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/sportbike.png') }}" 
+          alt="Motor"
+        >
+        <img 
+          src="{{ url_for('static', filename='images/camper.png') }}" 
+          alt="Camper"
+        >
+      </div>
+      <a href="{{ url_for('personal_loan') }}" class="diensten-card-btn">
+        Naar Huurkoop
+      </a>
+    </div>
+
+  </div> <!-- end .diensten-cards -->
+
+  <p class="diensten-help-text">
+    Heb je hulp nodig bij je keuze? Neem gerust 
+    <a href="{{ url_for('contact') }}">contact met ons op</a> – 
+    we denken graag met je mee.
+  </p>
+
+  <p class="diensten-subfooter">
+    <strong>Neo Lease – Snel, helder en betrouwbaar financieren.</strong>
+  </p>
+</section>
+{% endblock %}

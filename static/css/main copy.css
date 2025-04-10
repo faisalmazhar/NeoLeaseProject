@@ -1,0 +1,701 @@
+/* ----------- Global Resets / Base ----------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Arial', sans-serif;
+    background: #fff;
+    color: #333;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  main {
+    flex: 1; /* So main content expands to push footer down */
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* ----------- Header / Nav ----------- */
+  .site-header {
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+  }
+  .logo-img {
+    max-height: 60px;
+    object-fit: contain;
+  }
+  .main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+  }
+  .main-nav a {
+    color: #444;
+    font-weight: 500;
+    padding: 8px 0;
+    position: relative;
+  }
+  .main-nav a:hover,
+  .main-nav a.active {
+    color: #4c37c6; /* Purple accent */
+  }
+  .main-nav a.active::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #4c37c6;
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+  }
+  
+  /* ----------- Hero Section ----------- */
+  .hero {
+    position: relative;
+    min-height: 60vh;
+    background-size: cover;
+    background-position: center;
+  }
+  .hero .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .hero-content {
+    position: relative;
+    text-align: center;
+    color: #fff;
+    padding: 100px 0;
+  }
+  .hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-content p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0.5rem auto 0 auto;
+  }
+  .scroll-down {
+    position: absolute;      /* Absolutely position it within .hero */
+    bottom: -220px;            /* Move near bottom of hero area */
+    left: 50%;               /* Center horizontally */
+    transform: translateX(-50%);
+    cursor: pointer;
+    margin-top: 0;           /* Override any prior margin if needed */
+  }
+  .scroll-down .arrow {
+    font-size: 2rem;
+    animation: bounce 1.5s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+  
+  /* ----------- Info Bullets Section ----------- */
+  .info-bullets {
+    text-align: center;
+    margin: 3rem auto;
+  }
+  .info-bullets .bullets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .bullet {
+    font-size: 1.1rem;
+    color: #4c37c6; 
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .info-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    background: #4c37c6;
+    color: #fff;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .btn:hover {
+    opacity: 0.9;
+  }
+  .btn.purple {
+    background: #4c37c6;
+  }
+  .btn.border {
+    background: transparent;
+    color: #4c37c6;
+    border: 2px solid #4c37c6;
+  }
+  .btn.border:hover {
+    background: #4c37c6;
+    color: #fff;
+  }
+  
+  /* ----------- Services Section ----------- */
+  .services h2,
+  .why-neo h2,
+  .start-today h2 {
+    text-align: center;
+    color: #4c37c6;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
+  .services-grid {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2rem;
+
+  }
+  .service-item {
+    display: flex;
+    flex-direction: column;
+    width: 300px;      /* Or max-width: 300px, whichever you prefer */
+    background: #fff;  /* optional styling */
+    border-radius: 8px;      /* optional styling */
+    text-align: center;
+  }
+  .service-img {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 1rem auto;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  .service-item h3 {
+    color: #4c37c6;
+    margin-bottom: 0.5rem;
+  }
+  .service-item p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+/* The middle text container; grows to fill leftover space */
+.service-content {
+    flex: 1;
+  }
+  
+  
+  /* ----------- Why Neo Lease Section ----------- */
+  .why-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .why-item {
+    flex: 1 1 250px;
+    max-width: 300px;
+    text-align: center;
+  }
+  .why-img {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 1rem auto;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  .why-item h3 {
+    color: #4c37c6;
+    margin-bottom: 0.5rem;
+  }
+  .why-item p {
+    font-size: 0.95rem;
+  }
+  
+  /* ----------- Start Today Section ----------- */
+  .start-today {
+    text-align: center;
+    margin: 3rem auto;
+  }
+  .today-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  /* ----------- Contact Section (Two Columns) ----------- */
+  .contact-section {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+  }
+  .contact-col-image {
+    flex: 1 1 50%;
+    min-height: 300px;
+    background-size: cover;
+    background-position: center;
+  }
+  .contact-col-text {
+    flex: 1 1 50%;
+    background: #fafafa;
+    padding: 2rem;
+  }
+  .contact-col-text h2 {
+    color: #4c37c6;
+    margin-bottom: 1rem;
+  }
+  .contact-col-text p {
+    margin-bottom: 0.5rem;
+  }
+  .social-links a {
+    display: inline-block;
+    margin-right: 1rem;
+    color: #4c37c6;
+    font-weight: 500;
+  }
+  .social-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* ----------- Footer ----------- */
+  .site-footer {
+    background: #4c37c6;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+  .site-footer p {
+    font-size: 0.9rem;
+  }
+  
+  /* ----------- Responsive Tweaks ----------- */
+  @media (max-width: 768px) {
+    .services-grid, 
+    .why-grid {
+      flex-direction: column;
+      align-items: center;
+    }
+    .contact-section {
+      flex-direction: column;
+    }
+    .contact-col-image, .contact-col-text {
+      width: 100%;
+      flex: auto;
+    }
+  }
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* 2a) Default: Hide the hamburger and show the regular nav on bigger screens */
+.nav-toggle {
+    display: none;
+  }
+  
+  /* 2b) On small screens, show the hamburger and hide the nav by default */
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: block;
+      background: none;  /* style as you wish */
+      border: none;
+      font-size: 1.5rem; /* bigger icon text */
+      cursor: pointer;
+    }
+  
+    .main-nav {
+      position: absolute;  /* or fixed if you want a drawer style */
+      top: 80px;           /* just below header */
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid #eee;
+      display: none;       /* hide by default */
+      flex-direction: column;
+      padding: 1rem;
+    }
+  
+    .main-nav ul {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  
+    /* If the nav is “open,” show it */
+    .main-nav.nav-open {
+      display: flex;
+    }
+  }
+  
+
+
+
+
+
+
+
+  /* Split sections for “diensten” */
+.dienst-split {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.dienst-split.reverse {
+  flex-direction: row-reverse;
+}
+
+.dienst-image {
+  flex: 1;
+  min-height: 400px;
+  background-position: center;
+  background-size: cover;
+}
+
+.dienst-text {
+  flex: 1;
+  background: #fff;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dienst-text h2 {
+  color: #4c37c6;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.dienst-text p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Benefits & CTA sections for the “diensten” page */
+.dienst-benefits {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.dienst-benefits h2 {
+  color: #4c37c6;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dienst-benefits ul {
+  list-style: none;
+  padding: 0;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: left; /* or center, as you wish */
+}
+
+.dienst-benefits li {
+  margin-bottom: 0.7rem;
+  line-height: 1.4;
+}
+
+.dienst-benefits strong {
+  color: #000;
+}
+
+/* CTA */
+.dienst-cta {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.dienst-cta h2 {
+  color: #4c37c6;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+
+
+
+
+
+
+
+
+/* =================== CAR DETAIL PAGE =================== */
+
+/* =========================
+   Single-Image Carousel
+========================= */
+
+.carousel-container {
+  position: relative; /* for arrow positioning */
+  margin-bottom: 2rem;
+  text-align: center; /* so arrows appear centered vertically, if you want */
+}
+
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #4c37c6;
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 4px;
+  opacity: 0.9;
+}
+
+.carousel-arrow:hover {
+  opacity: 0.8;
+}
+
+.arrow-left {
+  left: 10px;
+  opacity: 0.4;
+}
+
+.arrow-right {
+  right: 10px;
+  opacity: 0.4;
+}
+
+/* The single-image container */
+.carousel-single-image {
+  margin: 0 auto;  /* center horizontally */
+}
+
+/* The big image itself */
+#carousel-big-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+
+/* ========== Car Detail Container ========== */
+.car-detail-container {
+  padding: 2rem 1rem;
+}
+
+.car-title {
+  font-size: 2rem;
+  color: #4c37c6;
+  margin-bottom: 0.5rem;
+}
+
+.car-subtitle {
+  color: #666;
+}
+
+.car-info {
+  margin: 1.5rem 0;
+  line-height: 1.6;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.car-card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.car-card img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************
+    CAR DETAIL PAGE / TWO-COLUMN
+**********************************/
+
+.car-detail-page {
+  background: #fff; /* We keep it white, as requested */
+  padding: 2rem 0;
+}
+
+.car-detail-wrapper {
+  /* Two columns: .car-left and .car-right */
+  display: flex;
+  gap: 2rem;
+  max-width: 1200px; /* you can tweak this as needed */
+  margin: 0 auto;    /* center horizontally */
+}
+
+.car-left, .car-right {
+  background: #fff; 
+  flex: 1; /* each takes half space, can refine with specific widths if you prefer */
+}
+
+/* Car heading (title + favorite button) */
+.car-heading {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+.car-heading .car-title {
+  margin: 0; /* remove default heading margin */
+  font-size: 2rem;
+  color: #4c37c6;
+}
+.favorite-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #f00; /* or something else */
+  cursor: pointer;
+}
+
+/* .car-info lines with icons */
+.car-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+.car-line img.icon-img {
+  width: 30px; 
+  height: 30px;
+  margin-right: 0.5rem;
+}
+.car-line i.fa-solid {
+  font-size: 1.3rem;
+  margin-right: 0.4rem;
+}
+.car-line.small-line {
+  margin-top: 1rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* Right column: .calc-box */
+.calc-box {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem; /* spacing from top */
+}
+.calc-box .calc-title {
+  margin: 0;
+  color: #4c37c6;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+.calc-box .calc-desc {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* Responsive fix: if screen narrower than 900 px, go vertical */
+@media (max-width: 900px) {
+  .car-detail-wrapper {
+    flex-direction: column;
+  }
+  .car-left, .car-right {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+}

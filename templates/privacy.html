@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Privacy Statement | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 2rem 1rem; line-height:1.6;">
+  <h1 style="color: #4c37c6; margin-bottom: 1.5rem; font-size:1.8rem;">
+    Privacystatement Neo Lease
+  </h1>
+
+  <!-- We’ll make sub-headings purple as well, smaller font, and spaced. -->
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">1. Wie zijn wij?</h2>
+  <p>
+    Neo Lease is gespecialiseerd in het aanbieden van financiële leaseoplossingen voor auto’s, 
+    gericht op zzp’ers en mkb-ondernemers. Wij hechten grote waarde aan jouw privacy en gaan 
+    zorgvuldig om met jouw persoonsgegevens.
+  </p>
+  <p>
+    <strong>Bedrijfsgegevens:</strong><br>
+    Neo Lease B.V.<br>
+    De Boomgaard 77 te Nijkerk<br>
+    KvK-nummer: 96496118<br>
+    E-mailadres: <a href="mailto:info@neolease.nl">info@neolease.nl</a><br>
+    Website: <a href="https://www.neolease.nl" target="_blank">www.neolease.nl</a>
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">2. Welke persoonsgegevens verwerken wij?</h2>
+  <p>
+    Wij verwerken persoonsgegevens die jij actief aan ons verstrekt, bijvoorbeeld via ons 
+    contactformulier, bij een aanvraag of in het kader van een offerte of overeenkomst.
+  </p>
+  <p>Dit kan onder andere gaan om:</p>
+  <ul style="list-style: disc; margin-left:1.5rem;">
+    <li>Voor- en achternaam</li>
+    <li>Bedrijfsnaam</li>
+    <li>Adresgegevens</li>
+    <li>Telefoonnummer</li>
+    <li>E-mailadres</li>
+    <li>KvK-nummer</li>
+    <li>IBAN (indien van toepassing)</li>
+    <li>Kenteken of voertuiggegevens</li>
+    <li>Inkomensgegevens of andere documenten t.b.v. kredietbeoordeling</li>
+  </ul>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">3. Waarom verwerken wij jouw gegevens?</h2>
+  <p>
+    Wij verwerken jouw persoonsgegevens voor de volgende doeleinden:
+  </p>
+  <ul style="list-style: disc; margin-left:1.5rem;">
+    <li>Het opstellen van offertes</li>
+    <li>Het afsluiten en uitvoeren van leaseovereenkomsten</li>
+    <li>Kredietwaardigheids- en identiteitscontrole</li>
+    <li>Klantenservice en contact</li>
+    <li>Wettelijke verplichtingen (zoals fiscale bewaarplicht)</li>
+    <li>Marketingdoeleinden (alleen met jouw toestemming)</li>
+  </ul>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">4. Op basis van welke grondslagen?</h2>
+  <p>
+    Wij verwerken jouw gegevens op basis van de volgende wettelijke grondslagen:
+  </p>
+  <ul style="list-style: disc; margin-left:1.5rem;">
+    <li>Uitvoering van een overeenkomst</li>
+    <li>Wettelijke verplichting</li>
+    <li>Gerechtvaardigd belang</li>
+    <li>Toestemming (voor marketing)</li>
+  </ul>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">5. Delen wij jouw gegevens met derden?</h2>
+  <p>
+    Wij delen jouw gegevens alleen met derden als dat noodzakelijk is, zoals:
+  </p>
+  <ul style="list-style: disc; margin-left:1.5rem;">
+    <li>Leasemaatschappijen of kredietverstrekkers</li>
+    <li>IT-dienstverleners (bijvoorbeeld hosting of CRM-systemen)</li>
+    <li>Boekhoud- en administratiekantoor</li>
+    <li>Overheidsinstanties, indien wettelijk verplicht</li>
+  </ul>
+  <p>
+    Wij sluiten verwerkersovereenkomsten met partijen die namens ons persoonsgegevens verwerken.
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">6. Hoe lang bewaren wij jouw gegevens?</h2>
+  <p>
+    Wij bewaren jouw persoonsgegevens niet langer dan noodzakelijk is voor het doel 
+    waarvoor ze zijn verzameld, tenzij een langere bewaartermijn wettelijk verplicht is 
+    (bijvoorbeeld 7 jaar voor fiscale gegevens).
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">7. Jouw rechten</h2>
+  <p>Je hebt recht op:</p>
+  <ul style="list-style: disc; margin-left:1.5rem;">
+    <li>Inzage in jouw gegevens</li>
+    <li>Correctie van onjuiste gegevens</li>
+    <li>Verwijdering van jouw gegevens (recht op vergetelheid)</li>
+    <li>Beperking van de verwerking</li>
+    <li>Overdraagbaarheid van gegevens</li>
+    <li>Bezwaar maken tegen de verwerking</li>
+    <li>Intrekken van toestemming (voor zover van toepassing)</li>
+  </ul>
+  <p>
+    Wil je gebruikmaken van één van deze rechten? Neem dan contact met ons op via 
+    <em>[e-mailadres]</em>.
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">8. Cookies</h2>
+  <p>
+    Onze website gebruikt alleen technische en functionele cookies, en analytische cookies 
+    die geen inbreuk maken op jouw privacy. Voor meer informatie, zie ons 
+    <a href="{{ url_for('cookieverklaring') }}">cookiebeleid</a>.
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">9. Beveiliging</h2>
+  <p>
+    Wij nemen passende technische en organisatorische maatregelen om jouw gegevens 
+    te beschermen tegen verlies of enige vorm van onrechtmatige verwerking.
+  </p>
+
+  <h2 style="color:#4c37c6; font-size:1.3rem; margin-top:1.5rem;">10. Vragen of klachten</h2>
+  <p>
+    Heb je vragen over ons privacystatement of de manier waarop wij met jouw 
+    gegevens omgaan? Neem gerust contact met ons op via <em>[e-mailadres]</em>.<br>
+    Ben je niet tevreden over onze reactie, dan kun je een klacht indienen bij 
+    de Autoriteit Persoonsgegevens via 
+    <a href="https://www.autoriteitpersoonsgegevens.nl" target="_blank">www.autoriteitpersoonsgegevens.nl</a>.
+  </p>
+
+  <p style="margin-top:1.5rem;">
+    <em>Laatste wijziging: 1-4-2025</em>
+  </p>
+</section>
+{% endblock %}

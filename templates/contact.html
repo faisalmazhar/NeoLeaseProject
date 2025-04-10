@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Contact | Neo Lease{% endblock %}
+
+{% block content %}
+
+<!-- TOP SECTION: "Ontdek Neo Lease" + an image -->
+<section class="container" style="padding: 2rem 0;">
+  <!-- Wrap in a flex container so the text & image can sit side by side -->
+  <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+    
+    <!-- LEFT: "Ontdek Neo Lease" text -->
+    <div style="flex:1; min-width:250px;">
+      <h2 style="color: #4c37c6; margin-bottom: 0.5rem;">
+        Ontdek Neo Lease: Flexibele Financial Lease voor Jouw Bedrijf
+      </h2>
+      <p style="color: #888; font-size: 0.9rem; margin-bottom: 1rem;">
+        8 mrt 2025 11:44
+      </p>
+      <p style="line-height:1.4;">
+        Bij Neo Lease maken we financial lease eenvoudig en toegankelijk. Of je nu voertuigen,
+        machines of IT-apparatuur nodig hebt, wij bieden flexibele leaseoplossingen die
+        meegroeien met jouw onderneming.
+      </p>
+      <p>
+        <a href="#" style="color: #4c37c6; text-decoration: underline;">
+          Lees meer &raquo;
+        </a>
+      </p>
+    </div>
+    
+    <!-- RIGHT: An image (contact.jpg) -->
+    <div style="
+    flex: 1;
+    min-width: 200px;
+    background-image: url('{{ url_for('static', filename='images/contact.jpg') }}');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 8px;"
+    >
+    </div>
+  
+
+  </div>
+</section>
+
+<!-- MAIN CONTACT SECTION: Big heading + form + contact details -->
+<section class="container" style="padding:2rem 0 4rem 0;">
+  
+  <!-- Big Heading -->
+  <h2 style="color:#4c37c6; font-size:2rem; margin-bottom:1.5rem;">
+    Neem contact met ons op
+  </h2>
+  
+  <!-- Two columns: Form (left), NEO LEASE details (right) -->
+  <div style="display:flex; flex-wrap: wrap; gap:2rem;">
+    
+    <!-- LEFT: Contact Form -->
+    <div style="flex:1; min-width:280px; background:#fff; padding:1rem; border-radius:4px;">
+      <form action="#" method="post">
+        
+        <!-- Naam -->
+        <label for="name" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+          Naam *
+        </label>
+        <input 
+          id="name" 
+          name="name" 
+          required 
+          style="width:100%; margin-bottom:1rem; padding:0.5rem; border:1px solid #ccc; border-radius:4px;"
+        />
+        
+        <!-- Telefoonnummer -->
+        <label for="phone" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+          Telefoonnummer *
+        </label>
+        <input 
+          id="phone" 
+          name="phone" 
+          required 
+          style="width:100%; margin-bottom:1rem; padding:0.5rem; border:1px solid #ccc; border-radius:4px;"
+        />
+        
+        <!-- E-mail -->
+        <label for="email" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+          E-mailadres *
+        </label>
+        <input 
+          type="email"
+          id="email" 
+          name="email" 
+          required 
+          style="width:100%; margin-bottom:1rem; padding:0.5rem; border:1px solid #ccc; border-radius:4px;"
+        />
+        
+        <!-- Bericht -->
+        <label for="message" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+          Bericht *
+        </label>
+        <textarea 
+          id="message" 
+          name="message" 
+          required 
+          style="width:100%; height:100px; margin-bottom:1rem; padding:0.5rem; border:1px solid #ccc; border-radius:4px;"
+        ></textarea>
+        
+        <!-- Checkbox: "Stuur mij een kopie" -->
+        <div style="margin-bottom:1rem;">
+          <input type="checkbox" id="send-copy" name="copy" value="1" />
+          <label for="send-copy">Stuur mij een kopie</label>
+        </div>
+        
+        <!-- Submit -->
+        <button 
+          type="submit" 
+          class="btn purple"
+          style="border:none; cursor:pointer;"
+        >
+          Verzenden
+        </button>
+      </form>
+    </div>
+    
+    <!-- RIGHT: NEO LEASE B.V. Contact Info + Social Icons -->
+    <div style="flex:1; min-width:250px;">
+      <h3 style="margin-bottom:0.5rem;">NEO LEASE B.V.</h3>
+      <p style="margin-bottom:0.5rem;">
+        <a href="mailto:info@neolease.nl" style="color:#4c37c6; text-decoration:none;">
+          info@neolease.nl
+        </a>
+      </p>
+      <p style="margin-bottom:1rem;">
+        <a href="tel:+31858008086" style="color:#4c37c6; text-decoration:none;">
+          +31 85 800 8086
+        </a>
+      </p>
+      
+      <!-- Social icons row -->
+      <div style="display:flex; gap:1rem;">
+        <div style="display:flex; gap:1rem;">
+          <a href="https://instagram.com/neo_lease" target="_blank">
+            <img src="{{ url_for('static', filename='images/instagram.png') }}" 
+                 alt="Instagram" style="width:32px; height:auto;">
+          </a>
+          <a href="https://tiktok.com/@neo.lease" target="_blank">
+            <img src="{{ url_for('static', filename='images/tiktok.png') }}" 
+                 alt="TikTok" style="width:32px; height:auto;">
+          </a>
+          <a href="https://api.whatsapp.com/send?phone=31616118086" target="_blank">
+            <img src="{{ url_for('static', filename='images/whatsapp.png') }}" 
+                 alt="WhatsApp" style="width:32px; height:auto;">
+          </a>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
