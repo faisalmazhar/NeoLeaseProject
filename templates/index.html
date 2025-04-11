@@ -6,16 +6,25 @@
 
   <!-- HERO SECTION -->
   <section class="hero"
-           style="background-image: url('{{ url_for('static', filename='images/index_header.png') }}');">
+    style="background-image: url('{{ url_for('static', filename='images/index_header.png') }}');">
     <div class="overlay"></div>
     <div class="hero-content container">
-      <h1>De Nieuwe Standaard in Financial Lease</h1>
-      <p>Wij regelen financial lease zoals het hoort: snel, transparant en altijd in jouw voordeel.</p>
-      <div class="scroll-down">
-        <span class="arrow">&#x25BC;</span>
-      </div>
+    <h1>De Nieuwe Standaard in Financial Lease</h1>
+    <p>Wij regelen financial lease zoals het hoort: snel, transparant en altijd in jouw voordeel.</p>
+
+    <!-- NEW BUTTON: “View Offer” => link to your /listings page -->
+    <div style="margin-top: 1.5rem;">
+    <a href="{{ url_for('listings') }}" class="btn purple">
+    Bekijk Aanbod  
+    </a>
+    </div>
+
+    <div class="scroll-down">
+    <span class="arrow">&#x25BC;</span>
+    </div>
     </div>
   </section>
+
 
   <!-- TOP INFO-BULLETS SECTION -->
   <section class="info-bullets container">

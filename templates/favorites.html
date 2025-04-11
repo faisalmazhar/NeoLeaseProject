@@ -1,0 +1,101 @@
+{# templates/favorites.html #}
+{% extends "base.html" %}
+{% block title %}Mijn Favorieten | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 1rem;">
+  <h1 style="color:#4c37c6; margin-bottom:1rem;">Mijn Favorieten</h1>
+  <p>Hier vind je de auto's die je als favoriet hebt gemarkeerd.</p>
+
+  <!-- The grid container for favorites -->
+  <div 
+    id="favorites-container" 
+    class="car-grid" 
+    style="margin-top:2rem; 
+           display: grid; 
+           grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+           gap:1rem;">
+    <!-- Cards will be dynamically injected by JS -->
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // 1) Grab favorites from localStorage
+  //    We'll assume we store them as JSON array under "favorites"
+  //    Each favorite might have: {id, title, imageUrl, monthlyPayment} etc.
+  let stored = localStorage.getItem("favorites");
+  let favorites = [];
+  if (stored) {
+    try {
+      favorites = JSON.parse(stored);
+    } catch(e) {
+      console.warn("Could not parse favorites from localStorage");
+      favorites = [];
+    }
+  }
+
+  const container = document.getElementById("favorites-container");
+
+  // If no favorites
+  if (!favorites.length) {
+    container.innerHTML = `<p style="grid-column: 1 / -1;">Je hebt nog geen favorieten toegevoegd.</p>`;
+    return;
+  }
+
+  // 2) Otherwise, build card HTML for each favorite
+  let html = "";
+  favorites.forEach(item => {
+    html += `
+      <div class="car-card">
+        <!-- If we have an image -->
+        ${
+          item.imageUrl 
+          ? `<img src="${item.imageUrl}" alt="Car Image" style="width: 100%; height:auto; margin-bottom:0.5rem;">`
+          : `<div style="background:#ccc; width:100%; height:150px; margin-bottom:0.5rem;">No Image</div>`
+        }
+
+        <h3 style="font-size:1.2rem; color:#4c37c6; margin-bottom:0.5rem;">
+          <a href="/car/${item.id}" style="color:#4c37c6; text-decoration:none;">
+            ${item.title || "Onbekend"}
+          </a>
+        </h3>
+
+        <!-- If monthlyPayment stored, show it -->
+        ${
+          item.monthlyPayment 
+          ? `<p><strong>${item.monthlyPayment}</strong></p>` 
+          : ``
+        }
+
+        <!-- "Un-favorite" button (optional) -->
+        <button 
+          class="btn border" 
+          style="margin-top:1rem;" 
+          onclick="removeFavorite('${item.id}')"
+        >
+          Verwijder uit favorieten
+        </button>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+});
+
+function removeFavorite(carId) {
+  // 1) Load from localStorage
+  let stored = localStorage.getItem("favorites");
+  let favorites = stored ? JSON.parse(stored) : [];
+
+  // 2) Filter out the one with this ID
+  favorites = favorites.filter(f => f.id != carId);
+
+  // 3) Save back to localStorage
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+
+  // 4) Reload the page or re-render
+  location.reload();
+}
+</script>
+{% endblock %}

@@ -100,6 +100,57 @@ document.addEventListener("DOMContentLoaded", () => {
       //   alert('Hier kun je later een popup maken om cookie-instellingen aan te passen.');
       // });
     }
+    
+    const favButtons = document.querySelectorAll('.favorite-btn');
+    favButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const carId = btn.getAttribute('data-car-id');
+        const title = btn.getAttribute('data-title');
+        const imageUrl = btn.getAttribute('data-image') || "";
+        const monthly = btn.getAttribute('data-monthly') || "";
+        addToFavorites(carId, title, imageUrl, monthly);
+      });
+    });
+
+  
+  /** 
+   * addToFavorites: store in localStorage
+   */
+  function addToFavorites(id, title, imageUrl, monthlyPayment) {
+    // 1) get or create "favorites" array from localStorage
+    let stored = localStorage.getItem("favorites");
+    let favorites = [];
+    if (stored) {
+      try {
+        favorites = JSON.parse(stored);
+      } catch(e) {
+        console.warn("Could not parse favorites:", e);
+        favorites = [];
+      }
+    }
+  
+    // 2) Check if already in favorites
+    const exists = favorites.find(item => item.id == id);
+    if (exists) {
+      alert("Deze auto is al in je favorieten!");
+      return;
+    }
+  
+    // 3) Otherwise push new object
+    favorites.push({
+      id: id,
+      title: title,
+      imageUrl: imageUrl,
+      monthlyPayment: monthlyPayment
+    });
+  
+    // 4) Save
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  
+    alert("Toegevoegd aan favorieten!");
+
+    }
+  
 
 });
 

@@ -165,7 +165,7 @@ a {
 .scroll-down {
   position: absolute; 
   /* Instead of bottom: -220px, use something near the bottom: */
-  bottom: 2rem; 
+  bottom: -12rem; 
   left: 50%;    
   transform: translateX(-50%);
   cursor: pointer;

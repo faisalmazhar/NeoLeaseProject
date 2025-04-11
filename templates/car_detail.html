@@ -86,10 +86,17 @@
                 <strong>favoriet</strong> maken of <strong>opslaan</strong> voor later?
                 </p>
             
-                <button class="btn border">
+                <button 
+                class="btn border favorite-btn"
+                data-car-id="{{ car.id }}"
+                data-title="{{ car.title }}"
+                data-image="{{ car.images[0].image_url if car.images and car.images|length > 0 }}"
+                data-monthly="{{ car.financial_lease_price or '' }}"
+                >
                 <i class="fa-regular fa-heart" style="color: #4c36c6;"></i>         
                 Favoriet toevoegen
-                </button>
+              </button>
+              
             </div>
   
         </div> <!-- end car-right -->
