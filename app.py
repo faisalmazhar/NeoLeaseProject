@@ -7,7 +7,9 @@ app = Flask(__name__)
 from utils import parse_price  # or put the function above directly in app.py
 
 # Use the same connection style as your CSV script
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/neolease_db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/neolease_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neolease_db_user:DKuNZ0Z4OhuNKWvEFaAuWINgr7BfgyTE@dpg-cvslkuvdiees73fiv97g-a.oregon-postgres.render.com:5432/neolease_db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -160,9 +162,15 @@ def request_quote(car_id):
 
 # ------------------ Final Startup ------------------
 
+# if __name__ == "__main__":
+#     # Make sure tables exist
+#     with app.app_context():
+#         db.create_all()
+#     # Then run the server
+#     app.run(debug=True)
+
+
 if __name__ == "__main__":
-    # Make sure tables exist
     with app.app_context():
         db.create_all()
-    # Then run the server
     app.run(debug=True)
