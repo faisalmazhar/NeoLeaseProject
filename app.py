@@ -16,23 +16,19 @@ db.init_app(app)
 
 # ------------------ Define Routes Below ------------------
 
+# @app.route("/")
+# def index():
+#     return render_template("index.html")
 @app.route("/")
 def index():
-    return render_template("index.html")
+    total_cars = CarListing.query.count()  # Number of all listings
+    return render_template("index.html", total_cars=total_cars)
 
 @app.route('/calculator')
 def general_calculator():
     # Maybe just show a generic form or instructions
     return render_template('calculator_general.html')
 
-
-
-# @app.route("/calculator/<int:car_id>")
-# def calculator(car_id):
-#     # Fetch the car from DB
-#     car = CarListing.query.get_or_404(car_id)
-#     # Pass the car into the calculator template
-#     return render_template("calculator.html", car=car)
 
 
 @app.route("/calculator/<int:car_id>")
@@ -97,16 +93,97 @@ def contact():
 def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
-    
-    # Paginate CarListing items from the database
-    pagination = CarListing.query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # 1) Grab distinct brands for the “Merk” dropdown
+    distinct_brands = db.session.query(CarListing.merk)\
+                        .filter(CarListing.merk.isnot(None))\
+                        .distinct()\
+                        .order_by(CarListing.merk.asc())\
+                        .all()
+    # This gives a list of tuples like [(“Audi”,), (“BMW”,)...]
+    # Convert them to a simple list:
+    brand_choices = [b[0] for b in distinct_brands if b[0]]
+
+    # 2) Gather GET filters
+    brand_filter = request.args.get("brand")       # e.g. “Audi”
+    budget_filter = request.args.get("budget")     # e.g. “25000”
+    search_query  = request.args.get("q")          # e.g. “Panoramadak”
+
+    # 3) Start building base query
+    query = CarListing.query
+
+    # 3a) Brand filter
+    if brand_filter:
+        query = query.filter(CarListing.merk.ilike(f"%{brand_filter}%"))
+
+    # 3b) Budget filter => assume “budget” means “max price” or a range
+    #    We must parse CarListing.prijs from its string form
+    #    into numeric. In a real scenario, you’d store price numeric in DB.
+    if budget_filter:
+        # Convert our “budget” to float and compare
+        # Because your ‘prijs’ is a string like “29.950,-”, we can reuse parse_price:
+        from utils import parse_price
+        max_budget = float(budget_filter)
+        # We only want listings whose numeric price <= max_budget
+        # We do a custom check on each row (which typically requires a hybrid property or CAST).
+        # As a quick fix in plain SQLAlchemy:
+        # We do a custom text-based cast. (But be mindful of DB engine differences.)
+        # Example approach:
+        query = query.filter(
+            db.func.cast(
+                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
+                db.Float
+            ) <= max_budget
+        )
+
+    # 3c) Free-text search for “q”
+    if search_query:
+        # Search across ‘title’ + ‘subtitle’ + ‘model’ for example:
+        query = query.filter(
+            db.or_(
+                CarListing.title.ilike(f"%{search_query}%"),
+                CarListing.subtitle.ilike(f"%{search_query}%"),
+                CarListing.model.ilike(f"%{search_query}%")
+            )
+        )
+
+    sort = request.args.get("sort")  # "price_asc" or "price_desc"
+    if sort == "price_asc":
+        # Because CarListing.prijs is a string, we need to cast it to numeric.
+        # Example approach:
+        query = query.order_by(
+            db.func.cast(
+                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
+                db.Float
+            ).asc()
+        )
+    elif sort == "price_desc":
+        query = query.order_by(
+            db.func.cast(
+                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
+                db.Float
+            ).desc()
+        )
+
+
+    # 4) Paginate
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # 5) Pass brand_choices and search_query, brand_filter, etc. into the template
     return render_template(
         "listings.html",
         cars=pagination.items,
         page=page,
         total_pages=pagination.pages,
+        brand_choices=brand_choices,
+        current_brand=brand_filter,
+        current_budget=budget_filter,
+        current_q=search_query,
+        current_sort=sort,             # Add this
+        pagination=pagination   # <-- Add this
+
     )
+
 
 
 @app.route("/submit-quote", methods=["POST"])

@@ -4,52 +4,126 @@
 
 {% block content %}
 <section class="container" style="padding: 2rem 1rem;">
-  <h1 style="color: #4c37c6; font-size: 2rem; margin-bottom: 1rem;">Ons aanbod</h1>
+  <h1 style="color: #4c37c6; font-size: 2rem; margin-bottom: 1.5rem;">Ons aanbod</h1>
+
+  <!-- FILTER BAR (EXAMPLE) -->
+  <div class="filter-bar" style="margin-bottom: 2rem;">
+    <!-- Form that performs a GET request to /listings -->
+    <form action="{{ url_for('listings') }}" method="get" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+      
+      <!-- 1) Free-text search (q) -->
+      <input
+        type="text"
+        name="q"
+        placeholder="Zoeken (bijv. 'GTI' of 'Panoramadak')"
+        value="{{ current_q or '' }}"
+        style="padding: 0.5rem; flex: 0 0 200px; max-width: 250px;"
+      >
+
+      <!-- 2) Merk dropdown from brand_choices (provided by app.py) -->
+      <select
+        name="brand"
+        style="padding: 0.5rem; min-width: 160px;"
+      >
+        <option value="">- Kies een merk -</option>
+        {% if brand_choices %}
+          {% for b in brand_choices %}
+            <option value="{{ b }}"
+              {% if current_brand == b %} selected {% endif %}
+            >
+              {{ b }}
+            </option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      <!-- 3) Example Budget filter (budget param) -->
+      <select
+        name="budget"
+        style="padding: 0.5rem; min-width: 160px;"
+      >
+        <option value="">- Budget (max) -</option>
+        <option value="10000" {% if current_budget == '10000' %} selected {% endif %}>Tot €10.000</option>
+        <option value="15000" {% if current_budget == '15000' %} selected {% endif %}>Tot €15.000</option>
+        <option value="20000" {% if current_budget == '20000' %} selected {% endif %}>Tot €20.000</option>
+        <option value="25000" {% if current_budget == '25000' %} selected {% endif %}>Tot €25.000</option>
+        <option value="30000" {% if current_budget == '30000' %} selected {% endif %}>Tot €30.000</option>
+        <option value="40000" {% if current_budget == '40000' %} selected {% endif %}>Tot €40.000</option>
+        <option value="50000" {% if current_budget == '50000' %} selected {% endif %}>Tot €50.000</option>
+      </select>
+
+      <!-- 4) Sort example (sort param) -->
+      <select name="sort">
+        <option value="">- Sorteer op -</option>
+        <option value="price_asc"
+          {% if current_sort == 'price_asc' %}selected{% endif %}
+        >Prijs (Laag - Hoog)</option>
+        <option value="price_desc"
+          {% if current_sort == 'price_desc' %}selected{% endif %}
+        >Prijs (Hoog - Laag)</option>
+      </select>
+
+      <!-- 5) Submit button -->
+      <button
+        type="submit"
+        class="btn border"
+        style="padding: 0.5rem 1rem;"
+      >
+        Filteren
+      </button>
+    </form>
+  </div>
   
+  <!-- Optional text showing how many results in total (if you pass pagination.total) -->
+  {% if pagination.total %}
+    <p style="margin-bottom: 1.5rem;">{{ pagination.total }} resultaten gevonden</p>
+  {% endif %}
+  
+  <!-- CAR GRID -->
   <div class="car-grid" style="
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1rem;
   ">
     {% for car in cars %}
-      <div class="car-card" style="border:1px solid #ddd; padding:1rem; border-radius:6px;">
+      <div class="car-card" style="border: 1px solid #ddd; padding: 1rem; border-radius: 6px;">
         
         <!-- Clickable image -->
-        <a href="{{ url_for('car_detail', car_id=car.id) }}" style="display:block;">
+        <a href="{{ url_for('car_detail', car_id=car.id) }}" style="display: block;">
           {% if car.images and car.images|length > 0 %}
-            <img 
-              src="{{ car.images[0].image_url }}" 
+            <img
+              src="{{ car.images[0].image_url }}"
               alt="Car Image"
               style="width: 100%; height: auto; margin-bottom: 0.5rem;"
             >
           {% else %}
-            <div style="background:#ccc; width:100%; height:150px; margin-bottom:0.5rem;">
-              No Image
+            <div style="background: #ccc; width: 100%; height: 150px; margin-bottom: 0.5rem;">
+              Geen afbeelding
             </div>
           {% endif %}
         </a>
 
         <!-- Title text that underlines on hover -->
-        <h3 style="font-size:1.2rem;">
-          <a 
+        <h3 style="font-size: 1.2rem;">
+          <a
             href="{{ url_for('car_detail', car_id=car.id) }}"
-            style="color:#4c37c6; text-decoration:none;"
+            style="color: #4c37c6; text-decoration: none;"
             class="car-title-link"
           >
             {{ car.title or 'Onbekend' }}
           </a>
         </h3>
 
-        <p style="color:#999; margin-bottom:0.5rem;">{{ car.subtitle }}</p>
+        <p style="color: #999; margin-bottom: 0.5rem;">{{ car.subtitle }}</p>
         <p style="margin-bottom: 0.5rem;">
           <strong>{{ car.financial_lease_price }}</strong> / {{ car.financial_lease_term }}
         </p>
         <p>Merk: {{ car.merk }}, Model: {{ car.model }}</p>
         
-        <!-- Existing “Meer info” button -->
-        <a 
+        <!-- “Meer info” button -->
+        <a
           href="{{ url_for('car_detail', car_id=car.id) }}"
-          style="display:inline-block; margin-top:1rem;" 
+          style="display: inline-block; margin-top: 1rem;"
           class="btn border"
         >
           Meer info
@@ -58,13 +132,22 @@
     {% endfor %}
   </div>
 
-  <div style="text-align:center; margin-top:2rem;">
+  <!-- PAGINATION -->
+  <div style="text-align: center; margin-top: 2rem;">
     {% if page > 1 %}
-      <a href="{{ url_for('listings', page=page-1) }}">&laquo; Vorige</a>
+      <a href="{{ url_for('listings', page=page-1,
+                          brand=current_brand,
+                          q=current_q,
+                          budget=current_budget,
+                          sort=request.args.get('sort')) }}">&laquo; Vorige</a>
     {% endif %}
     <span style="margin:0 1rem;">Pagina {{ page }} van {{ total_pages }}</span>
     {% if page < total_pages %}
-      <a href="{{ url_for('listings', page=page+1) }}">Volgende &raquo;</a>
+      <a href="{{ url_for('listings', page=page+1,
+                          brand=current_brand,
+                          q=current_q,
+                          budget=current_budget,
+                          sort=request.args.get('sort')) }}">Volgende &raquo;</a>
     {% endif %}
   </div>
 </section>
