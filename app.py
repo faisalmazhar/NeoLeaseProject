@@ -156,7 +156,7 @@ def listings():
             
             query = query.filter(
                 db.func.cast(
-                    db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'),
+                    db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
                     db.Float
                 ) >= min_total
             )
@@ -172,7 +172,7 @@ def listings():
 
                 query = query.filter(
                     db.func.cast(
-                        db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'),
+                        db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
                         db.Float
                     ).between(lo_total, hi_total)
                 )
@@ -181,11 +181,11 @@ def listings():
     sort = request.args.get("sort")
     if sort == "price_asc":
         query = query.order_by(
-            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), db.Float).asc()
+            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).asc()
         )
     elif sort == "price_desc":
         query = query.order_by(
-            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), db.Float).desc()
+            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).desc()
         )
 
     # Paginate
