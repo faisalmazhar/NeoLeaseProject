@@ -37,20 +37,47 @@
         {% endif %}
       </select>
 
-      <!-- 3) Example Budget filter (budget param) -->
-      <select
-        name="budget"
-        style="padding: 0.5rem; min-width: 160px;"
-      >
-        <option value="">- Budget (max) -</option>
-        <option value="10000" {% if current_budget == '10000' %} selected {% endif %}>Tot €10.000</option>
-        <option value="15000" {% if current_budget == '15000' %} selected {% endif %}>Tot €15.000</option>
-        <option value="20000" {% if current_budget == '20000' %} selected {% endif %}>Tot €20.000</option>
-        <option value="25000" {% if current_budget == '25000' %} selected {% endif %}>Tot €25.000</option>
-        <option value="30000" {% if current_budget == '30000' %} selected {% endif %}>Tot €30.000</option>
-        <option value="40000" {% if current_budget == '40000' %} selected {% endif %}>Tot €40.000</option>
-        <option value="50000" {% if current_budget == '50000' %} selected {% endif %}>Tot €50.000</option>
-      </select>
+    <!-- 3) Monthly budget filter (similar to homepage) -->
+    <select
+      name="monthly"
+      style="padding: 0.5rem; min-width: 160px;"
+    >
+      <option value="">- Budget (p/m) -</option>
+      <option value="1-99"
+        {% if current_monthly == '1-99' %} selected {% endif %}
+      >€1 - €99 p/m</option>
+      <option value="100-199"
+        {% if current_monthly == '100-199' %} selected {% endif %}
+      >€100 - €199 p/m</option>
+      <option value="200-299"
+        {% if current_monthly == '200-299' %} selected {% endif %}
+      >€200 - €299 p/m</option>
+      <option value="300-399"
+        {% if current_monthly == '300-399' %} selected {% endif %}
+      >€300 - €399 p/m</option>
+      <option value="400-499"
+        {% if current_monthly == '400-499' %} selected {% endif %}
+      >€400 - €499 p/m</option>
+      <option value="500-599"
+        {% if current_monthly == '500-599' %} selected {% endif %}
+      >€500 - €599 p/m</option>
+      <option value="600-699"
+        {% if current_monthly == '600-699' %} selected {% endif %}
+      >€600 - €699 p/m</option>
+      <option value="700-799"
+        {% if current_monthly == '700-799' %} selected {% endif %}
+      >€700 - €799 p/m</option>
+      <option value="800-899"
+        {% if current_monthly == '800-899' %} selected {% endif %}
+      >€800 - €899 p/m</option>
+      <option value="900-999"
+        {% if current_monthly == '900-999' %} selected {% endif %}
+      >€900 - €999 p/m</option>
+      <option value="1000+"
+        {% if current_monthly == '1000+' %} selected {% endif %}
+      >€1000 + p/m</option>
+    </select>
+
 
       <!-- 4) Sort example (sort param) -->
       <select name="sort">
@@ -133,22 +160,26 @@
   </div>
 
   <!-- PAGINATION -->
-  <div style="text-align: center; margin-top: 2rem;">
-    {% if page > 1 %}
-      <a href="{{ url_for('listings', page=page-1,
-                          brand=current_brand,
-                          q=current_q,
-                          budget=current_budget,
-                          sort=request.args.get('sort')) }}">&laquo; Vorige</a>
-    {% endif %}
-    <span style="margin:0 1rem;">Pagina {{ page }} van {{ total_pages }}</span>
-    {% if page < total_pages %}
-      <a href="{{ url_for('listings', page=page+1,
-                          brand=current_brand,
-                          q=current_q,
-                          budget=current_budget,
-                          sort=request.args.get('sort')) }}">Volgende &raquo;</a>
-    {% endif %}
+  {% if page > 1 %}
+    <a href="{{ url_for('listings', page=page-1,
+                        brand=current_brand,
+                        q=current_q,
+                        monthly=current_monthly,
+                        sort=request.args.get('sort')) }}">
+      &laquo; Vorige
+    </a>
+  {% endif %}
+  <span style="margin:0 1rem;">Pagina {{ page }} van {{ total_pages }}</span>
+  {% if page < total_pages %}
+    <a href="{{ url_for('listings', page=page+1,
+                        brand=current_brand,
+                        q=current_q,
+                        monthly=current_monthly,
+                        sort=request.args.get('sort')) }}">
+      Volgende &raquo;
+    </a>
+  {% endif %}
+
   </div>
 </section>
 {% endblock %}

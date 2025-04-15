@@ -16,36 +16,46 @@
     <!-- Some new “filter box” near the top or inside your hero or below it -->
     <div class="filter-box" style="background:#f9f9f9; padding:1rem; border-radius:8px; max-width:400px;">
       <form action="{{ url_for('listings') }}" method="get" style="display:flex; flex-direction:column; gap:1rem;">
-        <!-- 1) Merk en Model (we’ll just call it “q” for an all-in-one search) -->
-        <label for="q" style="font-weight:bold;">Merk en Model</label>
-        <select id="q" name="q" style="padding:0.5rem;">
-          <option value="">--Selecteer merk/model--</option>
-          <option value="Volkswagen">Volkswagen</option>
-          <option value="Mercedes">Mercedes</option>
-          <option value="Audi">Audi</option>
-          <!-- etc. Or use a text input if you prefer. -->
+    
+        <!-- 1) Merk & Model => brand dropdown (dynamic) or a text input for model -->
+        <label for="brand" style="font-weight:bold;">Merk en model</label>
+        <select id="brand" name="brand" style="padding:0.5rem;">
+          <option value="">-- Alle merken --</option>
+          {% if brand_choices %}
+            {% for b in brand_choices %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          {% endif %}
         </select>
-
-        <!-- 2) Kies je budget -->
-        <label for="budget" style="font-weight:bold;">Kies je budget</label>
-        <select id="budget" name="budget" style="padding:0.5rem;">
-          <option value="">--Geen budgetlimiet--</option>
-          <option value="10000">Tot €10.000</option>
-          <option value="15000">Tot €15.000</option>
-          <option value="20000">Tot €20.000</option>
-          <option value="30000">Tot €30.000</option>
-          <option value="40000">Tot €40.000</option>
-          <!-- etc. -->
+        <!-- Alternatively, if you want “Merk en model” to be a text input for free search, 
+             you can do name="q" instead. But here we’re copying the approach from listings. -->
+        
+        <!-- 2) Monthly budget dropdown -->
+        <label for="budget" style="font-weight:bold;">Kies je budget (p/m)</label>
+        <select id="budget" name="monthly" style="padding:0.5rem;">
+          <option value="">Geen budget</option>
+          <option value="1-99">€1 - €99 p/m</option>
+          <option value="100-199">€100 - €199 p/m</option>
+          <option value="200-299">€200 - €299 p/m</option>
+          <option value="300-399">€300 - €399 p/m</option>
+          <option value="400-499">€400 - €499 p/m</option>
+          <option value="500-599">€500 - €599 p/m</option>
+          <option value="600-699">€600 - €699 p/m</option>
+          <option value="700-799">€700 - €799 p/m</option>
+          <option value="800-899">€800 - €899 p/m</option>
+          <option value="900-999">€900 - €999 p/m</option>
+          <option value="1000+">€1000 > p/m</option>
         </select>
-
-        <!-- 3) Big green button that shows total_cars from your route -->
+        <!-- Notice we call the param “monthly” to differentiate from the old “budget” param. -->
+    
+        <!-- 3) Big button that shows total_cars -->
         <button type="submit"
-                style="background:green; color:white; padding:0.75rem; font-size:1rem; border:none; border-radius:4px;">
+                style="background:#4c37c6; color:white; padding:0.75rem; font-size:1rem; border:none; border-radius:4px;">
           Bekijk aanbod ({{ total_cars }})
         </button>
       </form>
     </div>
-
+    
 
     <div class="scroll-down">
     <span class="arrow">&#x25BC;</span>

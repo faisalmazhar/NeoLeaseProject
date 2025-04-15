@@ -16,13 +16,28 @@ db.init_app(app)
 
 # ------------------ Define Routes Below ------------------
 
+
 # @app.route("/")
 # def index():
-#     return render_template("index.html")
+#     total_cars = CarListing.query.count()  # Number of all listings
+#     return render_template("index.html", total_cars=total_cars)
+
 @app.route("/")
 def index():
-    total_cars = CarListing.query.count()  # Number of all listings
-    return render_template("index.html", total_cars=total_cars)
+    # 1) total cars count
+    total_cars = CarListing.query.count()
+
+    # 2) distinct brand list
+    distinct_brands = db.session.query(CarListing.merk)\
+                        .filter(CarListing.merk.isnot(None))\
+                        .distinct()\
+                        .order_by(CarListing.merk.asc())\
+                        .all()
+    brand_choices = [b[0] for b in distinct_brands if b[0]]
+
+    return render_template("index.html", total_cars=total_cars, brand_choices=brand_choices)
+
+
 
 @app.route('/calculator')
 def general_calculator():
@@ -94,82 +109,88 @@ def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
 
-    # 1) Grab distinct brands for the “Merk” dropdown
+    # distinct brand list
     distinct_brands = db.session.query(CarListing.merk)\
                         .filter(CarListing.merk.isnot(None))\
                         .distinct()\
                         .order_by(CarListing.merk.asc())\
                         .all()
-    # This gives a list of tuples like [(“Audi”,), (“BMW”,)...]
-    # Convert them to a simple list:
     brand_choices = [b[0] for b in distinct_brands if b[0]]
 
-    # 2) Gather GET filters
-    brand_filter = request.args.get("brand")       # e.g. “Audi”
-    budget_filter = request.args.get("budget")     # e.g. “25000”
-    search_query  = request.args.get("q")          # e.g. “Panoramadak”
+    # Gather filters
+    brand_filter   = request.args.get("brand")
+    search_query   = request.args.get("q")
+    
+    # The new monthly range string, e.g. "200-299" or "1000+"
+    monthly_param  = request.args.get("monthly")
 
-    # 3) Start building base query
     query = CarListing.query
-
-    # 3a) Brand filter
+    
+    # brand
     if brand_filter:
         query = query.filter(CarListing.merk.ilike(f"%{brand_filter}%"))
 
-    # 3b) Budget filter => assume “budget” means “max price” or a range
-    #    We must parse CarListing.prijs from its string form
-    #    into numeric. In a real scenario, you’d store price numeric in DB.
-    if budget_filter:
-        # Convert our “budget” to float and compare
-        # Because your ‘prijs’ is a string like “29.950,-”, we can reuse parse_price:
-        from utils import parse_price
-        max_budget = float(budget_filter)
-        # We only want listings whose numeric price <= max_budget
-        # We do a custom check on each row (which typically requires a hybrid property or CAST).
-        # As a quick fix in plain SQLAlchemy:
-        # We do a custom text-based cast. (But be mindful of DB engine differences.)
-        # Example approach:
-        query = query.filter(
-            db.func.cast(
-                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
-                db.Float
-            ) <= max_budget
-        )
-
-    # 3c) Free-text search for “q”
+    # If the user typed a free-text search
     if search_query:
-        # Search across ‘title’ + ‘subtitle’ + ‘model’ for example:
+        from sqlalchemy import or_
         query = query.filter(
-            db.or_(
+            or_(
                 CarListing.title.ilike(f"%{search_query}%"),
                 CarListing.subtitle.ilike(f"%{search_query}%"),
                 CarListing.model.ilike(f"%{search_query}%")
             )
         )
 
-    sort = request.args.get("sort")  # "price_asc" or "price_desc"
+    # If we got a monthly param (like "200-299", "1-99", or "1000+"), 
+    # convert that to total price range:
+    if monthly_param:
+        from utils import parse_price
+        # We'll assume 60 months. 
+        # So "x-y" means total price range [x*60, y*60].
+        # "1000+" means monthly >= 1000 => total >= 1000*60 => 60000
+        if monthly_param.endswith("+"):
+            # e.g. "1000+" => min 1000 => total >= 60000
+            min_val_str = monthly_param.replace("+", "")  # "1000"
+            min_val = float(min_val_str)
+            min_total = min_val * 60.0
+            
+            query = query.filter(
+                db.func.cast(
+                    db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'),
+                    db.Float
+                ) >= min_total
+            )
+
+        else:
+            # e.g. "200-299"
+            parts = monthly_param.split("-")
+            if len(parts) == 2:
+                lo = float(parts[0])  # 200
+                hi = float(parts[1])  # 299
+                lo_total = lo * 60.0
+                hi_total = hi * 60.0
+
+                query = query.filter(
+                    db.func.cast(
+                        db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'),
+                        db.Float
+                    ).between(lo_total, hi_total)
+                )
+
+    # (Optional) if you still want sorting logic
+    sort = request.args.get("sort")
     if sort == "price_asc":
-        # Because CarListing.prijs is a string, we need to cast it to numeric.
-        # Example approach:
         query = query.order_by(
-            db.func.cast(
-                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
-                db.Float
-            ).asc()
+            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), db.Float).asc()
         )
     elif sort == "price_desc":
         query = query.order_by(
-            db.func.cast(
-                db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), 
-                db.Float
-            ).desc()
+            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9.]', '', 'g'), db.Float).desc()
         )
 
-
-    # 4) Paginate
+    # Paginate
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    # 5) Pass brand_choices and search_query, brand_filter, etc. into the template
     return render_template(
         "listings.html",
         cars=pagination.items,
@@ -177,11 +198,10 @@ def listings():
         total_pages=pagination.pages,
         brand_choices=brand_choices,
         current_brand=brand_filter,
-        current_budget=budget_filter,
         current_q=search_query,
-        current_sort=sort,             # Add this
-        pagination=pagination   # <-- Add this
-
+        current_sort=sort,
+        current_monthly=monthly_param,     # <--- Add this line
+        pagination=pagination
     )
 
 
