@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, abort
 from models import db, CarListing
 import logging
+from sqlalchemy import func  # Add this import for random()
 app = Flask(__name__)
 from utils import parse_price  # or put the function above directly in app.py
 
@@ -34,8 +35,9 @@ def index():
                         .order_by(CarListing.merk.asc())\
                         .all()
     brand_choices = [b[0] for b in distinct_brands if b[0]]
+    random_cars = CarListing.query.order_by(func.random()).limit(10).all()
 
-    return render_template("index.html", total_cars=total_cars, brand_choices=brand_choices)
+    return render_template("index.html", total_cars=total_cars, random_cars=random_cars, brand_choices=brand_choices)
 
 
 
@@ -84,6 +86,13 @@ def cookieverklaring():
 def privacy():
     return render_template('privacy.html')
 
+@app.route("/disclaimer")
+def disclaimer():
+    return render_template("disclaimer.html")
+
+@app.route("/short-lease")
+def short_lease():
+    return render_template("short_lease.html")
 
 
 @app.route('/operational-lease')
@@ -191,11 +200,39 @@ def listings():
     # Paginate
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # Right after pagination = query.paginate(...):
+
+    page = pagination.page          # The current page
+    total_pages = pagination.pages  # The total number of pages
+
+    # 1) Try to center "page" with +/-2
+    start_page = page - 2
+    if start_page < 1:
+        start_page = 1
+
+    end_page = page + 2
+    if end_page > total_pages:
+        end_page = total_pages
+
+    # 2) Make sure we always show 5 pages if possible
+    window_size = end_page - start_page + 1
+    if window_size < 5:
+        if start_page == 1:
+            # Bump end_page up if we can
+            end_page = min(total_pages, start_page + 4)
+        else:
+            # Shift start_page down
+            start_page = max(1, end_page - 4)
+
+
+
     return render_template(
         "listings.html",
         cars=pagination.items,
         page=page,
         total_pages=pagination.pages,
+        start_page=start_page,     # <--- ADD THIS
+        end_page=end_page,         # <--- AND THIS
         brand_choices=brand_choices,
         current_brand=brand_filter,
         current_q=search_query,
@@ -238,7 +275,13 @@ def submit_quote():
 def car_detail(car_id):
     # Grab the CarListing from DB or 404
     car = CarListing.query.get_or_404(car_id)
-    return render_template("car_detail.html", car=car)
+    random_cars = CarListing.query.order_by(func.random()).limit(10).all()
+
+    return render_template(
+        "car_detail.html",
+        car=car,
+        random_cars=random_cars   # <-- pass these to the template
+        )
 
 @app.route("/request-quote/<int:car_id>")
 def request_quote(car_id):

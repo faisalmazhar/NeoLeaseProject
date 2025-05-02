@@ -111,6 +111,23 @@
         <strong>Start met leasen!</strong><br>
         Neem contact op voor een offerte op maat.
       </p>
+
+            <!-- =============================================== -->
+      <!-- NEW ERROR BOX DIV: put it right here, so it shows above the button -->
+      <div 
+        id="errorBox" 
+        style="
+          display: none; 
+          background: #f44336; /* typical red color */
+          color: #fff; 
+          padding: 1rem;
+          margin: 1rem 0; 
+          border-radius: 4px;
+        "
+      >
+        <!-- We will fill this text dynamically in JS -->
+      </div>
+      <!-- =============================================== -->
       
       <button 
         id="applyNowBtn"
@@ -134,56 +151,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Grab references to the fields
-  const purchasePriceInput = document.getElementById('purchasePrice');
-  const downPaymentInput   = document.getElementById('downPayment');
-  const balloonInput       = document.getElementById('balloon');
-  const monthsRange        = document.getElementById('monthsRange');
-  const monthsValueLabel   = document.getElementById('monthsValue');
-  const monthlyPayment     = document.getElementById('monthlyPayment');
-  
-  function recalc() {
-    const purchase = parseFloat(purchasePriceInput.value) || 30000;
-    const down     = parseFloat(downPaymentInput.value)   || 5000;
-    const balloon  = parseFloat(balloonInput.value)       || 10000;
-    const months   = parseInt(monthsRange.value)          || 60;
 
-    // Basic formula example:
-    //  financed = (purchase - down - balloon)
-    //  monthly = financed / months + (some interest factor)
-    //  We'll do a super simplified approach:
-    const financed = purchase - down - balloon;
-    // Suppose interest is ~10% APR => monthly rate ~ 0.0083
-    const monthlyRate = 0.0083;
-    // monthly interest portion:
-    const interestPart = financed * monthlyRate;
-    // principal:
-    const principalPart = financed / months;
-    const totalMonth = interestPart + principalPart;
-
-    // Round to 2 decimals
-    monthlyPayment.textContent = "€" + totalMonth.toFixed(2);
-
-    // Show the slider label
-    monthsValueLabel.textContent = months;
-  }
-
-  // Listen for changes
-  purchasePriceInput.addEventListener('input', recalc);
-  downPaymentInput.addEventListener('input', recalc);
-  balloonInput.addEventListener('input', recalc);
-  monthsRange.addEventListener('input', recalc);
-
-  // Initial calc
-  recalc();
-
-  // “Nu aanvragen” button => maybe link to contact?
-  const applyBtn = document.getElementById('applyNowBtn');
-  applyBtn.addEventListener('click', () => {
-    window.location.href = "{{ url_for('contact') }}";
-  });
-});
-</script>
 {% endblock %}

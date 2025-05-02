@@ -34,10 +34,51 @@ a {
   color: inherit;
 }
 
-.container {
-  width: 90%;
-  max-width: 1200px;
+/* .container {
+  max-width: 100% !important;
   margin: 0 auto;
+} */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;        /* center at larger sizes */
+  padding-inline: 2rem !important;       /* minimal horizontal padding */
+}
+
+/* On “small” screens, limit the container to 540px wide */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* On “medium” screens (tablets, ~768px) => 720px max */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+/* On “large” screens (~992px) => 960px max */
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* On “extra‐large” screens (~1200px) => 1140px or 1200px max */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* On “XXL” (if you want an even larger breakpoint at ~1400px) => 1320px max */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
 }
 
 
@@ -47,6 +88,9 @@ a {
 .site-header {
   background: #ffffff;
   border-bottom: 1px solid #eee;
+  position: relative; /* Add this if it's not already there */
+  z-index: 9999; /* High z-index to ensure the header is always on top */
+
 }
 
 .header-inner {
@@ -107,7 +151,8 @@ a {
 
   .main-nav {
     position: absolute; 
-    top: 80px;  
+    top:100%;
+    /* top: 80px;   */
     left: 0;
     right: 0;
     background: #fff;
@@ -136,16 +181,48 @@ a {
   min-height: 60vh;
   background-size: cover;
   background-position: center;
+  overflow: hidden;
+
 }
+
+.hero-slide-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+.hero-slide {
+  position: absolute;
+  top: 0; left: 0;
+  height: 70vh;
+  width: 100%; 
+  /* height: 100%; */
+  object-fit: cover;     /* crops/fills if the images differ in size */
+  
+  opacity: 0;            /* all slides start out invisible */
+  transition: opacity 2s ease-in-out;
+}
+
+
+.hero-slide.active {
+  opacity: 1;            /* the “active” slide becomes visible */
+  z-index: 1;
+}
+
 
 .hero .overlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  z-index: 2;
 }
 
 .hero-content {
   position: relative;
+  z-index: 3;
   text-align: center;
   color: #fff;
   padding: 100px 0;
@@ -230,23 +307,26 @@ a {
 }
 
 .btn.purple {
-  background: #4c37c6;
+  background: #4c37c6 !important;
   color: #fff;
 }
 
 .btn.purple:hover{
-  color: #4c36c6;
+  background: #250eab !important;
+  color: #fff;
+
+  /* color: #4c36c6; */
 }
 
 .btn.border {
-  background: transparent;
-  color: #4c37c6;
+  background: #4c37c6 !important;
+  color: #fff;
   border: 2px solid #4c37c6;
   margin-top: 1rem;
 }
 
 .btn.border:hover {
-  background: #4c37c6;
+  background: #250eab;
   color: #fff;
 }
 
@@ -259,7 +339,7 @@ a {
 .start-today h2 {
   text-align: center;
   color: #4c37c6;
-  margin-bottom: 2rem;
+  padding-block: 3rem;
   font-size: clamp(1.5rem, 4vw, 2rem);
 }
 
@@ -274,7 +354,7 @@ a {
 .service-item {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  /* width: 300px; */
   background: #fff;
   border-radius: 8px;
   text-align: center;
@@ -311,10 +391,29 @@ a {
   margin-top: 2rem;
 }
 
+
+.services-grid,
+.why-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;  /* Spreads items from left to right */
+  margin: 2rem auto;               /* optional margin */
+}
+
+/* Let each item grow to fill leftover space, with a min width to prevent tiny columns */
+.service-item,
 .why-item {
-  flex: 1 1 250px;
-  max-width: 300px;
+  flex: 1 1 0;            /* or flex: 1 1 auto; */
+  min-width: 260px;       /* So they don’t get too narrow on smaller screens */
+  max-width: 360px;       /* If you want some upper bound (optional) */
+  background: #fff;
+  border-radius: 8px;
   text-align: center;
+  margin: 0 auto;         /* If you prefer them centered when you have fewer than 3 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .why-img {
@@ -409,6 +508,16 @@ a {
   font-size: 0.9rem;
 }
 
+.site-footer a {
+  text-decoration: none;
+  transition: text-decoration 0.2s ease;
+
+}
+
+.site-footer a:hover {
+  text-decoration: underline !important;
+}
+
 /* =========================
    RESPONSIVE TWEAKS
 ========================= */
@@ -429,6 +538,7 @@ a {
     flex: auto;
   }
 }
+
 
 
 /* =========================
@@ -539,6 +649,11 @@ a {
   margin-bottom: 0.5rem;
 } */
 
+.car-card p {
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word; /* ensures extra-long text moves to a new line */
+}
 
 
 .car-card {
@@ -607,15 +722,24 @@ a {
 }
 
 .car-detail-wrapper {
+  display: flex;
+  margin: 0 auto;
+  gap: 2rem; /* some spacing between left & right columns */
   max-width: 1200px;
-  margin: 0 6rem;
+  /* margin: 0 6rem; */
 }
 
+.left-column {
+  /* flex: 0.65;            */
+  max-width: 1220px;       /* do not exceed 700px wide */
+  width: 100%;            /* let it shrink on narrower screens */
+}
 
 .car-right {
   flex: 0.35; /* e.g., 35% */
   background: #fff;
-  padding-left: 2rem;
+  padding-left: clamp(3rem,4vw,6rem);
+  width: 100%;
 }
 
 /* For mobile, stack them. */
@@ -628,6 +752,7 @@ a {
   .car-right {
     width: 100%;
     margin-bottom: 2rem;
+    padding-inline: 0 !important;
   }
 }
 
@@ -637,7 +762,7 @@ a {
 }
 
 .car-title {
-  font-size: 2rem;
+  font-size: 4rem;
   color: #4c37c6;
   margin-bottom: 1rem;
   margin-top: 1rem;
@@ -645,11 +770,13 @@ a {
 
 .car-subtitle {
   color: #666;
+  font-size: 1.5rem;
 }
 
 /* Carousel */
 .carousel-container {
   position: relative;
+  max-width: 700px;
   margin-bottom: 2rem;
   text-align: center;
   flex: 0.65;
@@ -657,18 +784,45 @@ a {
 
 .carousel-arrow {
   position: absolute;
-  top: 50%;
+  /* top: 50%; */
+  top: clamp(30%, 15vw, 50%);
+
   transform: translateY(-50%);
   background: #4c37c6;
   color: #fff;
   border: none;
   font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
+  /* width: 40px;
+  height: 40px; */
+  width: clamp(40px,4vw,60px);
+  height: clamp(40px,4vw,60px); 
   cursor: pointer;
   z-index: 2;
   border-radius: 4px;
-  opacity: 0.9;
+  opacity: 0.5;
+}
+
+@media (max-width:448px) {
+  .carousel-arrow {
+    top:50% !important;
+  }
+}
+@media (max-width:1220px) {
+  .carousel-arrow {
+    top:50% !important;
+  }
+}
+
+
+@media (max-width: 992px) {
+  .carousel-wrapper {
+    flex-direction: column !important; 
+  }
+
+  .car-right {
+    margin-top: 1.5rem; /* some extra space when it moves below */
+  }
+
 }
 
 .carousel-arrow:hover {
@@ -743,6 +897,11 @@ a {
 .calc-box {
   background: #f9f9f9;
   border-radius: 8px;
+  padding: 50px;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   /* padding: 1.5rem;
   margin-top: 2rem; */
 }
@@ -751,7 +910,7 @@ a {
   margin: 0;
   color: #4c37c6;
   font-size: 1.4rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .calc-desc {
@@ -921,5 +1080,602 @@ a {
 .diensten-subfooter {
   text-align: center;
   margin-bottom: 1rem;
+}
+
+
+
+
+
+/* Only underline footer links on hover */
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+.floating-whatsapp {
+  position: fixed;
+  bottom: 20px;      /* how far from the bottom */
+  right: 20px;       /* how far from the right edge */
+  width: 60px;       /* size of the icon container */
+  height: 60px;
+  border-radius: 50%;
+  z-index: 9999;     /* stay above most elements */
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+  overflow: hidden;  /* just in case the image is bigger */
+  background-color: #25D366; /* optional green behind the image */
+}
+
+/* Zoom on hover if you want a nice effect */
+.floating-whatsapp:hover {
+  transform: scale(1.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************* BRAND LOGO MARQUEE *************/
+.logo-marquee-wrapper {
+  overflow: hidden;       /* Hide the overflow so the row slides under */
+  width: 100%;
+  position: relative;     
+  height: 100px;          /* Adjust if you want bigger logos */
+  margin: 0 auto;
+}
+
+.logo-marquee {
+  display: inline-flex;
+  gap: 3rem;              /* Spacing between logos */
+  animation: logoScroll 20s linear infinite;
+  /* 20s is the total duration for scrolling across. Adjust speed as you like */
+}
+
+.brand-logo-link img {
+  width: 120px;   /* Adjust for bigger logos if you prefer */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Make each logo ~120px wide. You can tweak this. */
+.logo-slider img {
+  width: 120px; 
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain; /* so they don't blow up if the source is big */
+}
+
+
+.logo-slider {
+  display: flex;
+  flex-wrap: wrap;         /* allows wrapping on smaller screens */
+  gap: 1rem;               /* adds horizontal & vertical spacing */
+  justify-content: center; /* optional: center them in the container */
+}
+
+
+/* Base (desktop) style for .logo-slider */
+.logo-slider {
+  gap: 2rem; /* big spacing on large screens */
+}
+
+/* For narrower screens (≤1400px) */
+@media (max-width: 1400px) {
+  .logo-slider {
+    gap: 1.8rem;
+  }
+}
+
+
+
+/* For phone-ish (≤768px) */
+@media (max-width: 768px) {
+  .logo-slider {
+    gap: 1rem;
+  }
+}
+
+/* For very small phones (≤576px) */
+@media (max-width: 576px) {
+  .logo-slider {
+    gap: 0.8rem;
+  }
+}
+
+/* For tiny devices (≤320px) - if you want it */
+@media (max-width: 320px) {
+  .logo-slider {
+    gap: 0.5rem;
+  }
+}
+
+
+
+@keyframes logoScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Move left enough so the second batch lines up for continuous scroll. 
+       If you repeated them, -50% might be fine. If not, consider -100%. */
+    transform: translateX(-50%);
+  }
+}
+
+/************* FEATURED CARS MARQUEE *************/
+
+/* The outer wrapper (if you want no forced height for better wrapping) */
+.featured-cars-marquee-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  background: #f9f9f9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 
+  Desktop default: 
+  We'll do 4 columns by setting each card to ~23% width
+  (4 × 23% + gaps should fit in one row).
+*/
+.featured-cars-marquee {
+  display: flex;
+  flex-wrap: wrap; /* let them wrap if needed */
+  gap: 1rem;       /* horizontal + vertical spacing */
+  justify-content: flex-start; /* or center, if you prefer */
+  padding: 1rem;
+}
+
+.featured-car-card {
+  width: 23%;      /* about 4 columns across (with gap) on large desktop */
+  max-width: 300px;/* optional upper bound if you don’t want them too wide */
+  margin: 0;       /* or auto if you want them centered if fewer than 4 columns */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box; /* so padding + width stays consistent */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* space out content vertically */
+}
+
+/* Example for the image inside the card */
+.featured-car-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+
+
+
+
+@media (max-width: 992px) {
+  .featured-cars-marquee {
+    flex-wrap: nowrap;     /* no wrapping => single row */
+    overflow-x: auto;      /* horizontal scrolling if needed */
+  }
+  .featured-car-card {
+    flex: 0 0 auto;        /* keep the card from shrinking or wrapping */
+    min-width: 300px;      /* the card never goes below 300px wide */
+    margin-right: 1rem;    /* or use gap instead */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Hide the default arrow and inject your own colored SVG or PNG icon */
+.filter-box select {
+  -webkit-appearance: none; /* Hide default on Safari */
+  -moz-appearance: none;    /* Hide default on Firefox */
+  appearance: none;         /* Hide default on Chrome/Edge */
+  border: 1px solid #4c37c6;  
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border-radius: 4px; /* If you want slightly rounded corners */
+  background: #fff
+    url("data:image/svg+xml;charset=UTF-8,<svg fill='%234c37c6' height='24' width='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")
+    no-repeat right 0.75rem center;
+  background-size: 2rem auto; /* Make the icon about 16px tall (1rem) */
+
+  /* Use a consistent font-size, etc. */
+  font-size: 1rem;
+  color: #333; /* Text color for the option labels */
+}
+
+/* This helps remove the extra “expand arrow” in older IE/Edge */
+.filter-box select::-ms-expand {
+  display: none;
+}
+
+/* Force the Choices.js dropdown to have limited height with a scroll */
+.choices__list--dropdown {
+  max-height: 400px !important; 
+  overflow-y: auto !important;
+  /* width: max-content !important;  */
+}
+
+
+
+.choices {
+  margin-bottom: 0 !important; 
+  min-width: 140px !important;
+}
+
+/* 0) ALSO hide native arrow from the ORIGINAL .brandSelect (so no second arrow in Chrome/FF) */
+.brandSelect {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  /* padding:0; margin:0; -- only add if needed */
+}
+
+/* Explicitly hide the default browser arrow from original select inside Choices.js */
+.choices__inner select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Hide arrow specifically for Edge/IE */
+.brandSelect::-ms-expand,
+select::-ms-expand {
+  display: none !important;
+}
+
+/* 1) Style the “outer” input (the part that shows the selected item) */
+.choices[data-type*=select-one] .choices__inner {
+  border: 1px solid #4c37c6 !important;
+  border-radius: 4px !important;
+  background-color: #fff;
+  min-height: 42px;
+  padding: 0.5rem !important;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* 2) Custom purple caret/arrow */
+.choices[data-type*=select-one] .choices__inner::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #4c37c6;
+  pointer-events: none;  
+}
+
+.choices[data-type*=select-one].is-open .choices__inner::after {
+  transform: translateY(-50%) rotate(180deg); 
+}
+
+/* 3) The dropdown list container itself */
+.choices[data-type*=select-one] .choices__list--dropdown {
+  border: 1px solid #4c37c6 !important;
+  border-radius: 4px !important;
+  margin-top: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  background-color: #fff;
+}
+
+/* 4) Each option line */
+.choices[data-type*=select-one] .choices__list--dropdown .choices__item--selectable {
+  font-size: 1rem;
+  color: #333;
+  padding: 0.4rem 0.75rem; 
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.choices[data-type*=select-one] .choices__list--dropdown .choices__item--selectable:last-of-type {
+  border-bottom: none;
+}
+
+.choices__list--dropdown .choices__item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hover effect for options */
+.choices[data-type*=select-one] .choices__list--dropdown .choices__item--selectable:hover {
+  background-color: rgba(76, 55, 198, 0.1);
+}
+
+/* 5) Remove search box if it’s hidden or set “searchEnabled: false” in JS */
+.choices[data-type*=select-one] .choices__search {
+  display: none !important;
+}
+
+/* Explicitly hide the hidden Choices.js-generated select arrow causing double arrow issue */
+.choices__input {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Hide specifically in Edge/IE */
+.choices__input::-ms-expand {
+  display: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 1) Overall spacing for major sections */
+.how-it-works,
+.diensten {
+  padding: 2rem 1rem; /* bigger top/bottom spacing for a nice, airy look */
+  text-align: center;
+}
+
+.how-it-works h2,
+.diensten h2 {
+  color: #4c37c6;     /* matches your brand color */
+  padding-block: 3rem;
+  font-size: clamp(1.5rem, 4vw, 2rem); /* responsive heading size */
+}
+
+/* 2) Grid for the steps or services */
+.steps-grid,
+.diensten-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* The item wrappers */
+.step-item,
+.dienst-item {
+  flex: 1 1 200px;       /* Grow/shrink, minimum 200px wide */
+  max-width: 250px;      /* or 300px if you want them bigger */
+  background: transparent;  /* no background unless you want a card style */
+  text-align: center; 
+  margin: 0 auto;        /* center them if narrower than max-width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-item h3,
+.dienst-item h3 {
+  margin: 0.75rem 0 0.5rem 0;
+  color: #4c37c6;
+  font-size: 1.1rem;
+}
+
+.step-item p,
+.dienst-item p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #333;
+  margin-bottom: 1rem;   /* put a little space below paragraphs */
+}
+
+/* 3) Icon styling */
+.step-icon,
+.dienst-icon {
+  width: 80px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+/* If you want uniform icon sizes, keep width fixed (like 80px) 
+   and let 'height:auto' handle aspect ratio.
+   If icons are inconsistent in aspect ratio, 
+   you might want a consistent 'max-height: 80px;' etc. */
+
+/* 4) Additional spacing between sections */
+.services,
+.why-neo,
+.start-today,
+.info-bullets,
+.featured-cars-marquee-section {
+  margin-bottom: 3rem; /* add extra breathing room after these sections */
+}
+
+
+
+
+
+
+
+
+/* Force featured car cards to a uniform height */
+.featured-cars-marquee .featured-car-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* so content is spaced top to bottom */
+  align-items: center;            /* center horizontally or use 'flex-start' if you prefer left alignment */
+  min-width: 220px;                   /* or whatever width you use */
+  height: 300px;                  /* pick a height that fits your text/image */
+  /* If you worry about content possibly being too big, you could do min-height: 350px; instead */
+  overflow: hidden;               /* hides anything that doesn’t fit */
+  min-height: 300px; 
+  padding: 1rem;
+  margin: 0 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+
+}
+
+
+.featured-cars-marquee .featured-car-card img {
+  width: 100%;
+  height: 150px;     /* or 180px, etc. */
+  object-fit: cover; /* crops the image if it’s a different aspect ratio */
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover; 
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+
+}
+
+
+
+.featured-cars-marquee .featured-car-card h3 {
+  font-size: 1rem;
+  /* or smaller if you need more space */
+  white-space: nowrap;    /* optional, but might push text if it’s too long */
+  overflow: hidden;       /* if you truly want to clamp text */
+  text-overflow: ellipsis;
+}
+
+
+
+.custom-button {
+  background: #4c37c6;
+  color: white;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s ease;
+
+}
+
+.custom-button:hover {
+  background: #7766da !important;
+}
+
+/* style="background:#4c37c6; color:white; padding:0.75rem; font-size:1rem; border:none; border-radius:4px;"> */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**************************************
+  LISTINGS HERO & FILTERS (NEW STYLES)
+**************************************/
+
+/* Light-purple background for the top section */
+.listings-hero {
+  background: #f2ebff;  /* a very light purple */
+  padding: 2rem 0 3rem 0;
+}
+
+
+/* Big heading style in the hero */
+.listings-hero h1 {
+  color: #4c37c6;
+  font-size: 2.4rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
 }
 

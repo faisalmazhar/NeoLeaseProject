@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Disclaimer | Neo Lease{% endblock %}
+
+{% block content %}
+<section class="container" style="padding:2rem 1rem; line-height:1.6;">
+  <h1 style="color:#4c37c6; margin-bottom:1rem;">Disclaimer</h1>
+  
+  <p>
+    Bij Neo Lease onderhouden we onze website met grote zorg. Desondanks kan het voorkomen
+    dat de gepubliceerde informatie onvolledig of onjuist is. Neo Lease behoudt zich het recht
+    voor om de inhoud van de website en deze disclaimer te allen tijde en zonder voorafgaande
+    aankondiging te wijzigen.
+  </p>
+
+  <p>
+    Aan de informatie op deze website kunnen geen rechten worden ontleend. Neo Lease kan niet
+    aansprakelijk worden gesteld voor (in)directe schade als gevolg van onjuistheden of
+    onvolledigheden op deze website, of het (tijdelijk) niet beschikbaar zijn van de website.
+  </p>
+
+  <p>
+    Alle prijzen, productinformatie en voorwaarden zijn onder voorbehoud van mogelijke type- en
+    invoerfouten. Wanneer u persoonsgegevens verstrekt op onze website, verwerken wij deze
+    conform de geldende privacywetgeving en onze 
+    <a href="{{ url_for('privacy') }}">Privacyverklaring</a>.
+  </p>
+
+  <p>
+    Heeft u vragen? Neem dan gerust 
+    <a href="{{ url_for('contact') }}">contact</a> met ons op. 
+  </p>
+
+  <p style="margin-top:1rem; font-size:0.9rem;">
+    <em>Laatste update: 1-4-2025</em>
+  </p>
+</section>
+{% endblock %}

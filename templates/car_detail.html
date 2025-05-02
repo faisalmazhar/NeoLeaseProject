@@ -8,9 +8,14 @@
 <section class="car-detail-page">
 
   <!-- PAGE WRAPPER with two columns: Left (carousel + details) and Right (calculator) -->
+  <div class="container">
+
+  
   <div class="car-detail-wrapper">
       
       <!-- TITLE & SUBTITLE -->
+      <div class="left-column">
+
       <div class="car-heading">
         <h1 class="car-title">
           {{ car.title }}
@@ -19,6 +24,8 @@
         </h1>
         <p class="car-subtitle">{{ car.subtitle }}</p>
       </div>
+
+
 
       {# Prepare a CSV of image URLs for the data-attribute #}
       {% if car.images and car.images|length > 0 %}
@@ -93,7 +100,7 @@
                 data-image="{{ car.images[0].image_url if car.images and car.images|length > 0 }}"
                 data-monthly="{{ car.financial_lease_price or '' }}"
                 >
-                <i class="fa-regular fa-heart" style="color: #4c36c6;"></i>         
+                <i class="fa-regular fa-heart" style="color: #ffffff;"></i>         
                 Favoriet toevoegen
               </button>
               
@@ -109,7 +116,7 @@
        'skoda': 'https://img.icons8.com/ios/50/skoda.png',
        'alfa romeo': 'https://img.icons8.com/ios-filled/50/alfa-romeo.png',
        'audi': 'https://img.icons8.com/ios/50/audi.png',
-       'bmw': 'https://img.icons8.com/ios/50/bmw.svg',
+       'bmw': '/static/images/bmw1.svg',
        'citro': 'https://img.icons8.com/ios/50/citroen.png',
        'cupra': '/static/images/cupra.png',
        'dodge': 'https://img.icons8.com/color/48/dodge.png',
@@ -166,7 +173,7 @@
      <div class="car-info" style="margin-top:2rem;">
      
        <div class="car-features" 
-            style="display:grid; grid-template-columns: repeat(2,1fr); gap:1rem;">
+            style="display:grid;  gap:1rem;">
      
          <!-- 1) BRAND -->
          <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
@@ -225,12 +232,14 @@
          </div>
      
        </div>  <!-- end .car-features (2 columns) -->
+      </div> <!-- end .left-column -->
+
      
        {# 4) Show a map for the address #}
        <div class="map-section" style="margin-top:2rem;">
          {% if car.address %}
            <h3 style="margin-bottom:0.5rem;">Locatie:</h3>
-           <div style="width:100%; max-width:600px; height:300px;">
+           <div style="width:100%; max-width:90%; height:15vw; min-height: 250px; align-items: center;">
              <iframe
                width="100%"
                height="100%"
@@ -256,6 +265,48 @@
      </div>  <!-- end .car-info -->
      
   </div> <!-- end car-detail-wrapper -->
+</div>
 
 </section>
+<div class="container">
+
+{% if random_cars and random_cars|length > 0 %}
+  <section class="featured-cars-marquee-section container" style="padding:2rem 1rem;">
+    <h2 style="text-align:center; color:#4c37c6; margin-bottom:1rem;">
+      Andere interessante deals
+    </h2>
+    <p style="text-align:center; max-width:700px; margin:0 auto 2rem auto; font-size:0.95rem;">
+      Een selectie van auto’s uit onze database &mdash; scroll voor meer!
+    </p>
+  
+    <div class="featured-cars-marquee">
+      {% for car_item in random_cars %}
+        <div class="featured-car-card">
+          <a href="{{ url_for('car_detail', car_id=car_item.id) }}"
+             style="text-decoration:none; color:inherit;">
+            {% if car_item.images and car_item.images|length > 0 %}
+              <img src="{{ car_item.images[0].image_url }}"
+                   alt="{{ car_item.title or 'Auto' }}"
+                   style="width:100%; height:auto;" />
+            {% else %}
+              <div style="background:#ccc; width:100%; height:150px; line-height:150px; text-align:center;">
+                Geen afbeelding
+              </div>
+            {% endif %}
+
+            <h3 style="color:#4c37c6; margin-top:0.5rem; font-size:1rem;">
+              {{ car_item.title or 'Onbekend Model' }}
+            </h3>
+            <p style="font-size:0.9rem;">
+              {{ car_item.financial_lease_price }} / {{ car_item.financial_lease_term }}
+            </p>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  </section>
+{% endif %}
+
 {% endblock %}

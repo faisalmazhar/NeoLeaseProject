@@ -1,185 +1,345 @@
-{# templates/listings.html #}
 {% extends "base.html" %}
 {% block title %}Ons Aanbod | Neo Lease{% endblock %}
 
 {% block content %}
-<section class="container" style="padding: 2rem 1rem;">
-  <h1 style="color: #4c37c6; font-size: 2rem; margin-bottom: 1.5rem;">Ons aanbod</h1>
 
-  <!-- FILTER BAR (EXAMPLE) -->
-  <div class="filter-bar" style="margin-bottom: 2rem;">
-    <!-- Form that performs a GET request to /listings -->
-    <form action="{{ url_for('listings') }}" method="get" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+<!-- PURPLE HERO (shorter) -->
+<!-- Purple Hero (shorter) -->
+<section class="listings-hero">
+  <div class="container">
+    <!-- Heading -->
+    <h1 style="text-align:left;">Ons aanbod</h1>
+
+    <!-- Search + Filters Form (stacked) -->
+    <form action="{{ url_for('listings') }}" method="get"
+          style="max-width:800px; margin-top:1rem;">
       
-      <!-- 1) Free-text search (q) -->
-      <input
-        type="text"
-        name="q"
-        placeholder="Zoeken (bijv. 'GTI' of 'Panoramadak')"
-        value="{{ current_q or '' }}"
-        style="padding: 0.5rem; flex: 0 0 200px; max-width: 250px;"
-      >
+      <!-- 1) Search row by itself -->
+      <div style="margin-bottom:1rem;">
+        <input
+          type="text"
+          name="q"
+          placeholder="Bijv. 'GTI' of 'Panoramadak'"
+          value="{{ current_q or '' }}"
+          style="
+            width:100%;
+            padding:0.75rem;
+            border:1px solid #4c37c6;
+            border-radius:4px;
+          "
+        >
+      </div>
 
-      <!-- 2) Merk dropdown from brand_choices (provided by app.py) -->
-      <select
-        name="brand"
-        style="padding: 0.5rem; min-width: 160px;"
-      >
-        <option value="">- Kies een merk -</option>
-        {% if brand_choices %}
-          {% for b in brand_choices %}
-            <option value="{{ b }}"
-              {% if current_brand == b %} selected {% endif %}
-            >
-              {{ b }}
-            </option>
-          {% endfor %}
-        {% endif %}
-      </select>
+      <!-- 2) Filters row (or multiple rows) underneath -->
+      <!-- Example: listings.html (or wherever you want the custom dropdown) -->
 
-    <!-- 3) Monthly budget filter (similar to homepage) -->
-    <select
-      name="monthly"
-      style="padding: 0.5rem; min-width: 160px;"
-    >
-      <option value="">- Budget (p/m) -</option>
-      <option value="1-99"
-        {% if current_monthly == '1-99' %} selected {% endif %}
-      >€1 - €99 p/m</option>
-      <option value="100-199"
-        {% if current_monthly == '100-199' %} selected {% endif %}
-      >€100 - €199 p/m</option>
-      <option value="200-299"
-        {% if current_monthly == '200-299' %} selected {% endif %}
-      >€200 - €299 p/m</option>
-      <option value="300-399"
-        {% if current_monthly == '300-399' %} selected {% endif %}
-      >€300 - €399 p/m</option>
-      <option value="400-499"
-        {% if current_monthly == '400-499' %} selected {% endif %}
-      >€400 - €499 p/m</option>
-      <option value="500-599"
-        {% if current_monthly == '500-599' %} selected {% endif %}
-      >€500 - €599 p/m</option>
-      <option value="600-699"
-        {% if current_monthly == '600-699' %} selected {% endif %}
-      >€600 - €699 p/m</option>
-      <option value="700-799"
-        {% if current_monthly == '700-799' %} selected {% endif %}
-      >€700 - €799 p/m</option>
-      <option value="800-899"
-        {% if current_monthly == '800-899' %} selected {% endif %}
-      >€800 - €899 p/m</option>
-      <option value="900-999"
-        {% if current_monthly == '900-999' %} selected {% endif %}
-      >€900 - €999 p/m</option>
-      <option value="1000+"
-        {% if current_monthly == '1000+' %} selected {% endif %}
-      >€1000 + p/m</option>
-    </select>
+      <div style="
+      display: flex; 
+      flex-wrap: wrap;
+      gap: 0.5rem; 
+      margin-bottom:1rem;
+      ">
+        <select class="brandSelect" name="brand" >
+          <option value="">Merk</option>
+          <option value="Audi">Audi</option>
+          <option value="BMW">BMW</option>
+          <option value="Bürstner">Bürstner</option>
+          <option value="BYD">BYD</option>
+          <option value="Cenntro">Cenntro</option>
+          <option value="Chevrolet">Chevrolet</option>
+          <option value="Citroën">Citroën</option>
+          <option value="CUPRA">CUPRA</option>
+          <option value="Dacia">Dacia</option>
+          <option value="Dodge">Dodge</option>
+          <option value="DS">DS</option>
+          <option value="Ducati">Ducati</option>
+          <option value="Fiat">Fiat</option>
+          <option value="Ford">Ford</option>
+          <option value="Honda">Honda</option>
+          <option value="Hyundai">Hyundai</option>
+          <option value="Jeep">Jeep</option>
+          <option value="Kawasaki">Kawasaki</option>
+          <option value="Kia">Kia</option>
+          <option value="KTM">KTM</option>
+          <option value="Land Rover">Land Rover</option>
+          <option value="Lynk &amp; Co">Lynk &amp; Co</option>
+          <option value="Mazda">Mazda</option>
+          <option value="Mercedes-Benz">Mercedes-Benz</option>
+          <option value="MINI">MINI</option>
+          <option value="Mitsubishi">Mitsubishi</option>
+          <option value="Nissan">Nissan</option>
+          <option value="Opel">Opel</option>
+          <option value="Peugeot">Peugeot</option>
+          <option value="Renault">Renault</option>
+          <option value="SEAT">SEAT</option>
+          <option value="Škoda">Škoda</option>
+          <option value="Smart">Smart</option>
+          <option value="Suzuki">Suzuki</option>
+          <option value="Tesla">Tesla</option>
+          <option value="Toyota">Toyota</option>
+          <option value="Volkswagen">Volkswagen</option>
+          <option value="Volvo">Volvo</option>
+          <option value="Yamaha">Yamaha</option>
+        </select>
+        
 
 
-      <!-- 4) Sort example (sort param) -->
-      <select name="sort">
-        <option value="">- Sorteer op -</option>
-        <option value="price_asc"
-          {% if current_sort == 'price_asc' %}selected{% endif %}
-        >Prijs (Laag - Hoog)</option>
-        <option value="price_desc"
-          {% if current_sort == 'price_desc' %}selected{% endif %}
-        >Prijs (Hoog - Laag)</option>
-      </select>
+        
 
-      <!-- 5) Submit button -->
-      <button
-        type="submit"
-        class="btn border"
-        style="padding: 0.5rem 1rem;"
-      >
-        Filteren
-      </button>
+        <!-- Type -->
+        <select name="type" class="brandSelect">
+          <option value="">Voertuigsoort</option>
+          <option value="auto">Auto</option>
+          <option value="motor">Motor</option>
+        </select>
+
+        <!-- Fuel -->
+        <select name="fuel" class="brandSelect">
+          <option value="">Brandstof</option>
+          <option value="benzine">Benzine</option>
+          <option value="diesel">Diesel</option>
+          <option value="electric">Elektrisch</option>
+        </select>
+
+        <select name="monthly" class="brandSelect" >
+        <option value="">Budget (p/m)</option>
+        <option value="1-99" {% if current_monthly == '1-99' %} selected {% endif %}>€1 - €99</option>
+        <option value="100-199" {% if current_monthly == '100-199' %} selected {% endif %}>€100 - €199</option>
+        <option value="200-299" {% if current_monthly == '200-299' %} selected {% endif %}>€200 - €299</option>
+        <option value="300-399" {% if current_monthly == '300-399' %} selected {% endif %}>€300 - €399</option>
+        <option value="400-499" {% if current_monthly == '400-499' %} selected {% endif %}>€400 - €499</option>
+        <option value="500-599" {% if current_monthly == '500-599' %} selected {% endif %}>€500 - €599</option>
+        <option value="600-699" {% if current_monthly == '600-699' %} selected {% endif %}>€600 - €699</option>
+        <option value="700-799" {% if current_monthly == '700-799' %} selected {% endif %}>€700 - €799</option>
+        <option value="800-899" {% if current_monthly == '800-899' %} selected {% endif %}>€800 - €899</option>
+        <option value="900-999" {% if current_monthly == '900-999' %} selected {% endif %}>€900 - €999</option>
+        <option value="1000+" {% if current_monthly == '1000+' %} selected {% endif %}>€1000 +</option>
+        </select>
+
+        <!-- Sort -->
+        <select name="sort" class="brandSelect">
+          <option value="">Populariteit</option>
+          <option value="price_asc" {% if current_sort == 'price_asc' %} selected {% endif %}>Prijs (Laag - Hoog)</option>
+          <option value="price_desc" {% if current_sort == 'price_desc' %} selected {% endif %}>Prijs (Hoog - Laag)</option>
+        </select>
+
+        <!-- Filter Button -->
+        <button type="submit"
+                style="
+                  background:#4c37c6; 
+                  color:#fff; 
+                  padding:0.6rem 1.2rem; 
+                  border:none;
+                  border-radius:4px;
+                  font-weight:500;
+                "
+        >
+          Filter
+        </button>
+      </div>
     </form>
   </div>
-  
-  <!-- Optional text showing how many results in total (if you pass pagination.total) -->
+</section>
+
+
+<!-- RESULTS COUNT on White Background -->
+<div class="container" style="margin-top:1rem;">
   {% if pagination.total %}
-    <p style="margin-bottom: 1.5rem;">{{ pagination.total }} resultaten gevonden</p>
+    <p style="margin-bottom:1.5rem; font-weight:500;">
+      {{ pagination.total }} resultaten gevonden
+    </p>
   {% endif %}
-  
-  <!-- CAR GRID -->
-  <div class="car-grid" style="
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-  ">
+</div>
+
+
+<!-- CAR LISTINGS GRID -->
+<section class="container" style="padding-top: 1rem;">
+  <div class="car-grid"
+       style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
     {% for car in cars %}
-      <div class="car-card" style="border: 1px solid #ddd; padding: 1rem; border-radius: 6px;">
+      <div class="car-card">
         
-        <!-- Clickable image -->
-        <a href="{{ url_for('car_detail', car_id=car.id) }}" style="display: block;">
+        <a href="{{ url_for('car_detail', car_id=car.id) }}">
           {% if car.images and car.images|length > 0 %}
-            <img
-              src="{{ car.images[0].image_url }}"
-              alt="Car Image"
-              style="width: 100%; height: auto; margin-bottom: 0.5rem;"
-            >
+            <img src="{{ car.images[0].image_url }}" alt="Car Image">
           {% else %}
-            <div style="background: #ccc; width: 100%; height: 150px; margin-bottom: 0.5rem;">
+            <div style="
+              background:#ccc; 
+              width:100%; 
+              height:150px; 
+              line-height:150px; 
+              text-align:center;
+            ">
               Geen afbeelding
             </div>
           {% endif %}
         </a>
 
-        <!-- Title text that underlines on hover -->
-        <h3 style="font-size: 1.2rem;">
-          <a
-            href="{{ url_for('car_detail', car_id=car.id) }}"
-            style="color: #4c37c6; text-decoration: none;"
-            class="car-title-link"
-          >
+        <h3>
+          <a href="{{ url_for('car_detail', car_id=car.id) }}">
             {{ car.title or 'Onbekend' }}
           </a>
         </h3>
-
-        <p style="color: #999; margin-bottom: 0.5rem;">{{ car.subtitle }}</p>
-        <p style="margin-bottom: 0.5rem;">
+        <p style="color:#999; margin-bottom:0.5rem;">
+          {{ car.subtitle }}
+        </p>
+        <p>
           <strong>{{ car.financial_lease_price }}</strong> / {{ car.financial_lease_term }}
         </p>
-        <p>Merk: {{ car.merk }}, Model: {{ car.model }}</p>
-        
-        <!-- “Meer info” button -->
-        <a
-          href="{{ url_for('car_detail', car_id=car.id) }}"
-          style="display: inline-block; margin-top: 1rem;"
-          class="btn border"
-        >
+        <p>
+          {{ car.brandstof }} | {{ car.km_stand }} km | {{ car.bouwjaar }}
+        </p>
+        <p>
+          Prijs: €{{ car.prijs }}
+        </p>
+        <a href="{{ url_for('car_detail', car_id=car.id) }}"
+           class="btn border"
+           style="margin-top:1rem;">
           Meer info
         </a>
       </div>
     {% endfor %}
   </div>
 
-  <!-- PAGINATION -->
+<!-- PAGINATION FOR DESKTOP: show up to 5 page links -->
+<div class="d-none d-md-block" style="text-align:center; margin-top:2rem; margin-bottom:3rem;">
+  <!-- "Vorige" link -->
   {% if page > 1 %}
-    <a href="{{ url_for('listings', page=page-1,
+    <a href="{{ url_for('listings',
+                        page=page-1,
                         brand=current_brand,
                         q=current_q,
                         monthly=current_monthly,
-                        sort=request.args.get('sort')) }}">
+                        sort=current_sort) }}">
       &laquo; Vorige
     </a>
   {% endif %}
-  <span style="margin:0 1rem;">Pagina {{ page }} van {{ total_pages }}</span>
+
+  {% for p in range(start_page, end_page + 1) %}
+    {% if p == page %}
+      <span style="
+          display:inline-block;
+          margin:0 0.5rem;
+          padding:0.3rem 0.7rem;
+          border:2px solid #4c37c6;
+          border-radius:50%;
+          font-weight:bold;
+          color:#4c37c6;">
+        {{ p }}
+      </span>
+    {% else %}
+      <a href="{{ url_for('listings',
+                          page=p,
+                          brand=current_brand,
+                          q=current_q,
+                          monthly=current_monthly,
+                          sort=current_sort) }}"
+         style="
+           display:inline-block;
+           margin:0 0.5rem;
+           padding:0.3rem 0.7rem;
+           text-decoration:none;
+           border:1px solid #ccc;
+           border-radius:50%;
+           color:#000;">
+        {{ p }}
+      </a>
+    {% endif %}
+  {% endfor %}
+
+  <!-- "Volgende" link -->
   {% if page < total_pages %}
-    <a href="{{ url_for('listings', page=page+1,
+    <a href="{{ url_for('listings',
+                        page=page+1,
                         brand=current_brand,
                         q=current_q,
                         monthly=current_monthly,
-                        sort=request.args.get('sort')) }}">
+                        sort=current_sort) }}">
       Volgende &raquo;
     </a>
   {% endif %}
+</div>
 
-  </div>
+
+<!-- PAGINATION FOR MOBILE: show fewer links (3 max) -->
+<div class="d-md-none" style="text-align:center; margin-top:2rem; margin-bottom:3rem;">
+  {# We'll do +/-1 around current page, so 3 total. #}
+  {% set mobile_start = page - 1 %}
+  {% if mobile_start < 1 %}
+    {% set mobile_start = 1 %}
+  {% endif %}
+
+  {% set mobile_end = page + 1 %}
+  {% if mobile_end > total_pages %}
+    {% set mobile_end = total_pages %}
+  {% endif %}
+
+  {# If the range is still < 3 wide, shift it as needed #}
+  {% set mobile_window = mobile_end - mobile_start + 1 %}
+  {% if mobile_window < 3 %}
+    {% if mobile_start == 1 %}
+      {% set mobile_end = [mobile_end + (3 - mobile_window), total_pages]|min %}
+    {% else %}
+      {% set mobile_start = [mobile_start - (3 - mobile_window), 1]|max %}
+    {% endif %}
+  {% endif %}
+
+  <!-- Vorige link -->
+  {% if page > 1 %}
+    <a href="{{ url_for('listings',
+                        page=page-1,
+                        brand=current_brand,
+                        q=current_q,
+                        monthly=current_monthly,
+                        sort=current_sort) }}">
+      &laquo; Vorige
+    </a>
+  {% endif %}
+
+  {% for p in range(mobile_start, mobile_end + 1) %}
+    {% if p == page %}
+      <span style="
+          display:inline-block;
+          margin:0 0.5rem;
+          padding:0.3rem 0.7rem;
+          border:2px solid #4c37c6;
+          border-radius:50%;
+          font-weight:bold;
+          color:#4c37c6;">
+        {{ p }}
+      </span>
+    {% else %}
+      <a href="{{ url_for('listings',
+                          page=p,
+                          brand=current_brand,
+                          q=current_q,
+                          monthly=current_monthly,
+                          sort=current_sort) }}"
+         style="
+           display:inline-block;
+           margin:0 0.5rem;
+           padding:0.3rem 0.7rem;
+           text-decoration:none;
+           border:1px solid #ccc;
+           border-radius:50%;
+           color:#000;">
+        {{ p }}
+      </a>
+    {% endif %}
+  {% endfor %}
+
+  <!-- Volgende link -->
+  {% if page < total_pages %}
+    <a href="{{ url_for('listings',
+                        page=page+1,
+                        brand=current_brand,
+                        q=current_q,
+                        monthly=current_monthly,
+                        sort=current_sort) }}">
+      Volgende &raquo;
+    </a>
+  {% endif %}
+</div>
 </section>
+
 {% endblock %}

@@ -1,8 +1,9 @@
-import os
-import csv
+#!/usr/bin/env python3
 import sys
 import time
 import requests
+import psycopg2
+import os
 from lxml import html
 from urllib.parse import urljoin
 
@@ -21,190 +22,282 @@ HEADERS = {
         "Chrome/133.0.0.0 Mobile Safari/537.36"
     ),
     "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.9,nl;q=0.8",
-    "Referer": "https://www.dtc-lease.nl/"
 }
 
-COOKIES = {
-    # If special cookies or session data is required, set them here
-}
+# Pull DB credentials from environment or fallback:
+DB_NAME = os.getenv("DB_NAME", "neolease_db")
+DB_USER = os.getenv("DB_USER", "neolease_db_user")
+DB_PASS = os.getenv("DB_PASS", "DKuNZ0Z4OhuNKWvEFaAuWINgr7BfgyTE")
+DB_HOST = os.getenv("DB_HOST", "dpg-cvslkuvdiees73fiv97g-a.oregon-postgres.render.com")
+DB_PORT = os.getenv("DB_PORT", "5432")
 
-CSV_COLUMNS = [
-    "URL", "Title", "Subtitle", "Financial Lease Price", "Financial Lease Term",
-    "Advertentienummer", "Merk", "Model", "Bouwjaar", "Km stand",
-    "Transmissie", "Prijs", "Brandstof", "Btw/marge", "Opties & Accessoires",
-    "Address", "Images"
-]
+def connect_db():
+    """Connect to Postgres with psycopg2."""
+    return psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST,
+        port=DB_PORT
+    )
 
-def fetch_url(session, url):
-    """
-    Fetch a URL with backoff if we receive status 403 or 429.
-    Backoff times: 10m, 30m, 1h, 2h. If still fails, exit.
-    """
-    backoff_times = [600, 1800, 3600, 7200]  # in seconds
-    for wait_seconds in backoff_times + [None]:
-        response = session.get(url, headers=HEADERS, cookies=COOKIES, timeout=15)
-        print(f"GET {url} => {response.status_code}")
-        if response.status_code not in (403, 429):
-            return response
-        if wait_seconds is None:
-            print("Repeated 403/429 responses. Exiting the scraper.")
-            sys.exit(1)
-        print(f"Got {response.status_code}, sleeping {wait_seconds // 60} minutes...")
-        time.sleep(wait_seconds)
+def robust_fetch(url, session, max_retries=4):
+    """Fetch the URL with retry/backoff logic."""
+    backoffs = [10, 30, 60, 120]
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            resp = session.get(url, headers=HEADERS, timeout=15)
+            print(f"[fetch] GET {url} => {resp.status_code}")
+            if resp.status_code in (403, 429):
+                # 403 or 429 => wait + retry
+                if attempt < max_retries - 1:
+                    wait = backoffs[attempt]
+                    print(f"[warn] {resp.status_code} => wait {wait}s, retry...")
+                    time.sleep(wait)
+                    attempt += 1
+                    continue
+                else:
+                    print(f"[error] {resp.status_code} after {max_retries} tries => skip.")
+                    return None
+            return resp
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            # Retry on certain network errors
+            if attempt < max_retries - 1:
+                wait = backoffs[attempt]
+                print(f"[warn] {type(e).__name__} => wait {wait}s, retry {url}...")
+                time.sleep(wait)
+                attempt += 1
+            else:
+                print(f"[error] {type(e).__name__} after {max_retries} tries => skip {url}")
+                return None
     return None
 
-def get_listing_links(session, page_number):
-    """
-    Fetch the listing page for 'page_number' and collect up to 16 product-result links:
-      //main[@id="main-content"]//a[@data-testid="product-result-X"][@href]
-    We'll gather them for X=1..16.
-    If 'product-result-1' is not found, we return an empty list to signal we should stop pagination.
-    """
+def get_listing_links(page_number, session):
+    """Return up to 16 product links from the listing page. If none => []."""
     url = LISTING_URL_TEMPLATE.format(page=page_number)
-    resp = fetch_url(session, url)
+    resp = robust_fetch(url, session)
     if not resp or not resp.ok:
         return []
 
     tree = html.fromstring(resp.text)
-
-    # Check if product-result-1 exists. If not, stop pagination.
-    first_product = tree.xpath('//main[@id="main-content"]//a[@data-testid="product-result-1"]/@href')
-    if not first_product:
-        # Means no results on this page
+    # Quick check to see if there's at least a 'product-result-1'
+    first_sel = '//main[@id="main-content"]//a[@data-testid="product-result-1"]/@href'
+    first_link = tree.xpath(first_sel)
+    if not first_link:
         return []
 
-    # Try to get product-result-i links up to 16
     links = []
-    for i in range(1, 17):
+    for i in range(0, 16):
         xp = f'//main[@id="main-content"]//a[@data-testid="product-result-{i}"]/@href'
         found = tree.xpath(xp)
-        # If we find it, we add to the links list
         if found:
-            # Usually it should be a single link, but let's handle if there's more
             links.extend(found)
-        else:
-            # If we don't find product-result-i, it means no more items on this page
-            break
 
-    # Convert relative to absolute
-    full_links = [urljoin(BASE_URL, ln) for ln in links]
-    return full_links
+    abs_links = [urljoin(BASE_URL, ln) for ln in links]
+    return abs_links
 
-def parse_detail_page(session, detail_url):
-    """
-    Fetch detail page and extract data fields into a dict.
-    Prints the record (debug) before returning.
-    """
-    data = dict.fromkeys(CSV_COLUMNS, None)
-    data["URL"] = detail_url
+def parse_detail(detail_url, session):
+    record = {
+        "url": detail_url,
+        "title": None,
+        "subtitle": None,
+        "financial_lease_price": None,
+        "financial_lease_term": None,
+        "advertentienummer": None,
+        "merk": None,
+        "model": None,
+        "bouwjaar": None,
+        "km_stand": None,
+        "transmissie": None,
+        "prijs": None,
+        "brandstof": None,
+        "btw_marge": None,
+        "opties_accessoires": None,
+        "address": None,
+        "images": [],
+    }
 
-    resp = fetch_url(session, detail_url)
+    resp = robust_fetch(detail_url, session)
     if not resp or not resp.ok:
-        return data
+        print(f"[error] Cannot fetch detail => {detail_url}")
+        return None
 
     tree = html.fromstring(resp.text)
     t = lambda xp: tree.xpath(xp)
 
+    # Title / subtitle
     title = t('//h1[@class="h1-sm tablet:h1 text-trustful-1"]/text()')
-    data["Title"] = title[0].strip() if title else None
+    if title:
+        record["title"] = title[0].strip()
 
-    subtitle = t('//p[@class="type-auto-sm tablet:type-auto-m text-trustful-1"]/text()')
-    data["Subtitle"] = subtitle[0].strip() if subtitle else None
+    subt = t('//p[@class="type-auto-sm tablet:type-auto-m text-trustful-1"]/text()')
+    if subt:
+        record["subtitle"] = subt[0].strip()
 
-    fl_price = t('//div[@data-testid="price-block"]//h2/text()')
-    data["Financial Lease Price"] = fl_price[0].strip() if fl_price else None
+    # Lease price + term
+    flp = t('//div[@data-testid="price-block"]//h2/text()')
+    if flp:
+        record["financial_lease_price"] = flp[0].strip()
 
-    fl_term = t('//div[@data-testid="price-block"]//p[contains(@class,"info-sm") and contains(text(),"mnd")]/text()')
-    data["Financial Lease Term"] = fl_term[0].strip() if fl_term else None
+    flt = t('//div[@data-testid="price-block"]//p[contains(@class,"info-sm") and contains(text(),"mnd")]/text()')
+    if flt:
+        record["financial_lease_term"] = flt[0].strip()
 
-    ad_num = t('//div[contains(@class,"p-sm") and contains(text(),"Advertentienummer")]/text()')
-    if ad_num:
-        data["Advertentienummer"] = ad_num[0].split(":", 1)[-1].strip()
+    # Advertentienummer
+    adnum = t('//div[contains(@class,"p-sm") and contains(text(),"Advertentienummer")]/text()')
+    if adnum:
+        record["advertentienummer"] = adnum[0].split(":", 1)[-1].strip()
 
+    # Helper function for specs
     def spec(label):
-        v = t(f'//div[@class="text-p-sm text-grey-1" and normalize-space(text())="{label}"]/following-sibling::div/text()')
-        return v[0].strip() if v else None
+        xp = f'//div[@class="text-p-sm text-grey-1" and normalize-space(text())="{label}"]/following-sibling::div/text()'
+        val = t(xp)
+        return val[0].strip() if val else None
 
-    data["Merk"] = spec("Merk")
-    data["Model"] = spec("Model")
-    data["Bouwjaar"] = spec("Bouwjaar")
-    data["Km stand"] = spec("Km stand")
-    data["Transmissie"] = spec("Transmissie")
-    data["Prijs"] = spec("Prijs")
-    data["Brandstof"] = spec("Brandstof")
-    data["Btw/marge"] = spec("Btw/marge")
+    record["merk"] = spec("Merk")
+    record["model"] = spec("Model")
+    record["bouwjaar"] = spec("Bouwjaar")
+    record["km_stand"] = spec("Km stand")
+    record["transmissie"] = spec("Transmissie")
+    record["prijs"] = spec("Prijs")
+    record["brandstof"] = spec("Brandstof")
+    record["btw_marge"] = spec("Btw/marge")
 
+    # Opties & Accessoires
     oa = t('//h2[contains(.,"Opties & Accessoires")]/following-sibling::ul/li/text()')
     if oa:
-        data["Opties & Accessoires"] = ", ".join(i.strip() for i in oa if i.strip())
+        cleaned = [x.strip() for x in oa if x.strip()]
+        record["opties_accessoires"] = ", ".join(cleaned)
 
-    addr = t('//div[@class="flex justify-between"]/div/p[@class="text-p-sm font-light text-black tablet:text-p"]/text()')
-    data["Address"] = addr[0].strip() if addr else None
+    # Address
+    addr_sel = '//div[@class="flex justify-between"]/div/p[@class="text-p-sm font-light text-black tablet:text-p"]/text()'
+    addr = t(addr_sel)
+    if addr:
+        record["address"] = addr[0].strip()
 
-    imgs = t('//ul[@class="swiper-wrapper pb-10"]/li/img/@src')
+    # Images
+    img_sel = '//ul[@class="swiper-wrapper pb-10"]/li/img/@src'
+    imgs = t(img_sel)
     if imgs:
-        data["Images"] = ",".join(
-            urljoin(BASE_URL, i) if i.startswith("/") else i
-            for i in imgs
-        )
+        for i in imgs:
+            if i.startswith("/"):
+                i = urljoin(BASE_URL, i)
+            record["images"].append(i)
 
-    print(f"Scraped data for {detail_url}: {data}")
-    return data
+    return record
 
 def main():
+    print("[info] Starting DTC scraper (Render version) ...")
     session = requests.Session()
-    session.headers.update(HEADERS)
 
-    if not os.path.exists("links.csv"):
-        print("No links.csv found. Scraping listing pages to get all detail links...")
-        all_links = []
-        page_number = 1
+    all_listings = []
+    page = 1
+    while True:
+        print(f"[info] Listing page {page} ...")
+        links = get_listing_links(page, session)
+        if not links:
+            print(f"[info] No links found on page {page} => stop.")
+            break
 
-        while True:
-            print(f"\n=== Fetching listing page {page_number} ===")
-            links = get_listing_links(session, page_number)
-            # If no product-result-1 is found => no links => break
-            if not links:
-                print(f"No links found on page {page_number}. Stopping pagination.")
-                break
-            print(f"Found {len(links)} links on page {page_number}.")
-            all_links.extend(links)
-            page_number += 1
-            time.sleep(2)  # Sleep between listing pages
+        print(f"[info] Found {len(links)} links on page {page}.")
+        for ln in links:
+            print(f"   -> detail: {ln}")
+            rec = parse_detail(ln, session)
+            if rec:
+                all_listings.append(rec)
+            time.sleep(1)
 
-        with open("links.csv", "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            for ln in all_links:
-                writer.writerow([ln])
-        print(f"Saved {len(all_links)} links to links.csv.")
-    else:
-        print("links.csv found. Will skip listing-pages scrape.")
+        page += 1
+        if page > 100:
+            print("[warn] Reached 100 pages => stopping.")
+            break
+        time.sleep(2)
 
-    all_links = []
-    with open("links.csv", "r", encoding="utf-8") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if row:
-                all_links.append(row[0])
-    print(f"Loaded {len(all_links)} links from links.csv.")
+    total_scraped = len(all_listings)
+    print(f"[info] Total listings scraped: {total_scraped}")
 
-    append_file = os.path.exists("dtc_lease_results.csv")
-    with open("dtc_lease_results.csv", "a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
-        if not append_file:
-            writer.writeheader()
+    if total_scraped == 0:
+        print("[warn] Scraped 0 listings. NOT wiping old DB data. Done.")
+        sys.exit(0)
 
-        total_scraped = 0
-        for idx, link in enumerate(all_links, start=1):
-            print(f"Scraping detail {idx}/{len(all_links)} => {link}")
-            record = parse_detail_page(session, link)
-            writer.writerow(record)
-            total_scraped += 1
-            print(f"Total scraped so far: {total_scraped}")
-            time.sleep(2)  # Sleep after each detail fetch
+    # Connect to DB + insert
+    try:
+        conn = connect_db()
+        cur = conn.cursor()
 
-    print(f"Finished. Appended {total_scraped} records to dtc_lease_results.csv.")
+        print("[info] Clearing old data in DB (car_images + car_listings)...")
+        cur.execute("TRUNCATE car_images;")
+        cur.execute("TRUNCATE car_listings RESTART IDENTITY CASCADE;")
+        conn.commit()
+
+        print("[info] Inserting new records...")
+
+        insert_listings_sql = """
+        INSERT INTO car_listings (
+            url, title, subtitle, financial_lease_price, financial_lease_term,
+            advertentienummer, merk, model, bouwjaar, km_stand,
+            transmissie, prijs, brandstof, btw_marge, opties_accessoires,
+            address
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id;
+        """
+
+        insert_images_sql = """
+        INSERT INTO car_images (image_url, car_listing_id)
+        VALUES (%s, %s);
+        """
+
+        inserted_count = 0
+
+        for listing in all_listings:
+            try:
+                # Insert the car_listings record
+                cur.execute(insert_listings_sql, (
+                    listing["url"],
+                    listing["title"],
+                    listing["subtitle"],
+                    listing["financial_lease_price"],
+                    listing["financial_lease_term"],
+                    listing["advertentienummer"],
+                    listing["merk"],
+                    listing["model"],
+                    listing["bouwjaar"],
+                    listing["km_stand"],
+                    listing["transmissie"],
+                    listing["prijs"],
+                    listing["brandstof"],
+                    listing["btw_marge"],
+                    listing["opties_accessoires"],
+                    listing["address"]
+                ))
+                new_id = cur.fetchone()[0]
+
+                # Insert car_images
+                for img_url in listing["images"]:
+                    cur.execute(insert_images_sql, (img_url, new_id))
+
+                # Commit this single listing successfully
+                conn.commit()
+                inserted_count += 1
+
+            except Exception as insert_err:
+                print(f"[error] Insert failed for {listing['url']} => {insert_err}")
+                conn.rollback()
+                continue
+
+        print(f"[info] Inserted {inserted_count} listings into DB successfully!")
+
+    except Exception as e:
+        print(f"[error] DB error => {e}")
+        sys.exit(1)
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+        print("[info] DB connection closed.")
 
 if __name__ == "__main__":
     main()
