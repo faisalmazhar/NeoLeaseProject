@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import time
-import csv
-import queue
-import threading
 import requests
+import csv
 from lxml import html
 from urllib.parse import urljoin, urlparse, parse_qs, urlencode
 
@@ -19,13 +17,6 @@ HEADERS = {
     "Accept": "*/*",
 }
 
-fieldnames = [
-    "url", "title", "subtitle", "financial_lease_price", "financial_lease_term",
-    "advertentienummer", "merk", "model", "bouwjaar", "km_stand",
-    "transmissie", "prijs", "brandstof", "btw_marge", "opties_accessoires",
-    "address", "images"
-]
-
 def robust_fetch(url, session, max_retries=4):
     """
     Fetch URL with basic retry/backoff for 403/429 or timeouts.
@@ -37,6 +28,7 @@ def robust_fetch(url, session, max_retries=4):
         try:
             resp = session.get(url, headers=HEADERS, timeout=15)
             print(f"[fetch] GET {url} => {resp.status_code}")
+            # If we get 403/429 => might be block => backoff
             if resp.status_code in (403, 429):
                 if attempt < max_retries - 1:
                     wait = backoffs[attempt]
@@ -60,13 +52,13 @@ def robust_fetch(url, session, max_retries=4):
                 return None
     return None
 
-def get_brand_model_links():
+def get_brand_model_links(session):
     """
-    1) Single-threaded step:
-       Visit https://www.dtc-lease.nl/merken
-       Collect all brand/model listing links.
+    Visit https://www.dtc-lease.nl/merken
+    Collect all brand/model links via:
+      //main[@id="main-content"]//ul/li[@class="text-cta-1 ml-6 list-disc"]/a/@href
+    Return the absolute URLs in a list.
     """
-    session = requests.Session()
     merken_url = urljoin(BASE_URL, "merken")
     resp = robust_fetch(merken_url, session)
     if not resp or not resp.ok:
@@ -74,28 +66,17 @@ def get_brand_model_links():
         return []
 
     tree = html.fromstring(resp.text)
+    # The XPath you gave:
     xp = '//main[@id="main-content"]//ul/li[@class="text-cta-1 ml-6 list-disc"]/a/@href'
     links = tree.xpath(xp)
+
     abs_links = [urljoin(BASE_URL, ln) for ln in links]
     print(f"[info] Found {len(abs_links)} brand/model links.")
     return abs_links
 
-def build_paginated_url(base_url, page_number):
-    """
-    base_url might be like:
-      https://www.dtc-lease.nl/voorraad/audi/a1?lease_type=financial&entity=business
-    We need to append or update the `page` parameter to page_number.
-    """
-    parsed = urlparse(base_url)
-    qs = parse_qs(parsed.query)
-    qs['page'] = [str(page_number)]
-    new_query = urlencode(qs, doseq=True)
-    new_url = parsed._replace(query=new_query).geturl()
-    return new_url
-
 def get_listing_links(listing_url, session):
     """
-    Returns up to 16 product links from the listing page.
+    Return up to 16 product links from the listing page.
     If no product found => return [].
     """
     resp = robust_fetch(listing_url, session)
@@ -120,49 +101,11 @@ def get_listing_links(listing_url, session):
     abs_links = [urljoin(BASE_URL, ln) for ln in links]
     return abs_links
 
-def collect_all_detail_links(brand_model_links):
-    """
-    Single-threaded logic to collect *all* detail URLs
-    from each brand-model listing + all pagination pages.
-    """
-    session = requests.Session()
-    all_detail_urls = []
-
-    for brand_link in brand_model_links:
-        page = 1
-        while True:
-            paginated_url = build_paginated_url(brand_link, page)
-            print(f"[info] Fetch listing => {paginated_url}")
-            product_links = get_listing_links(paginated_url, session)
-            if not product_links:
-                print(f"[info] No product links on page {page}. Stopping pagination for {brand_link}.")
-                break
-
-            print(f"  Found {len(product_links)} product links on page {page}.")
-            all_detail_urls.extend(product_links)
-
-            page += 1
-            # Safety net
-            if page > 200:
-                print("[warn] Reached 200 pages => stop as a safeguard.")
-                break
-
-    print(f"[info] Total detail URLs collected: {len(all_detail_urls)}")
-    return all_detail_urls
-
 def parse_detail(detail_url, session):
     """
     Scrape detail page, return dict with fields + list of image URLs.
     If fails => return None.
     """
-    resp = robust_fetch(detail_url, session)
-    if not resp or not resp.ok:
-        print(f"[error] Cannot fetch detail => {detail_url}")
-        return None
-
-    tree = html.fromstring(resp.text)
-    t = lambda xp: tree.xpath(xp)
-
     record = {
         "url": detail_url,
         "title": None,
@@ -182,22 +125,29 @@ def parse_detail(detail_url, session):
         "address": None,
         "images": [],
     }
+    resp = robust_fetch(detail_url, session)
+    if not resp or not resp.ok:
+        print(f"[error] Cannot fetch detail => {detail_url}")
+        return None
 
-    # Title etc.
+    tree = html.fromstring(resp.text)
+    t = lambda xp: tree.xpath(xp)
+
+    # Title etc
     title = t('//h1[@class="h1-sm tablet:h1 text-trustful-1"]/text()')
-    if title:
+    if title: 
         record["title"] = title[0].strip()
 
     subtitle = t('//p[@class="type-auto-sm tablet:type-auto-m text-trustful-1"]/text()')
-    if subtitle:
+    if subtitle: 
         record["subtitle"] = subtitle[0].strip()
 
     flp = t('//div[@data-testid="price-block"]//h2/text()')
-    if flp:
+    if flp: 
         record["financial_lease_price"] = flp[0].strip()
 
     flt = t('//div[@data-testid="price-block"]//p[contains(@class,"info-sm") and contains(text(),"mnd")]/text()')
-    if flt:
+    if flt: 
         record["financial_lease_term"] = flt[0].strip()
 
     adnum = t('//div[contains(@class,"p-sm") and contains(text(),"Advertentienummer")]/text()')
@@ -206,8 +156,8 @@ def parse_detail(detail_url, session):
 
     def spec(label):
         xp = f'//div[@class="text-p-sm text-grey-1" and normalize-space(text())="{label}"]/following-sibling::div/text()'
-        vals = t(xp)
-        return vals[0].strip() if vals else None
+        val = t(xp)
+        return val[0].strip() if val else None
 
     record["merk"] = spec("Merk")
     record["model"] = spec("Model")
@@ -233,95 +183,117 @@ def parse_detail(detail_url, session):
     # Images
     img_sel = '//ul[@class="swiper-wrapper pb-10"]/li/img/@src'
     imgs = t(img_sel)
-    for i in imgs:
-        if i.startswith("/"):
-            i = urljoin(BASE_URL, i)
-        record["images"].append(i)
+    if imgs:
+        for i in imgs:
+            if i.startswith("/"):
+                i = urljoin(BASE_URL, i)
+            record["images"].append(i)
 
     return record
 
-def worker_thread(
-    q: queue.Queue,
-    writer: csv.DictWriter,
-    lock: threading.Lock,
-    f,
-    ):
-    
+def build_paginated_url(base_url, page_number):
     """
-    Worker thread function:
-      - Uses its own requests.Session.
-      - Pulls detail URLs from the queue.
-      - Scrapes detail data.
-      - Immediately writes to CSV with thread-safe locking.
+    base_url might be like:
+      https://www.dtc-lease.nl/voorraad/audi/a1?lease_type=financial&entity=business
+    We need to append or update the `page` parameter to page_number.
+    If ?page= already exists, override it. Otherwise add &page=N.
     """
-    session = requests.Session()
-    while True:
-        try:
-            detail_url = q.get_nowait()
-        except queue.Empty:
-            break  # No more items => exit this thread
+    parsed = urlparse(base_url)
+    qs = parse_qs(parsed.query)
 
-        record = parse_detail(detail_url, session)
-        if record:
-            # Convert images to a CSV-friendly string
-            record["images"] = ",".join(record["images"]) if record["images"] else ""
-            with lock:
-                writer.writerow(record)
-                # Flush so data is immediately written to disk
-                # (helps in case the process is killed mid-scrape)
-                # writer.f.flush()
-                f.flush()
+    # set/override the 'page' param
+    qs['page'] = [str(page_number)]
 
-        q.task_done()
+    # build the new query string
+    new_query = urlencode(qs, doseq=True)
+
+    # reassemble the URL
+    new_url = parsed._replace(query=new_query).geturl()
+    return new_url
 
 def main():
-    print("[info] Starting DTC scraper...")
+    print("[info] Starting DTC scraper (brand/model + pagination)...")
+    session = requests.Session()
 
-    # Phase 1: Single-thread - gather all detail URLs
-    brand_model_links = get_brand_model_links()
-    all_detail_urls = collect_all_detail_links(brand_model_links)
+    # 1. Collect brand/model links from /merken
+    brand_model_links = get_brand_model_links(session)
 
-    if not all_detail_urls:
-        print("[warn] No detail URLs found. Exiting.")
+    all_results = []
+
+    # 2. For each brand/model link, paginate
+    for brand_link in brand_model_links:
+        page = 1
+        while True:
+            paginated_url = build_paginated_url(brand_link, page)
+            print(f"[info] Fetching listing page => {paginated_url}")
+            links = get_listing_links(paginated_url, session)
+            if not links:
+                print(f"[info] No product links found on page {page}. Stop pagination for this brand/model.")
+                break
+
+            print(f"  Found {len(links)} detail links on page {page}.")
+            for ln in links:
+                print(f"    -> detail: {ln}")
+                rec = parse_detail(ln, session)
+                if rec:
+                    all_results.append(rec)
+                time.sleep(1)  # short delay
+
+            page += 1
+            # Just a safety net
+            if page > 200: 
+                print("[warn] Reached 200 pages => stop pagination for this link as a safeguard.")
+                break
+
+            time.sleep(2)  # short delay between pages
+
+        print("[info] Done with brand/model link:", brand_link)
+        # short break before next brand/model
+        time.sleep(3)
+
+    print(f"[info] Done scraping all brand/model links. Total results = {len(all_results)}")
+
+    # Write to CSV locally
+    if not all_results:
+        print("[warn] No results. We'll just end.")
         return
 
-    print(f"[info] Ready to scrape {len(all_detail_urls)} detail pages with multiple threads...")
+    # Write to dtc_lease_results.csv
+    print("[info] Writing data to dtc_lease_results.csv ...")
+    fieldnames = [
+        "url", "title", "subtitle", "financial_lease_price", "financial_lease_term",
+        "advertentienummer", "merk", "model", "bouwjaar", "km_stand",
+        "transmissie", "prijs", "brandstof", "btw_marge", "opties_accessoires",
+        "address", "images"
+    ]
+    with open("dtc_lease_results.csv", "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for item in all_results:
+            # Join images into a comma-separated string for CSV
+            images_str = ",".join(item["images"]) if item["images"] else ""
+            rowdict = {
+                "url": item["url"],
+                "title": item["title"],
+                "subtitle": item["subtitle"],
+                "financial_lease_price": item["financial_lease_price"],
+                "financial_lease_term": item["financial_lease_term"],
+                "advertentienummer": item["advertentienummer"],
+                "merk": item["merk"],
+                "model": item["model"],
+                "bouwjaar": item["bouwjaar"],
+                "km_stand": item["km_stand"],
+                "transmissie": item["transmissie"],
+                "prijs": item["prijs"],
+                "brandstof": item["brandstof"],
+                "btw_marge": item["btw_marge"],
+                "opties_accessoires": item["opties_accessoires"],
+                "address": item["address"],
+                "images": images_str
+            }
+            writer.writerow(rowdict)
 
-    # Phase 2: Multithreaded scraping and immediate CSV writes
-    num_workers = 10  # tweak as you wish
-    q = queue.Queue()
-
-    # Fill the queue with all detail URLs
-    for url in all_detail_urls:
-        q.put(url)
-
-    # Open CSV once, write header, then let threads append
-    f = open("dtc_lease_results.csv", "w", encoding="utf-8", newline="")
-    writer = csv.DictWriter(f, fieldnames=fieldnames)
-    writer.writeheader()
-
-    # A lock to ensure one-at-a-time writes
-    lock = threading.Lock()
-
-    # Start workers
-    threads = []
-    for _ in range(num_workers):
-        t = threading.Thread(
-            target=worker_thread,
-            args=(q, writer, lock, f)  # <-- CHANGED: pass the file handle
-        )
-        t.start()
-        threads.append(t)
-
-    # Wait for all tasks and threads to finish
-    q.join()
-    for t in threads:
-        t.join()
-
-    # Close the CSV file
-    f.close()
-
-    print("[info] All done! Data is in dtc_lease_results.csv")
+    print("[info] Wrote CSV file successfully.")
 
 if __name__ == "__main__":
     main()

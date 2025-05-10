@@ -8,6 +8,12 @@ from lxml import html
 from urllib.parse import urljoin
 
 BASE_URL = "https://www.dtc-lease.nl"
+LISTING_URL_TEMPLATE = (
+    "https://www.dtc-lease.nl/voorraad"
+    "?lease_type=financial"
+    "&voertuigen%5Bpage%5D={page}"
+    "&voertuigen%5BsortBy%5D=voertuigen_created_at_desc"
+)
 
 HEADERS = {
     "User-Agent": (
@@ -67,40 +73,15 @@ def robust_fetch(url, session, max_retries=4):
                 return None
     return None
 
-def get_brand_links(session):
-    """
-    Scrape the /merken page to get all the brand/model links.
-
-    Example of what these links look like (each link might be ~600 total):
-    https://www.dtc-lease.nl/voorraad/audi/a1?lease_type=financial&entity=business
-    """
-    url = urljoin(BASE_URL, "/merken")
+def get_listing_links(page_number, session):
+    """Return up to 16 product links from the listing page. If none => []."""
+    url = LISTING_URL_TEMPLATE.format(page=page_number)
     resp = robust_fetch(url, session)
     if not resp or not resp.ok:
-        print(f"[error] Cannot fetch brand list => {url}")
         return []
 
     tree = html.fromstring(resp.text)
-    # XPath for brand/model links:
-    xp = '//main[@id="main-content"]//ul/li[@class="text-cta-1 ml-6 list-disc"]/a/@href'
-    found_links = tree.xpath(xp)
-
-    # Convert to absolute URLs:
-    abs_links = [urljoin(BASE_URL, ln) for ln in found_links]
-    return abs_links
-
-def get_listing_links(page_url, session):
-    """
-    Given a brand/model URL that includes query parameters, 
-    fetch that page (e.g., page 2) and return up to 16 product links. 
-    If none => [], which means 'stop' for that brand/model.
-    """
-    resp = robust_fetch(page_url, session)
-    if not resp or not resp.ok:
-        return []
-
-    tree = html.fromstring(resp.text)
-    # Check if there's at least a 'product-result-1'
+    # Quick check to see if there's at least a 'product-result-1'
     first_sel = '//main[@id="main-content"]//a[@data-testid="product-result-1"]/@href'
     first_link = tree.xpath(first_sel)
     if not first_link:
@@ -210,38 +191,28 @@ def main():
     print("[info] Starting DTC scraper (Render version) ...")
     session = requests.Session()
 
-    # 1) Collect brand/model links from /merken
-    brand_links = get_brand_links(session)
-    print(f"[info] Found {len(brand_links)} brand-model links from /merken.")
-
     all_listings = []
-    for brand_link in brand_links:
-        # For each brand/model link, we need to paginate.
-        # brand_link example:
-        #   https://www.dtc-lease.nl/voorraad/audi/a1?lease_type=financial&entity=business
-        page = 1
-        while True:
-            page_url = f"{brand_link}&page={page}" if page > 1 else brand_link
-            print(f"[info] Fetching listing page => {page_url}")
-            links = get_listing_links(page_url, session)
-            if not links:
-                print(f"[info] No links found on page {page} => stop pagination for {brand_link}.")
-                break
+    page = 1
+    while True:
+        print(f"[info] Listing page {page} ...")
+        links = get_listing_links(page, session)
+        if not links:
+            print(f"[info] No links found on page {page} => stop.")
+            break
 
-            print(f"[info] Found {len(links)} links on page {page}.")
-            for ln in links:
-                print(f"   -> detail: {ln}")
-                rec = parse_detail(ln, session)
-                if rec:
-                    all_listings.append(rec)
-                time.sleep(1)
+        print(f"[info] Found {len(links)} links on page {page}.")
+        for ln in links:
+            print(f"   -> detail: {ln}")
+            rec = parse_detail(ln, session)
+            if rec:
+                all_listings.append(rec)
+            time.sleep(1)
 
-            page += 1
-            # Safety check to avoid infinite loops:
-            if page > 100:
-                print("[warn] Reached 100 pages => stopping pagination for this brand/model.")
-                break
-            time.sleep(2)
+        page += 1
+        if page > 100:
+            print("[warn] Reached 100 pages => stopping.")
+            break
+        time.sleep(2)
 
     total_scraped = len(all_listings)
     print(f"[info] Total listings scraped: {total_scraped}")

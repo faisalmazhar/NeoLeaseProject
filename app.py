@@ -9,7 +9,8 @@ from utils import parse_price  # or put the function above directly in app.py
 
 # Use the same connection style as your CSV script
 # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/neolease_db"
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neolease_db_user:DKuNZ0Z4OhuNKWvEFaAuWINgr7BfgyTE@dpg-cvslkuvdiees73fiv97g-a.oregon-postgres.render.com:5432/neolease_db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neolease_db_user:DKuNZ0Z4OhuNKWvEFaAuWINgr7BfgyTE@dpg-cvslkuvdiees73fiv97g-a.oregon-postgres.render.com:5432/neolease_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neolease_db_kpz9_user:33H6QVFnAouvau72DlSjuKAMe5GdfviD@dpg-d0f0ihh5pdvs73b6h3bg-a.oregon-postgres.render.com:5432/neolease_db_kpz9"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -35,6 +36,7 @@ def index():
                         .order_by(CarListing.merk.asc())\
                         .all()
     brand_choices = [b[0] for b in distinct_brands if b[0]]
+    print(brand_choices)
     random_cars = CarListing.query.order_by(func.random()).limit(10).all()
 
     return render_template("index.html", total_cars=total_cars, random_cars=random_cars, brand_choices=brand_choices)

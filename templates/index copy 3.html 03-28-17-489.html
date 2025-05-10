@@ -1,0 +1,178 @@
+{# templates/index.html #}
+{% extends "base.html" %}
+{% block title %}Home | Neo Lease{% endblock %}
+
+{% block content %}
+
+  <!-- HERO SECTION -->
+  <section class="hero"
+    style="background-image: url('{{ url_for('static', filename='images/index_header.png') }}');">
+    <div class="overlay"></div>
+    <div class="hero-content container">
+    <h1>De Nieuwe Standaard in Financial Lease</h1>
+    <p>Wij regelen financial lease zoals het hoort: snel, transparant en altijd in jouw voordeel.</p>
+
+    <!-- NEW BUTTON: “View Offer” => link to your /listings page -->
+    <!-- Some new “filter box” near the top or inside your hero or below it -->
+    <div class="filter-box" style="background:#f9f9f9; padding:1rem; border-radius:8px; max-width:400px;">
+      <form action="{{ url_for('listings') }}" method="get" style="display:flex; flex-direction:column; gap:1rem;">
+    
+        <!-- 1) Merk & Model => brand dropdown (dynamic) or a text input for model -->
+        <label for="brand" style="font-weight:bold;">Merk en model</label>
+        <select id="brand" name="brand" style="padding:0.5rem;">
+          <option value="">-- Alle merken --</option>
+          {% if brand_choices %}
+            {% for b in brand_choices %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+        <!-- Alternatively, if you want “Merk en model” to be a text input for free search, 
+             you can do name="q" instead. But here we’re copying the approach from listings. -->
+        
+        <!-- 2) Monthly budget dropdown -->
+        <label for="budget" style="font-weight:bold;">Kies je budget (p/m)</label>
+        <select id="budget" name="monthly" style="padding:0.5rem;">
+          <option value="">Geen budget</option>
+          <option value="1-99">€1 - €99 p/m</option>
+          <option value="100-199">€100 - €199 p/m</option>
+          <option value="200-299">€200 - €299 p/m</option>
+          <option value="300-399">€300 - €399 p/m</option>
+          <option value="400-499">€400 - €499 p/m</option>
+          <option value="500-599">€500 - €599 p/m</option>
+          <option value="600-699">€600 - €699 p/m</option>
+          <option value="700-799">€700 - €799 p/m</option>
+          <option value="800-899">€800 - €899 p/m</option>
+          <option value="900-999">€900 - €999 p/m</option>
+          <option value="1000+">€1000 > p/m</option>
+        </select>
+        <!-- Notice we call the param “monthly” to differentiate from the old “budget” param. -->
+    
+        <!-- 3) Big button that shows total_cars -->
+        <button type="submit"
+                style="background:#4c37c6; color:white; padding:0.75rem; font-size:1rem; border:none; border-radius:4px;">
+          Bekijk aanbod ({{ total_cars }})
+        </button>
+      </form>
+    </div>
+    
+
+    <div class="scroll-down">
+    <span class="arrow">&#x25BC;</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- BRANDS ROW (below hero) -->
+  <section class="container" style="padding:2rem 1rem; text-align:center;">
+    <h2 style="color:#4c37c6; margin-bottom:1rem;">Zoek direct op merk</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center; align-items:center;">
+      <!-- Example brand: BMW -->
+      <a href="{{ url_for('listings', brand='BMW') }}" style="display:inline-block;">
+        <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW" style="width:80px; height:auto;">
+      </a>
+      <!-- Add more brand links: Mercedes, Audi, Volkswagen, etc. -->
+      <a href="{{ url_for('listings', brand='Mercedes') }}">
+        <img src="{{ url_for('static', filename='images/mercedes.png') }}" alt="Mercedes" style="width:80px; height:auto;">
+      </a>
+      <!-- Etc. -->
+    </div>
+  </section>
+
+
+  <!-- TOP INFO-BULLETS SECTION -->
+  <section class="info-bullets container">
+    <div class="bullets">
+      <div class="bullet">&#x2705; Binnen 24 uur een voorstel</div>
+      <div class="bullet">&#x2705; De beste leasevoorwaarden</div>
+      <div class="bullet">&#x2705; Geen ingewikkelde processen</div>
+    </div>
+    <div class="info-buttons">
+      <a href="{{ url_for('aanbod') }}" class="btn purple">BEKIJK ONS AANBOD</a>
+      <a href="{{ url_for('general_calculator') }}" class="btn purple">BEREKEN JE MAAND</a>
+    </div>
+  </section>
+
+  <!-- FINANCIAL LEASE DIENSTEN -->
+  <section class="services container">
+    <h2>Financial Lease Diensten</h2>
+    <div class="services-grid">
+      <!-- 1 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index11.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Personenauto's</h3>
+          <p>Ontdek ons uitgebreide aanbod personenauto’s en lease de perfecte auto voor jouw behoeften!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index12.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Bedrijfswagens</h3>
+          <p>Bekijk hier de mogelijkheden voor financial lease van bedrijfswagens en rijd snel weg!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index13.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Equipment</h3>
+          <p>Bekijk hier ons ruime aanbod van financial lease voor bedrijfsmiddelen!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAAROM KIEZEN VOOR NEO LEASE? -->
+  <section class="why-neo container">
+    <h2>Waarom kiezen voor Neo Lease?</h2>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index21.jpg') }}');"></div>
+        <h3>Snel</h3>
+        <p>Kies voor ons en ontvang binnen 24 uur een vrijblijvende offerte op maat!</p>
+      </div>
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index22.jpg') }}');"></div>
+        <h3>Transparant</h3>
+        <p>Kies voor ons en profiteer van heldere, transparante voorwaarden afgestemd op jouw behoeften!</p>
+      </div>
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index23.jpg') }}');"></div>
+        <h3>Simpel</h3>
+        <p>Kies voor ons en profiteer van financial lease zonder ingewikkelde processen!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- START VANDAAG NOG -->
+  <section class="start-today container">
+    <h2>Start vandaag nog!</h2>
+    <div class="today-buttons">
+      <a href="{{ url_for('aanbod') }}" class="btn border">Vraag een vrijblijvend voorstel aan</a>
+      <a href="https://api.whatsapp.com/send?phone=31616118086"
+         class="btn border"
+         target="_blank">Stuur een Whatsappbericht</a>
+      <a href="{{ url_for('contact') }}" class="btn border">Vraag een terugbelverzoek aan</a>
+    </div>
+  </section>
+
+{% endblock %}

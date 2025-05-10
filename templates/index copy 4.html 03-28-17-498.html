@@ -1,0 +1,527 @@
+{# templates/index.html #}
+{% extends "base.html" %}
+{% block title %}Home | Neo Lease{% endblock %}
+
+{% block content %}
+
+  <!-- HERO SECTION -->
+  <section class="hero"
+    style="background-image: url('{{ url_for('static', filename='images/index_header.png') }}');">
+    <div class="overlay"></div>
+    <div class="hero-content container">
+    <h1>De Nieuwe Standaard in Financial Lease</h1>
+    <p>Wij regelen financial lease zoals het hoort: snel, transparant en altijd in jouw voordeel.</p>
+
+    <!-- NEW BUTTON: “View Offer” => link to your /listings page -->
+    <!-- Some new “filter box” near the top or inside your hero or below it -->
+    <div class="filter-box" style="background:#f9f9f9; padding:1rem; border-radius:8px; max-width:400px;">
+      <form action="{{ url_for('listings') }}" method="get" style="display:flex; flex-direction:column; gap:1rem;">
+    
+        <!-- 1) Merk & Model => brand dropdown (dynamic) or a text input for model -->
+        <label for="brand" style="font-weight:bold;">Merk en model</label>
+        <select id="brand" name="brand" style="padding:0.5rem;">
+          <option value="">-- Alle merken --</option>
+          {% if brand_choices %}
+            {% for b in brand_choices %}
+              <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+        <!-- Alternatively, if you want “Merk en model” to be a text input for free search, 
+             you can do name="q" instead. But here we’re copying the approach from listings. -->
+        
+        <!-- 2) Monthly budget dropdown -->
+        <label for="budget" style="font-weight:bold;">Kies je budget (p/m)</label>
+        <select id="budget" name="monthly" style="padding:0.5rem;">
+          <option value="">Geen budget</option>
+          <option value="1-99">€1 - €99 p/m</option>
+          <option value="100-199">€100 - €199 p/m</option>
+          <option value="200-299">€200 - €299 p/m</option>
+          <option value="300-399">€300 - €399 p/m</option>
+          <option value="400-499">€400 - €499 p/m</option>
+          <option value="500-599">€500 - €599 p/m</option>
+          <option value="600-699">€600 - €699 p/m</option>
+          <option value="700-799">€700 - €799 p/m</option>
+          <option value="800-899">€800 - €899 p/m</option>
+          <option value="900-999">€900 - €999 p/m</option>
+          <option value="1000+">€1000 > p/m</option>
+        </select>
+        <!-- Notice we call the param “monthly” to differentiate from the old “budget” param. -->
+    
+        <!-- 3) Big button that shows total_cars -->
+        <button type="submit"
+                style="background:#4c37c6; color:white; padding:0.75rem; font-size:1rem; border:none; border-radius:4px;">
+          Bekijk aanbod ({{ total_cars }})
+        </button>
+      </form>
+    </div>
+    
+
+    <div class="scroll-down">
+    <span class="arrow">&#x25BC;</span>
+    </div>
+    </div>
+  </section>
+
+<!-- MARQUEE / CAROUSEL OF BRAND LOGOS -->
+  <!-- 1) MARQUEE: MERKLOGO’S -->
+  <!-- <section class="container" style="padding:2rem 1rem;">
+    <h2 style="text-align:center; color:#4c37c6; margin-bottom:1rem;">
+      Zoeken op merk
+    </h2>
+    <div class="logo-marquee-wrapper">
+      <div class="logo-marquee"> -->
+        <!-- Add all the brand logos you have: BMW, Mercedes, etc. Repeat for a seamless loop. -->
+        
+        <!-- <a href="{{ url_for('listings', brand='BMW') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW">
+        </a>
+        <a href="{{ url_for('listings', brand='Mercedes') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/mercedes.png') }}" alt="Mercedes">
+        </a>
+        <a href="{{ url_for('listings', brand='Audi') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/audi.png') }}" alt="Audi">
+        </a>
+        <a href="{{ url_for('listings', brand='Volkswagen') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/volkswagen.png') }}" alt="Volkswagen">
+        </a>
+        <a href="{{ url_for('listings', brand='Hyundai') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/hyundai.svg') }}" alt="Hyundai">
+        </a>
+        <a href="{{ url_for('listings', brand='Porsche') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/porshe.svg') }}" alt="Porsche">
+        </a>
+        <a href="{{ url_for('listings', brand='MG') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/mg.png') }}" alt="MG">
+        </a>
+        <a href="{{ url_for('listings', brand='Seat') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/seat.png') }}" alt="Seat">
+        </a>
+        <a href="{{ url_for('listings', brand='Cupra') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/cupra.jpg') }}" alt="Cupra">
+        </a>
+        <a href="{{ url_for('listings', brand='fiat') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/fiat.png') }}" alt="fiat">
+        </a>
+        <a href="{{ url_for('listings', brand='ford') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/ford.png') }}" alt="ford">
+        </a>
+        <a href="{{ url_for('listings', brand='honda') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/honda.png') }}" alt="honda">
+        </a>
+        <a href="{{ url_for('listings', brand='iveco') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/iveco.png') }}" alt="iveco">
+        </a>
+        <a href="{{ url_for('listings', brand='landrover') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/landrover.png') }}" alt="landrover">
+        </a>
+        <a href="{{ url_for('listings', brand='kia') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/kia.png') }}" alt="kia">
+        </a>
+        <a href="{{ url_for('listings', brand='lexus') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/lexus.png') }}" alt="lexus">
+        </a>
+        <a href="{{ url_for('listings', brand='peugeot') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/peugeot.png') }}" alt="peugeot">
+        </a>
+        <a href="{{ url_for('listings', brand='porsche') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/porsche.png') }}" alt="porsche">
+        </a>
+        <a href="{{ url_for('listings', brand='renault') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/renault.png') }}" alt="renault">
+        </a>
+        <a href="{{ url_for('listings', brand='skoda') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/skoda.png') }}" alt="skoda">
+        </a>
+        <a href="{{ url_for('listings', brand='suzuki') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/suzuki.png') }}" alt="suzuki">
+        </a>
+        <a href="{{ url_for('listings', brand='tesla') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/tesla.png') }}" alt="tesla">
+        </a>
+        <a href="{{ url_for('listings', brand='toyota') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/toyota.png') }}" alt="toyota">
+        </a>
+        <a href="{{ url_for('listings', brand='volvo') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/volvo.png') }}" alt="volvo">
+        </a>
+        <a href="{{ url_for('listings', brand='nissan') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/nissan.png') }}" alt="nissan">
+        </a>
+        <a href="{{ url_for('listings', brand='BMW') }}" class="brand-logo-link">
+          <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW">
+        </a>
+      </div>
+    </div>
+  </section> -->
+
+  <section class="container" style="padding:2rem 1rem;">
+    <h2 style="text-align:center; color:#4c37c6; margin-bottom:1rem;">Zoeken op merk</h2>
+  
+    <div class="logo-slider">
+      <div>
+        <a href="{{ url_for('listings', brand='BMW') }}">
+          <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Mercedes') }}">
+          <img src="{{ url_for('static', filename='images/mercedes.png') }}" alt="Mercedes">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Audi') }}">
+          <img src="{{ url_for('static', filename='images/audi.png') }}" alt="Audi">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Volkswagen') }}">
+          <img src="{{ url_for('static', filename='images/volkswagen.png') }}" alt="Volkswagen">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Hyundai') }}">
+          <img src="{{ url_for('static', filename='images/hyundai.svg') }}" alt="Hyundai">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Porsche') }}">
+          <img src="{{ url_for('static', filename='images/porshe.svg') }}" alt="Porsche">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='MG') }}">
+          <img src="{{ url_for('static', filename='images/mg.png') }}" alt="MG">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Seat') }}">
+          <img src="{{ url_for('static', filename='images/seat.png') }}" alt="Seat">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='Cupra') }}">
+          <img src="{{ url_for('static', filename='images/cupra.jpg') }}" alt="Cupra">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='fiat') }}">
+          <img src="{{ url_for('static', filename='images/fiat.png') }}" alt="fiat">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='ford') }}">
+          <img src="{{ url_for('static', filename='images/ford.png') }}" alt="ford">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='honda') }}">
+          <img src="{{ url_for('static', filename='images/honda.png') }}" alt="honda">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='iveco') }}">
+          <img src="{{ url_for('static', filename='images/iveco.png') }}" alt="iveco">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='landrover') }}">
+          <img src="{{ url_for('static', filename='images/landrover.png') }}" alt="landrover">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='kia') }}">
+          <img src="{{ url_for('static', filename='images/kia.png') }}" alt="kia">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='lexus') }}">
+          <img src="{{ url_for('static', filename='images/lexus.png') }}" alt="lexus">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='peugeot') }}">
+          <img src="{{ url_for('static', filename='images/peugeot.png') }}" alt="peugeot">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='porsche') }}">
+          <img src="{{ url_for('static', filename='images/porsche.png') }}" alt="porsche">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='renault') }}">
+          <img src="{{ url_for('static', filename='images/renault.png') }}" alt="renault">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='skoda') }}">
+          <img src="{{ url_for('static', filename='images/skoda.png') }}" alt="skoda">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='suzuki') }}">
+          <img src="{{ url_for('static', filename='images/suzuki.png') }}" alt="suzuki">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='tesla') }}">
+          <img src="{{ url_for('static', filename='images/tesla.png') }}" alt="tesla">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='toyota') }}">
+          <img src="{{ url_for('static', filename='images/toyota.png') }}" alt="toyota">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='volvo') }}">
+          <img src="{{ url_for('static', filename='images/volvo.png') }}" alt="volvo">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url_for('listings', brand='nissan') }}">
+          <img src="{{ url_for('static', filename='images/nissan.png') }}" alt="nissan">
+        </a>
+      </div>
+      
+    </div>
+  </section>
+  
+
+
+
+
+  <!-- TOP INFO-BULLETS SECTION -->
+  <section class="info-bullets container">
+    <div class="bullets">
+      <div class="bullet">&#x2705; Binnen 24 uur een voorstel</div>
+      <div class="bullet">&#x2705; De beste leasevoorwaarden</div>
+      <div class="bullet">&#x2705; Geen ingewikkelde processen</div>
+    </div>
+    <div class="info-buttons">
+      <a href="{{ url_for('aanbod') }}" class="btn purple">BEKIJK ONS AANBOD</a>
+      <a href="{{ url_for('general_calculator') }}" class="btn purple">BEREKEN JE MAAND</a>
+    </div>
+  </section>
+
+  <!-- FINANCIAL LEASE DIENSTEN -->
+  <section class="services container">
+    <h2>Financial Lease Diensten</h2>
+    <div class="services-grid">
+      <!-- 1 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index11.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Personenauto's</h3>
+          <p>Ontdek ons uitgebreide aanbod personenauto’s en lease de perfecte auto voor jouw behoeften!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index12.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Bedrijfswagens</h3>
+          <p>Bekijk hier de mogelijkheden voor financial lease van bedrijfswagens en rijd snel weg!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="service-item">
+        <div class="service-img"
+             style="background-image: url('{{ url_for('static', filename='images/index13.jpg') }}');"></div>
+        <div class="service-content">
+          <h3>Equipment</h3>
+          <p>Bekijk hier ons ruime aanbod van financial lease voor bedrijfsmiddelen!</p>
+        </div>
+        <div class="service-footer">
+          <a href="{{ url_for('aanbod') }}" class="btn border">Bekijk aanbod</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAAROM KIEZEN VOOR NEO LEASE? -->
+  <section class="why-neo container">
+    <h2>Waarom kiezen voor Neo Lease?</h2>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index21.jpg') }}');"></div>
+        <h3>Snel</h3>
+        <p>Kies voor ons en ontvang binnen 24 uur een vrijblijvende offerte op maat!</p>
+      </div>
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index22.jpg') }}');"></div>
+        <h3>Transparant</h3>
+        <p>Kies voor ons en profiteer van heldere, transparante voorwaarden afgestemd op jouw behoeften!</p>
+      </div>
+      <div class="why-item">
+        <div class="why-img"
+             style="background-image: url('{{ url_for('static', filename='images/index23.jpg') }}');"></div>
+        <h3>Simpel</h3>
+        <p>Kies voor ons en profiteer van financial lease zonder ingewikkelde processen!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- START VANDAAG NOG -->
+  <section class="start-today container">
+    <h2>Start vandaag nog!</h2>
+    <div class="today-buttons">
+      <a href="{{ url_for('aanbod') }}" class="btn border">Vraag een vrijblijvend voorstel aan</a>
+      <a href="https://api.whatsapp.com/send?phone=31616118086"
+         class="btn border"
+         target="_blank">Stuur een Whatsappbericht</a>
+      <a href="{{ url_for('contact') }}" class="btn border">Vraag een terugbelverzoek aan</a>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS SECTION -->
+  <section class="container" style="padding:2rem 1rem;">
+    <h2 style="color:#4c37c6; text-align:center; margin-bottom:1rem;">Hoe werkt het?</h2>
+    
+    <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center;">
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/step1-icon.png') }}" alt="Step 1" style="width:80px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Stap 1: Kies je auto</h3>
+        <p style="font-size:0.95rem;">Blader door ons aanbod en vind de perfecte auto, bedrijfswagen of equipment.</p>
+      </div>
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/step2-icon.png') }}" alt="Step 2" style="width:80px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Stap 2: Dien aanvraag in</h3>
+        <p style="font-size:0.95rem;">Vul je gegevens in voor een vrijblijvende offerte. We helpen je snel verder.</p>
+      </div>
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/step3-icon.png') }}" alt="Step 3" style="width:80px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Stap 3: Ontvang je contract</h3>
+        <p style="font-size:0.95rem;">We sturen binnen 24 uur een voorstel op maat. Akkoord? Dan is alles zo geregeld.</p>
+      </div>
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/step4-icon.png') }}" alt="Step 4" style="width:80px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Stap 4: Rijd weg</h3>
+        <p style="font-size:0.95rem;">Na goedkeuring staat je auto klaar en kun je direct de weg op!</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" style="padding:2rem 1rem;">
+    <h2 style="color:#4c37c6; text-align:center; margin-bottom:1rem;">Onze Diensten</h2>
+    
+    <div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center;">
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/financial_lease_icon.png') }}" alt="Financial Lease" style="width:60px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Financial Lease</h3>
+        <p style="font-size:0.95rem;">Voor ondernemers die eigenaar willen zijn van hun voertuig.</p>
+        <a href="{{ url_for('financial_lease') }}" class="btn border">Lees meer</a>
+      </div>
+      
+      <div style="flex:1; min-width:200px; max-width:250px; text-align:center;">
+        <img src="{{ url_for('static', filename='images/operational_lease_icon.png') }}" alt="Operational Lease" style="width:60px;">
+        <h3 style="color:#4c37c6; margin:0.5rem 0;">Operational Lease</h3>
+        <p style="font-size:0.95rem;">Volledig ontzorgd leasen voor ZZP en MKB.</p>
+        <a href="{{ url_for('operational_lease') }}" class="btn border">Ontdek</a>
+      </div>
+      
+      <!-- Add other services if you wish, e.g. Short Lease, Persoonlijke lening, etc. -->
+    </div>
+  </section>
+
+  <!-- 2) MARQUEE: UIT ONZE COLLECTIE (random DB cars) -->
+  {% if featured_cars and featured_cars|length > 0 %}
+  <section class="featured-cars-marquee-section container" style="padding:2rem 1rem;">
+    <h2 style="text-align:center; color:#4c37c6; margin-bottom:1rem;">
+      Uit onze collectie
+    </h2>
+    <p style="text-align:center; max-width:700px; margin:0 auto 2rem auto; font-size:0.95rem;">
+      Een kleine greep uit ons actuele aanbod &mdash; scroll voor meer!
+    </p>
+
+    <div class="featured-cars-marquee-wrapper">
+      <div class="featured-cars-marquee">
+        
+        {% for car in featured_cars %}
+          <div class="featured-car-card">
+            <a href="{{ url_for('car_detail', car_id=car.id) }}"
+                style="text-decoration:none; color:inherit;"
+            >
+              {% if car.images and car.images|length > 0 %}
+                <img src="{{ car.images[0].image_url }}" alt="Auto" />
+              {% else %}
+                <div style="background:#ccc; width:100%; height:150px; line-height:150px;">
+                  Geen afbeelding
+                </div>
+              {% endif %}
+              <h3 style="color:#4c37c6; margin-top:0.5rem; font-size:1rem;">
+                {{ car.title or 'Onbekend Model' }}
+              </h3>
+              <p style="font-size:0.9rem;">
+                {{ car.financial_lease_price }} / {{ car.financial_lease_term }}
+              </p>
+              <p style="font-size:0.9rem; color:#888;">
+                {{ car.merk }} - {{ car.model }}
+              </p>
+            </a>
+          </div>
+        {% endfor %}
+        
+        <!-- Repeat them if you want a smooth infinite loop -->
+        {% for car in featured_cars %}
+          <div class="featured-car-card">
+            <a href="{{ url_for('car_detail', car_id=car.id) }}"
+                style="text-decoration:none; color:inherit;"
+            >
+              {% if car.images and car.images|length > 0 %}
+                <img src="{{ car.images[0].image_url }}" alt="Auto" />
+              {% else %}
+                <div style="background:#ccc; width:100%; height:150px;">
+                  Geen afbeelding
+                </div>
+              {% endif %}
+              <h3 style="color:#4c37c6; margin-top:0.5rem; font-size:1rem;">
+                {{ car.title or 'Onbekend Model' }}
+              </h3>
+              <p style="font-size:0.9rem;">
+                {{ car.financial_lease_price }} / {{ car.financial_lease_term }}
+              </p>
+              <p style="font-size:0.9rem; color:#888;">
+                {{ car.merk }} - {{ car.model }}
+              </p>
+            </a>
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  
+  <section class="container" style="padding:2rem 1rem; background:#efefef; margin-top:2rem;">
+    <h2 style="color:#4c37c6; text-align:center;">Klaar om te starten?</h2>
+    <p style="text-align:center; max-width:600px; margin:0 auto;">
+      Wij staan voor je klaar om jouw financiering snel en betrouwbaar te regelen.
+    </p>
+    <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
+      <a href="{{ url_for('contact') }}" class="btn border">Neem contact op</a>
+      <a href="https://api.whatsapp.com/send?phone=31616118086" class="btn border" target="_blank">WhatsApp bericht</a>
+    </div>
+  </section>
+  
+
+{% endblock %}
