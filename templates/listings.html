@@ -158,22 +158,24 @@
        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
     {% for car in cars %}
       <div class="car-card">
-        
-        <a href="{{ url_for('car_detail', car_id=car.id) }}">
-          {% if car.images and car.images|length > 0 %}
-            <img src="{{ car.images[0].image_url }}" alt="Car Image">
-          {% else %}
-            <div style="
-              background:#ccc; 
-              width:100%; 
-              height:150px; 
-              line-height:150px; 
-              text-align:center;
-            ">
-              Geen afbeelding
-            </div>
-          {% endif %}
-        </a>
+        {# thumbnail with fallback list & spinner #}
+    <a href="{{ url_for('car_detail', car_id=car.id) }}"
+       class="thumb-wrapper">
+    
+      {% if car.images and car.images|length > 0 %}
+        {% set urls = car.images|map(attribute='image_url')|join(',') %}
+        <img class="listing-thumb"
+             data-image-urls="{{ urls }}"
+             src="{{ car.images[0].image_url }}"
+             alt="Car Image">
+        <div class="thumb-spinner" style="display:none;"></div>
+      {% else %}
+        <div style="background:#ccc;width:100%;height:150px;line-height:150px;text-align:center;">
+          Geen afbeelding
+        </div>
+      {% endif %}
+    </a>
+
 
         <h3>
           <a href="{{ url_for('car_detail', car_id=car.id) }}">
