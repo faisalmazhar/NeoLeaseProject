@@ -38,45 +38,60 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ========== 4) Single-image carousel logic ==========
-  const singleImageWrapper = document.querySelector('.carousel-single-image');
-  const arrowLeft = document.querySelector('.arrow-left');
-  const arrowRight = document.querySelector('.arrow-right');
-  const bigImage = document.getElementById('carousel-big-image');
+  // ========== 4) Single-image carousel logic (preload + spinner) ==========
+const wrapper   = document.querySelector('.carousel-single-image');
+const bigImage  = document.getElementById('carousel-big-image');
+const leftArrow = document.querySelector('.arrow-left');
+const rightArrow= document.querySelector('.arrow-right');
+const spinner   = document.getElementById('img-spinner');
 
-  if (singleImageWrapper && bigImage && arrowLeft && arrowRight) {
-    // Pull the CSV of image URLs from data attr
-    const imageUrls = singleImageWrapper.dataset.imageUrls
-      ? singleImageWrapper.dataset.imageUrls.split(',')
-      : [];
+if (wrapper && bigImage && leftArrow && rightArrow) {
 
-    // If there's more than 1 image, let user cycle
-    if (imageUrls.length > 1) {
-      let currentIndex = 0;
+  /* 1) parse CSV from data-attribute */
+  const imageUrls = wrapper.dataset.imageUrls
+        ? wrapper.dataset.imageUrls.split(',')
+        : [];
 
-      function updateBigImage() {
-        bigImage.src = imageUrls[currentIndex];
-      }
+  if (imageUrls.length <= 1) {
+    leftArrow.style.display = rightArrow.style.display = 'none';
+    /* nothing else to do */
+    return;
+  }
 
-      arrowLeft.addEventListener('click', () => {
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateBigImage();
-        }
-      });
+  /* 2) preload all images into an array */
+  const cache = imageUrls.map(u => { const img = new Image(); img.src = u; return img; });
 
-      arrowRight.addEventListener('click', () => {
-        if (currentIndex < imageUrls.length - 1) {
-          currentIndex++;
-          updateBigImage();
-        }
-      });
+  let current = 0;
+
+  function swap(toIdx){
+    current = toIdx;
+    spinner.style.display = 'block';
+
+    const img = cache[toIdx];
+    /* if already cached, .complete is true and onload won't fire */
+    if (img.complete) {
+      bigImage.src = img.src;
+      spinner.style.display = 'none';
     } else {
-      // If only 0 or 1 images, hide arrows
-      arrowLeft.style.display = 'none';
-      arrowRight.style.display = 'none';
+      img.onload = () => {
+        bigImage.src = img.src;
+        spinner.style.display = 'none';
+      };
     }
   }
-    // Simple Cookie Banner Logic
+
+  leftArrow.addEventListener('click', () => {
+    if (current > 0) swap(current - 1);
+  });
+  rightArrow.addEventListener('click', () => {
+    if (current < imageUrls.length - 1) swap(current + 1);
+  });
+}
+
+  
+  
+  
+  // Simple Cookie Banner Logic
     const banner = document.getElementById('cookie-banner');
     if (banner) {
       // Check localStorage or cookies to see if user made a choice
