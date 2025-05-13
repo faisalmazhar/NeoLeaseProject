@@ -83,7 +83,33 @@ if (singleImageWrapper && bigImage && arrowLeft && arrowRight) {
 }
 
 
-  
+  // ========== 4-bis) thumbnail auto-skip in listings grid ==========
+// handles every  <img class="listing-thumb" data-image-urls="url1,url2,…">
+document.querySelectorAll('.listing-thumb').forEach(img => {
+  const urls = img.dataset.imageUrls ? img.dataset.imageUrls.split(',') : [];
+  if (urls.length === 0) return;
+
+  const spinner = img.parentElement.querySelector('.thumb-spinner');
+  let current   = 0;
+
+  function load(i) {
+    if (i >= urls.length) {          // none worked → hide
+      img.style.display = 'none';
+      if (spinner) spinner.style.display = 'none';
+      return;
+    }
+    if (spinner) spinner.style.display = 'block';
+
+    img.onload  = () => { if (spinner) spinner.style.display = 'none'; };
+    img.onerror = () => {             // 404 / network error → next url
+      load(i + 1);
+    };
+    img.src = urls[i];
+    current = i;
+  }
+  load(0);
+});
+
   
   
   // Simple Cookie Banner Logic
