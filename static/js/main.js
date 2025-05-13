@@ -37,56 +37,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ========== 4) Single-image carousel logic ==========
-  // ========== 4) Single-image carousel logic (preload + spinner) ==========
-const wrapper   = document.querySelector('.carousel-single-image');
-const bigImage  = document.getElementById('carousel-big-image');
-const leftArrow = document.querySelector('.arrow-left');
-const rightArrow= document.querySelector('.arrow-right');
-const spinner   = document.getElementById('img-spinner');
+  
+// ========== 4) Single-image carousel logic ==========
+const singleImageWrapper = document.querySelector('.carousel-single-image');
+const arrowLeft  = document.querySelector('.arrow-left');
+const arrowRight = document.querySelector('.arrow-right');
+const bigImage   = document.getElementById('carousel-big-image');
+const spinner    = document.getElementById('img-spinner');   // the <div class="spinner">
 
-if (wrapper && bigImage && leftArrow && rightArrow) {
-
-  /* 1) parse CSV from data-attribute */
-  const imageUrls = wrapper.dataset.imageUrls
-        ? wrapper.dataset.imageUrls.split(',')
+if (singleImageWrapper && bigImage && arrowLeft && arrowRight) {
+  // 1) collect URLs
+  const imageUrls = singleImageWrapper.dataset.imageUrls
+        ? singleImageWrapper.dataset.imageUrls.split(',')
         : [];
 
-  if (imageUrls.length <= 1) {
-    leftArrow.style.display = rightArrow.style.display = 'none';
-    /* nothing else to do */
+  if (!imageUrls.length) {
+    arrowLeft.style.display = 'none';
+    arrowRight.style.display = 'none';
     return;
   }
 
-  /* 2) preload all images into an array */
-  const cache = imageUrls.map(u => { const img = new Image(); img.src = u; return img; });
+  let currentIndex = 0;
 
-  let current = 0;
-
-  function swap(toIdx){
-    current = toIdx;
+  // helper: try to load a URL; on 404 drop it and recurse
+  function loadImage(idx) {
+    if (idx < 0 || idx >= imageUrls.length) return;      // safety
     spinner.style.display = 'block';
-
-    const img = cache[toIdx];
-    /* if already cached, .complete is true and onload won't fire */
-    if (img.complete) {
-      bigImage.src = img.src;
-      spinner.style.display = 'none';
-    } else {
-      img.onload = () => {
-        bigImage.src = img.src;
-        spinner.style.display = 'none';
-      };
-    }
+    bigImage.onload  = () => { spinner.style.display = 'none'; };
+    bigImage.onerror = () => {
+      // remove bad URL and try again (same index now points to next img)
+      imageUrls.splice(idx, 1);
+      if (imageUrls.length) loadImage(idx >= imageUrls.length ? idx - 1 : idx);
+      else { spinner.style.display = 'none'; bigImage.style.display = 'none'; }
+    };
+    bigImage.src = imageUrls[idx];
+    currentIndex = idx;
   }
 
-  leftArrow.addEventListener('click', () => {
-    if (current > 0) swap(current - 1);
-  });
-  rightArrow.addEventListener('click', () => {
-    if (current < imageUrls.length - 1) swap(current + 1);
-  });
+  // initial display
+  loadImage(0);
+
+  // arrow handlers
+  arrowLeft.onclick  = () => loadImage(currentIndex - 1);
+  arrowRight.onclick = () => loadImage(currentIndex + 1);
 }
+
 
   
   
