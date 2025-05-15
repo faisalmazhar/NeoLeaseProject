@@ -1,5 +1,8 @@
 // static/js/main.js
 
+const FALLBACK_IMG = "/static/images/fallback.png";
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // ========== 1) Scroll-down arrow on hero section ==========
@@ -62,17 +65,29 @@ if (singleImageWrapper && bigImage && arrowLeft && arrowRight) {
   // helper: try to load a URL; on 404 drop it and recurse
   function loadImage(idx) {
     if (idx < 0 || idx >= imageUrls.length) return;      // safety
-    spinner.style.display = 'block';
-    bigImage.onload  = () => { spinner.style.display = 'none'; };
+    spinner.style.display = "block";
+  
+    bigImage.onload  = () => { spinner.style.display = "none"; };
     bigImage.onerror = () => {
-      // remove bad URL and try again (same index now points to next img)
+      // remove bad URL → try next
       imageUrls.splice(idx, 1);
-      if (imageUrls.length) loadImage(idx >= imageUrls.length ? idx - 1 : idx);
-      else { spinner.style.display = 'none'; bigImage.style.display = 'none'; }
+  
+      if (imageUrls.length) {
+        loadImage(idx >= imageUrls.length ? idx - 1 : idx);
+      } else {
+        // nothing worked  → show fallback
+        bigImage.src         = FALLBACK_IMG;
+        bigImage.style.display = "block";
+        spinner.style.display  = "none";
+        arrowLeft.style.display = "none";
+        arrowRight.style.display = "none";
+      }
     };
+  
     bigImage.src = imageUrls[idx];
     currentIndex = idx;
   }
+
 
   // initial display
   loadImage(0);
@@ -94,7 +109,7 @@ document.querySelectorAll('.listing-thumb').forEach(img => {
 
   function load(i) {
     if (i >= urls.length) {          // none worked → hide
-      img.style.display = 'none';
+      img.src = FALLBACK_IMG;          // <<< show fallback instead of hiding
       if (spinner) spinner.style.display = 'none';
       return;
     }
