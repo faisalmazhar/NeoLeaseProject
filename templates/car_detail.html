@@ -49,7 +49,9 @@
                 <div id="img-spinner" class="spinner" style="display:none;"></div>
 
             {% else %}
-                <p>Geen afbeeldingen</p>
+              <img id="carousel-big-image"
+               src="{{ url_for('static', filename='images/fallback.png') }}"
+               alt="Geen afbeelding">
             {% endif %}
             </div>
 
