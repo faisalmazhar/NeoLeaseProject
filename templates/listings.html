@@ -101,20 +101,16 @@
           <option value="electric">Elektrisch</option>
         </select>
 
-        <select name="monthly" class="brandSelect" >
-        <option value="">Budget (p/m)</option>
-        <option value="1-99" {% if current_monthly == '1-99' %} selected {% endif %}>€1 - €99</option>
-        <option value="100-199" {% if current_monthly == '100-199' %} selected {% endif %}>€100 - €199</option>
-        <option value="200-299" {% if current_monthly == '200-299' %} selected {% endif %}>€200 - €299</option>
-        <option value="300-399" {% if current_monthly == '300-399' %} selected {% endif %}>€300 - €399</option>
-        <option value="400-499" {% if current_monthly == '400-499' %} selected {% endif %}>€400 - €499</option>
-        <option value="500-599" {% if current_monthly == '500-599' %} selected {% endif %}>€500 - €599</option>
-        <option value="600-699" {% if current_monthly == '600-699' %} selected {% endif %}>€600 - €699</option>
-        <option value="700-799" {% if current_monthly == '700-799' %} selected {% endif %}>€700 - €799</option>
-        <option value="800-899" {% if current_monthly == '800-899' %} selected {% endif %}>€800 - €899</option>
-        <option value="900-999" {% if current_monthly == '900-999' %} selected {% endif %}>€900 - €999</option>
-        <option value="1000+" {% if current_monthly == '1000+' %} selected {% endif %}>€1000 +</option>
+        <select name="monthly" class="brandSelect">
+          <option value="">Budget&nbsp;(p/m)</option>
+          <option value="200-300" {% if current_monthly=='200-300' %}selected{% endif %}>€200 – €300</option>
+          <option value="301-400" {% if current_monthly=='301-400' %}selected{% endif %}>€301 – €400</option>
+          <option value="401-500" {% if current_monthly=='401-500' %}selected{% endif %}>€401 – €500</option>
+          <option value="501-600" {% if current_monthly=='501-600' %}selected{% endif %}>€501 – €600</option>
+          <option value="601-700" {% if current_monthly=='601-700' %}selected{% endif %}>€601 – €700</option>
+          <option value="700+"    {% if current_monthly=='700+'    %}selected{% endif %}>&gt; €700</option>
         </select>
+
 
         <!-- Sort -->
         <select name="sort" class="brandSelect">
