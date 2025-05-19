@@ -155,38 +155,28 @@ def listings():
     # If we got a monthly param (like "200-299", "1-99", or "1000+"), 
     # convert that to total price range:
     if monthly_param:
-        from utils import parse_price
-        # We'll assume 60 months. 
-        # So "x-y" means total price range [x*60, y*60].
-        # "1000+" means monthly >= 1000 => total >= 1000*60 => 60000
-        if monthly_param.endswith("+"):
-            # e.g. "1000+" => min 1000 => total >= 60000
-            min_val_str = monthly_param.replace("+", "")  # "1000"
-            min_val = float(min_val_str)
-            min_total = min_val * 60.0
-            
+        if monthly_param.endswith("+"):                      # "> 700"
+            min_monthly = float(monthly_param.rstrip("+"))   # 700
+            total_min   = (min_monthly + 1) * 60             # >= 701 €/mnd
             query = query.filter(
                 db.func.cast(
                     db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
                     db.Float
-                ) >= min_total
+                ) >= total_min
             )
-
         else:
-            # e.g. "200-299"
-            parts = monthly_param.split("-")
-            if len(parts) == 2:
-                lo = float(parts[0])  # 200
-                hi = float(parts[1])  # 299
-                lo_total = lo * 60.0
-                hi_total = hi * 60.0
-
+            try:
+                lo, hi = map(float, monthly_param.split("-"))   # e.g. 301-400
+                total_lo = lo * 60
+                total_hi = hi * 60
                 query = query.filter(
                     db.func.cast(
                         db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
                         db.Float
-                    ).between(lo_total, hi_total)
+                    ).between(total_lo, total_hi)
                 )
+            except ValueError:
+                pass   # ignore malformed input
 
     # (Optional) if you still want sorting logic
     sort = request.args.get("sort")
