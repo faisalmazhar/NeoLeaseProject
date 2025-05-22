@@ -24,6 +24,32 @@ class CarListing(db.Model):
     btw_marge = db.Column(db.String(50))
     opties_accessoires = db.Column(db.Text)
     address = db.Column(db.String(200))
+
+
+        # ─── NEW 24 columns ───
+    voertuigsoort       = db.Column(db.String(100))
+    gebruikt_nieuw      = db.Column(db.String(100))
+    inclusief_btw       = db.Column(db.String(100))
+    inclusief_bpm       = db.Column(db.String(100))
+    type                = db.Column(db.String(120))
+    inrichting          = db.Column(db.String(100))
+    aantal_versnellingen= db.Column(db.String(50))
+    carrosserie         = db.Column(db.String(100))
+    bekleding           = db.Column(db.String(100))
+    aantal_deuren       = db.Column(db.String(50))
+    aantal_zitplaatsen  = db.Column(db.String(50))
+    kleur_basis         = db.Column(db.String(100))
+    bovag               = db.Column(db.String(100))
+    nap                 = db.Column(db.String(100))
+    vermogen_motor      = db.Column(db.String(100))
+    cilinderinhoud      = db.Column(db.String(100))
+    aantal_cilinders    = db.Column(db.String(50))
+    wielbasis           = db.Column(db.String(100))
+    gewicht             = db.Column(db.String(100))
+    topsnelheid         = db.Column(db.String(100))
+    energielabel        = db.Column(db.String(20))
+    gemiddeld_verbruik  = db.Column(db.String(100))
+    tankinhoud          = db.Column(db.String(100))
     
     # Here’s the relationship to multiple images
     images = db.relationship(
