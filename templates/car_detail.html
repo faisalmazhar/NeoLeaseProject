@@ -1,4 +1,6 @@
-{# templates/car_detail.html #}
+{# ─────────────────────────────────────────────────────────────
+   templates/car_detail.html
+   ───────────────────────────────────────────────────────────── #}
 {% extends "base.html" %}
 {% block title %}{{ car.title or 'Auto Detail' }} | Neo Lease{% endblock %}
 
@@ -7,10 +9,10 @@
   <div class="container">
     <div class="car-detail-wrapper">
 
-      {# ───────────────────────  LEFT COLUMN  ─────────────────────── #}
+      {# ═════════════════════════  LEFT COLUMN  ════════════════════════ #}
       <div class="left-column">
 
-        {# ── Heading ── #}
+        {# ─── title + subtitle ─── #}
         <div class="car-heading">
           <h1 class="car-title">
             {{ car.title }}
@@ -19,7 +21,7 @@
           <p class="car-subtitle">{{ car.subtitle }}</p>
         </div>
 
-        {# ── single-image carousel ── #}
+        {# ─── image carousel ─── #}
         {% set all_urls = car.images|map(attribute='image_url')|join(',') if car.images else '' %}
         <div class="carousel-wrapper">
           <div class="carousel-container">
@@ -28,7 +30,6 @@
             <div class="carousel-single-image" data-image-urls="{{ all_urls }}">
               {% if all_urls %}
                 <img id="carousel-big-image" src="{{ car.images[0].image_url }}" alt="Car image">
-                <div id="img-spinner" class="spinner" style="display:none;"></div>
               {% else %}
                 <img id="carousel-big-image"
                      src="{{ url_for('static', filename='images/fallback.png') }}"
@@ -39,64 +40,55 @@
             <button class="carousel-arrow arrow-right">&#10095;</button>
           </div>
 
-          {# ── “calculator” mock ── #}
+          {# ─── calculator box ─── #}
           <div class="car-right">
             <div class="calc-box">
               <h3 class="calc-title">Jouw lease-calculator</h3>
 
               {% if car.financial_lease_price and car.financial_lease_term %}
-                <p><strong>{{ car.financial_lease_price }}</strong> per {{ car.financial_lease_term }} maanden</p>
+                <p><strong>{{ car.financial_lease_price }}</strong>
+                   per {{ car.financial_lease_term }} mnd</p>
               {% else %}
                 <p><em>Geen maandprijs beschikbaar</em></p>
               {% endif %}
 
-              <p class="calc-desc">
-                Stel hier je maandbedrag af voor financial lease,
-                <strong>kies looptijd, aanbetaling &amp; slottermijn</strong>.
+              <p class="calc-desc">Stel hier je maandbedrag af …</p>
+              <p>
+                <a href="{{ url_for('calculator', car_id=car.id) }}" class="btn purple">
+                  Open Calculator
+                </a>
               </p>
-
-              <p><a href="{{ url_for('calculator', car_id=car.id) }}" class="btn purple">Open Calculator</a></p>
-              <hr>
-              <p>Wil je deze auto <strong>favoriet</strong> maken of <strong>opslaan</strong> voor later?</p>
-
-              <button class="btn border favorite-btn"
-                      data-car-id="{{ car.id }}"
-                      data-title="{{ car.title }}"
-                      data-image="{{ car.images[0].image_url if car.images }}"
-                      data-monthly="{{ car.financial_lease_price or '' }}">
-                <i class="fa-regular fa-heart" style="color:#fff"></i>
-                Favoriet toevoegen
-              </button>
             </div>
           </div>
         </div>  {# /carousel-wrapper #}
 
-        {# ─────────────────────  OVER DEZE AUTO  ───────────────────── #}
+        {# ══════════════════  OVER DEZE AUTO  ══════════════════ #}
         <h2 class="car-title">Over deze auto</h2>
 
+        {# brand-icon lookup #}
         {% set brand_icons = {
-          'audi':'https://img.icons8.com/ios/50/audi.png',  'bmw':'/static/images/bmw1.svg',
-          'mercedes-benz':'https://img.icons8.com/color/48/mercedes-benz.png',
-          'volkswagen':'https://img.icons8.com/ios/50/volkswagen.png', 'skoda':'https://img.icons8.com/ios/50/skoda.png',
-          'volvo':'https://img.icons8.com/ios/50/volvo.png'
+          'audi':'https://img.icons8.com/ios/50/audi.png',
+          'bmw':'/static/images/bmw1.svg',
+          'citroën':'https://img.icons8.com/ios/50/citroen.png',
+          'volkswagen':'https://img.icons8.com/ios/50/volkswagen.png'
         } %}
         {% set fallback_icon = 'https://img.icons8.com/ios-filled/50/car.png' %}
-        {% set brand_icon   = brand_icons.get((car.merk or '').lower(), fallback_icon) %}
+        {% set brand_icon = brand_icons.get((car.merk or '').lower(), fallback_icon) %}
 
-        {# main 8 specs that are always visible #}
+        {# section-1 specs – always visible #}
         {% set primary_specs = [
-          ('Merk',         car.merk,        brand_icon),
-          ('Model',        car.model,       'https://img.icons8.com/ios-filled/50/car.png'),
-          ('Bouwjaar',     car.bouwjaar,    url_for('static', filename='images/calendar.png')),
-          ('Km stand',     (car.km_stand ~ ' km') if car.km_stand else None,
-                           url_for('static', filename='images/speedometer.png')),
-          ('Transmissie',  car.transmissie, url_for('static', filename='images/manual-transmission.png')),
-          ('Brandstof',    car.brandstof,   url_for('static', filename='images/fuel.png')),
-          ('Btw/marge',    car.btw_marge,   url_for('static', filename='images/vat.png')),
-          ('Prijs',        car.prijs,       url_for('static', filename='images/get-money.png'))
+          ('Merk',        car.merk,        brand_icon),
+          ('Model',       car.model,       'https://img.icons8.com/ios-filled/50/car.png'),
+          ('Bouwjaar',    car.bouwjaar,    url_for('static', filename='images/calendar.png')),
+          ('Km stand',    (car.km_stand ~ ' km') if car.km_stand else None,
+                          url_for('static', filename='images/speedometer.png')),
+          ('Transmissie', car.transmissie, url_for('static', filename='images/manual-transmission.png')),
+          ('Brandstof',   car.brandstof,   url_for('static', filename='images/fuel.png')),
+          ('Btw/marge',   car.btw_marge,   url_for('static', filename='images/vat.png')),
+          ('Prijs',       car.prijs,       url_for('static', filename='images/get-money.png'))
         ] %}
 
-        {# long tail of extra specs (can include blanks) #}
+        {# section-2 specs – extra, maybe empty #}
         {% set extra_specs = [
           ('Adres',              car.address),
           ('Voertuigsoort',      car.voertuigsoort),
@@ -124,24 +116,26 @@
           ('Tankinhoud',         car.tankinhoud)
         ] %}
 
-        <div id="spec-grid" class="spec-grid">
-          {# visible #}
-          {% for label, value, icon in primary_specs %}
-            <div class="spec-row">
-              <img src="{{ icon }}" class="spec-bullet" alt="">
-              <span class="spec-label">{{ label }}</span>
-              <span class="spec-value">{{ value if value else 'N/A' }}</span>
-            </div>
-          {% endfor %}
+        <div class="spec-wrapper">
+          <div class="spec-grid section-primary">
+            {% for label,val,icon in primary_specs %}
+              <div class="spec-row">
+                <img src="{{ icon }}" class="spec-bullet sm" alt="">
+                <span class="spec-label">{{ label }}</span>
+                <span class="spec-value">{{ val if val else 'N/A' }}</span>
+              </div>
+            {% endfor %}
+          </div>
 
-          {# hidden rows #}
-          {% for label, value in extra_specs %}
-            <div class="spec-row extra-spec d-none">
-              <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet small" alt="">
-              <span class="spec-label">{{ label }}</span>
-              <span class="spec-value">{{ value if value else 'N/A' }}</span>
-            </div>
-          {% endfor %}
+          <div id="spec-extra" class="spec-grid section-extra d-none">
+            {% for label,val in extra_specs %}
+              <div class="spec-row">
+                <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet sm" alt="">
+                <span class="spec-label">{{ label }}</span>
+                <span class="spec-value">{{ val if val else 'N/A' }}</span>
+              </div>
+            {% endfor %}
+          </div>
         </div>
 
         <button id="toggle-specs" class="toggle-btn">
@@ -150,7 +144,7 @@
 
         <hr class="section-divider">
 
-        {# ──────────────────  OPTIES & ACCESSOIRES  ────────────────── #}
+        {# ═══════════════  OPTIES & ACCESSOIRES  ═══════════════ #}
         {% set all_opts   = (car.opties_accessoires or '').split(',')|map('trim')|select|list %}
         {% set first_opts = all_opts[:5] %}
         {% set extra_opts = all_opts[5:] %}
@@ -158,14 +152,9 @@
         {% if all_opts %}
           <h2>Opties &amp; Accessoires</h2>
           <ul id="access-list" class="opties-list">
-            {% for o in first_opts %}
-              <li><span class="dash">-</span> {{ o }}</li>
-            {% endfor %}
-            {% for o in extra_opts %}
-              <li class="extra-opt d-none"><span class="dash">-</span> {{ o }}</li>
-            {% endfor %}
+            {% for o in first_opts %}<li><span class="dash">-</span> {{ o }}</li>{% endfor %}
+            {% for o in extra_opts %}<li class="extra-opt d-none"><span class="dash">-</span> {{ o }}</li>{% endfor %}
           </ul>
-
           {% if extra_opts %}
             <button id="toggle-opts" class="toggle-btn">
               Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
@@ -173,21 +162,24 @@
           {% endif %}
         {% endif %}
 
-        {# ───────────────────────  MAP  ─────────────────────── #}
-        {% if car.address %}
-          <div class="map-section" style="margin-top:2rem;">
+        {# ═════════════════════  MAP  ═════════════════════ #}
+        <div class="map-section" style="margin-top:2rem;">
+          {% if car.address %}
             <h3>Locatie:</h3>
-            <div style="width:100%; max-width:90%; height:15vw; min-height:250px;">
-              <iframe width="100%" height="100%" loading="lazy" frameborder="0"
-                      src="https://www.google.com/maps?q={{ car.address|urlencode }}&output=embed"></iframe>
-            </div>
-            <p style="margin-top:0.5rem; color:#555;">{{ car.address }}</p>
-          </div>
-        {% endif %}
+            <iframe width="100%" height="250"
+                    src="https://www.google.com/maps?q={{ car.address|urlencode }}&output=embed"
+                    loading="lazy" style="border:0;" allowfullscreen></iframe>
+            <p>{{ car.address }}</p>
+          {% else %}
+            <p><em>Geen adres beschikbaar</em></p>
+          {% endif %}
+        </div>
 
       </div>  {# /left-column #}
 
-    </div>  {# /car-detail-wrapper #}
-  </div>  {# /container #}
+      {# Right column with random cars slider etc. stays as you had it #}
+
+    </div> {# /car-detail-wrapper #}
+  </div>
 </section>
 {% endblock %}
