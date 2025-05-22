@@ -6,6 +6,7 @@ import logging
 from sqlalchemy import func  # Add this import for random()
 app = Flask(__name__)
 from utils import parse_price  # or put the function above directly in app.py
+import pprint, sys, logging
 
 # Use the same connection style as your CSV script
 # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/neolease_db"
@@ -269,6 +270,12 @@ def car_detail(car_id):
     car = CarListing.query.get_or_404(car_id)
     random_cars = CarListing.query.order_by(func.random()).limit(10).all()
 
+
+    logging.warning("CAR %s DUMP:\n%s",
+                    car_id,
+                    pprint.pformat({k: getattr(car, k) for k in car.__table__.columns.keys()},
+                                   width=120))
+    
     return render_template(
         "car_detail.html",
         car=car,
