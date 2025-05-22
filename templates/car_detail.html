@@ -265,7 +265,7 @@
         ("Gem. verbruik",      car.gemiddeld_verbruik),
         ("Tankinhoud",         car.tankinhoud),
       ] %}      {#  ←   *** removed the  |selectattr(1)|list  filter *** #}
-      
+      {% if extra_specs %}          {# ←  RE-ADD THIS LINE  #}
       <div id="spec-grid-extra" class="spec-grid">
         {% for label, value in extra_specs %}
           <div class="spec-row extra-spec d-none">
