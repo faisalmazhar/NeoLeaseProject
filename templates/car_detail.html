@@ -234,9 +234,84 @@
                 style="width:30px; height:auto;">
            <span>{{ car.prijs or "Onbekend" }}</span>
          </div>
-     
+         
        </div>  <!-- end .car-features (2 columns) -->
       </div> <!-- end .left-column -->
+      
+              {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block START ---------- ✂︎ #}
+      
+      {# build the list of additional, non-empty fields #}
+      {% set extra_specs = [
+        ("Adres",              car.address),
+        ("Voertuigsoort",      car.voertuigsoort),
+        ("Gebruikt/nieuw",     car.gebruikt_nieuw),
+        ("Incl. btw",          car.inclusief_btw),
+        ("Incl. bpm",          car.inclusief_bpm),
+        ("Type",               car.type),
+        ("Inrichting",         car.inrichting),
+        ("Versnellingen",      car.aantal_versnellingen),
+        ("Carrosserie",        car.carrosserie),
+        ("Bekleding",          car.bekleding),
+        ("Deuren",             car.aantal_deuren),
+        ("Zitplaatsen",        car.aantal_zitplaatsen),
+        ("Kleur",              car.kleur_basis),
+        ("Bovag",              car.bovag),
+        ("NAP",                car.nap),
+        ("Vermogen motor",     car.vermogen_motor),
+        ("Cilinderinhoud",     car.cilinderinhoud),
+        ("Aantal cilinders",   car.aantal_cilinders),
+        ("Wielbasis",          car.wielbasis),
+        ("Gewicht",            car.gewicht),
+        ("Topsnelheid",        car.topsnelheid),
+        ("Energielabel",       car.energielabel),
+        ("Gem. verbruik",      car.gemiddeld_verbruik),
+        ("Tankinhoud",         car.tankinhoud),
+      ] |selectattr(1)|list %}
+      
+      {% if extra_specs %}
+        <div id="spec-grid-extra" class="spec-grid">
+          {% for label,value in extra_specs %}
+            <div class="spec-row extra-spec d-none">
+              <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
+              <span class="spec-label">{{ label }}</span>
+              <span class="spec-value">{{ value }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      
+        <button id="toggle-specs" class="toggle-btn">
+          Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
+        </button>
+      
+        <hr class="section-divider">
+      {% endif %}
+      
+      {# ----------  OPTIES & ACCESSOIRES  ---------- #}
+      {% set all_opts = (car.opties_accessoires or "").split(",") |map("trim") |select|list %}
+      {% set first_opts = all_opts[:5] %}
+      {% set extra_opts = all_opts[5:] %}
+      
+      {% if all_opts %}
+        <h2>Opties & Accessoires</h2>
+      
+        <ul id="access-list" class="opties-list">
+          {% for o in first_opts %}
+            <li><span class="dash">-</span> {{ o }}</li>
+          {% endfor %}
+          {% for o in extra_opts %}
+            <li class="extra-opt d-none"><span class="dash">-</span> {{ o }}</li>
+          {% endfor %}
+        </ul>
+      
+        {% if extra_opts %}
+          <button id="toggle-opts" class="toggle-btn">
+            Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
+          </button>
+        {% endif %}
+      {% endif %}
+      
+      {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block END ---------- ✂︎ #}
+
 
      
        {# 4) Show a map for the address #}
