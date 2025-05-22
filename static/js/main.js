@@ -5,6 +5,30 @@ const FALLBACK_IMG = "/static/images/fallback.png";
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ========== 1***) new cardetails ==========
+
+  const btnSpecs=document.getElementById("toggle-specs");
+  const btnOpts =document.getElementById("toggle-opts");
+
+  if(btnSpecs){
+    btnSpecs.addEventListener("click",()=>{
+      document.querySelectorAll(".extra-spec").forEach(e=>e.classList.toggle("d-none"));
+      btnSpecs.firstChild.textContent = btnSpecs.firstChild.textContent.includes("meer")?"Toon minder":"Toon meer";
+      btnSpecs.querySelector("img").style.transform=
+        btnSpecs.firstChild.textContent.includes("meer")?"rotate(0deg)":"rotate(180deg)";
+    });
+  }
+  if(btnOpts){
+    btnOpts.addEventListener("click",()=>{
+      document.querySelectorAll(".extra-opt").forEach(e=>e.classList.toggle("d-none"));
+      btnOpts.firstChild.textContent = btnOpts.firstChild.textContent.includes("meer")?"Toon minder":"Toon meer";
+      btnOpts.querySelector("img").style.transform=
+        btnOpts.firstChild.textContent.includes("meer")?"rotate(0deg)":"rotate(180deg)";
+    });
+  }
+
+  
+
   // ========== 1) Scroll-down arrow on hero section ==========
   const scrollArrow = document.querySelector(".scroll-down");
   if (scrollArrow) {
