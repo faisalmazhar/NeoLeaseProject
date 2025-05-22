@@ -169,55 +169,84 @@
      {% endif %}
      
      {# 3) Render the first 8 features in a 2-column grid #}
+{# -------------------------------------------------------------------------- #}
+{# --------------  CAR INFO : "Over deze auto" (2-section grid) -------------- #}
+{# -------------------------------------------------------------------------- #}
 
-    <h1 class="car-title">
-        Over deze auto
-    </h1>
+{# 1) build a list with only NON-empty values #}
+{% set extra_specs = [
+    ("Adres",              car.address),
+    ("Voertuigsoort",      car.voertuigsoort),
+    ("Gebruikt/nieuw",     car.gebruikt_nieuw),
+    ("Incl. btw",          car.inclusief_btw),
+    ("Incl. bpm",          car.inclusief_bpm),
+    ("Type",               car.type),
+    ("Inrichting",         car.inrichting),
+    ("Versnellingen",      car.aantal_versnellingen),
+    ("Carrosserie",        car.carrosserie),
+    ("Bekleding",          car.bekleding),
+    ("Deuren",             car.aantal_deuren),
+    ("Zitplaatsen",        car.aantal_zitplaatsen),
+    ("Kleur",              car.kleur_basis),
+    ("Bovag",              car.bovag),
+    ("NAP",                car.nap),
+    ("Vermogen motor",     car.vermogen_motor),
+    ("Cilinderinhoud",     car.cilinderinhoud),
+    ("Aantal cilinders",   car.aantal_cilinders),
+    ("Wielbasis",          car.wielbasis),
+    ("Gewicht",            car.gewicht),
+    ("Topsnelheid",        car.topsnelheid),
+    ("Energielabel",       car.energielabel),
+    ("Gem. verbruik",      car.gemiddeld_verbruik),
+    ("Tankinhoud",         car.tankinhoud),
+] |selectattr(1, 'truthy')|list %}
 
-<div class="car-info" style="margin-top:2rem;">
+<h1 class="car-title">Over deze auto</h1>
 
-  <h1 class="car-title">Over deze auto</h1>
+<div class="car-info-grid" style="display:grid; gap:1.5rem; margin-top:1.5rem;">
 
-  <div class="car-features-wrapper">
-    <!-- Section 1 (Always visible) -->
-    <div class="car-features car-features-main" style="display:grid; gap:1rem;">
-      <div class="car-feature"><img src="{{ brand_icon }}" alt="{{ car.merk }}"><span>{{ car.merk or "Onbekend merk" }}</span></div>
-      <div class="car-feature"><img src="/static/images/car.png"><span>{{ car.model or "Model n/b" }}</span></div>
-      <div class="car-feature"><img src="/static/images/calendar.png"><span>{{ car.bouwjaar or "N/B" }}</span></div>
-      <div class="car-feature"><img src="/static/images/speedometer.png"><span>{{ car.km_stand or "N/B" }} km</span></div>
-      <div class="car-feature"><img src="/static/images/manual-transmission.png"><span>{{ car.transmissie or "Onbekend" }}</span></div>
-      <div class="car-feature"><img src="/static/images/fuel.png"><span>{{ car.brandstof or "N/B" }}</span></div>
-      <div class="car-feature"><img src="/static/images/vat.png"><span>{{ car.btw_marge or "N/B" }}</span></div>
-      <div class="car-feature"><img src="/static/images/get-money.png"><span>{{ car.prijs or "Onbekend" }}</span></div>
-    </div>
+  <!-- SECTION 1 – always visible -->
+  <div class="primary-specs" style="display:grid; gap:1rem;">
 
-    <!-- Section 2 (hidden, shown upon "Toon meer/minder" click) -->
-    <div id="extra-specs" class="car-features-extra d-none" style="display:grid; gap:1rem; margin-top:1rem;">
-      {% for label, value in extra_specs %}
-        <div class="car-feature">
-          <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
-          <span>{{ label }}: {{ value }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    <div class="car-feature"><img src="{{ brand_icon }}" alt="{{ car.merk }}"><span>{{ car.merk or "Onbekend merk" }}</span></div>
+    <div class="car-feature"><img src="/static/images/car.png"><span>{{ car.model or "Model n/b" }}</span></div>
+    <div class="car-feature"><img src="/static/images/calendar.png"><span>{{ car.bouwjaar or "N/B" }}</span></div>
+    <div class="car-feature"><img src="/static/images/speedometer.png"><span>{{ car.km_stand or "N/B" }} km</span></div>
+    <div class="car-feature"><img src="/static/images/manual-transmission.png"><span>{{ car.transmissie or "Onbekend" }}</span></div>
+    <div class="car-feature"><img src="/static/images/fuel.png"><span>{{ car.brandstof or "N/B" }}</span></div>
+    <div class="car-feature"><img src="/static/images/vat.png"><span>{{ car.btw_marge or "N/B" }}</span></div>
+    <div class="car-feature"><img src="/static/images/get-money.png"><span>{{ car.prijs or "Onbekend" }}</span></div>
 
-    <button id="toggle-specs" class="toggle-btn" onclick="toggleExtraSpecs()">
-      Toon meer
-      <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
-    </button>
   </div>
 
-  <script>
-    function toggleExtraSpecs() {
-      const specs = document.getElementById('extra-specs');
-      const btn = document.getElementById('toggle-specs');
-      specs.classList.toggle('d-none');
-      btn.innerHTML = specs.classList.contains('d-none') 
-        ? 'Toon meer <img src="{{ url_for("static", filename="images/arrow.png") }}" alt="">' 
-        : 'Toon minder <img src="{{ url_for("static", filename="images/arrow.png") }}" alt="">';
-    }
-  </script>
+  <!-- SECTION 2 – toggled rows -->
+  <div id="extra-specs" class="extra-specs d-none" style="display:grid; gap:1rem;">
+    {% for label, value in extra_specs %}
+      <div class="car-feature">
+        <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
+        <span class="spec-label">{{ label }}:</span>
+        <span class="spec-value">{{ value }}</span>
+      </div>
+    {% endfor %}
+  </div>
 
+  <!-- toggle button -->
+  <button id="toggle-specs" class="toggle-btn" onclick="toggleExtraSpecs()">
+    Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
+  </button>
+</div>
+
+<script>
+function toggleExtraSpecs () {
+  const block = document.getElementById('extra-specs');
+  const btn   = document.getElementById('toggle-specs');
+  block.classList.toggle('d-none');
+  btn.innerHTML = block.classList.contains('d-none')
+      ? 'Toon meer <img src="{{ url_for("static", filename="images/arrow.png") }}" alt="">'
+      : 'Toon minder <img src="{{ url_for("static", filename="images/arrow.png") }}" alt="">';
+}
+</script>
+{# -------------------------------------------------------------------------- #}
 </div>
       
       {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block END ---------- ✂︎ #}
