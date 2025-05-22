@@ -266,7 +266,7 @@
         ("Energielabel",       car.energielabel),
         ("Gem. verbruik",      car.gemiddeld_verbruik),
         ("Tankinhoud",         car.tankinhoud),
-      ] |selectattr(1)|list %}
+      ] |selectattr(1, 'truthy')|list %}
       
       {% if extra_specs %}
         <div id="spec-grid-extra" class="spec-grid">
