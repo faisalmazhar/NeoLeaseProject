@@ -1,391 +1,253 @@
 {# templates/car_detail.html #}
 {% extends "base.html" %}
-{% block title %}
-  {{ car.title or "Auto Detail" }} | Neo Lease
-{% endblock %}
+{% block title %}{{ car.title or "Auto Detail" }} | Neo Lease{% endblock %}
 
 {% block content %}
 <section class="car-detail-page">
-
-  <!-- PAGE WRAPPER with two columns: Left (carousel + details) and Right (calculator) -->
   <div class="container">
+    <div class="car-detail-wrapper">
 
-  
-  <div class="car-detail-wrapper">
-      
-      <!-- TITLE & SUBTITLE -->
+      <!-- ==============  LEFT COLUMN  ============== -->
       <div class="left-column">
 
-      <div class="car-heading">
-        <h1 class="car-title">
-          {{ car.title }}
-          <button class="favorite-btn" title="Toevoegen aan favorieten">
-          </button>
-        </h1>
-        <p class="car-subtitle">{{ car.subtitle }}</p>
-      </div>
+        <!-- ----------  TITLE ---------- -->
+        <div class="car-heading">
+          <h1 class="car-title">
+            {{ car.title }}
+            <button class="favorite-btn" title="Toevoegen aan favorieten"></button>
+          </h1>
+          <p class="car-subtitle">{{ car.subtitle }}</p>
+        </div>
 
-
-
-      {# Prepare a CSV of image URLs for the data-attribute #}
-      {% if car.images and car.images|length > 0 %}
-        {% set all_urls = car.images|map(attribute='image_url')|join(',') %}
-      {% else %}
-        {% set all_urls = '' %}
-      {% endif %}
-
-    <div class="carousel-wrapper"> 
-        <!-- CAROUSEL WRAPPER -->
-        <div class="carousel-container">
+        <!-- ----------  IMAGE CAROUSEL ---------- -->
+        {% set all_urls = car.images|map(attribute='image_url')|join(',') if car.images else '' %}
+        <div class="carousel-wrapper">
+          <div class="carousel-container">
             <button class="carousel-arrow arrow-left">&#10094;</button>
-            
-            <div class="carousel-single-image"
-                data-image-urls="{{ all_urls }}">
-            {% if all_urls %}
-                <!-- Show the first image initially -->
-                <img id="carousel-big-image"
-                    src="{{ car.images[0].image_url }}"
-                    alt="Car image">
-                <div id="img-spinner" class="spinner" style="display:none;"></div>
 
-            {% else %}
-              <img id="carousel-big-image"
-               src="{{ url_for('static', filename='images/fallback.png') }}"
-               alt="Geen afbeelding">
-            {% endif %}
+            <div class="carousel-single-image" data-image-urls="{{ all_urls }}">
+              {% if all_urls %}
+                <img id="carousel-big-image" src="{{ car.images[0].image_url }}" alt="Car image">
+                <div id="img-spinner" class="spinner" style="display:none;"></div>
+              {% else %}
+                <img id="carousel-big-image" src="{{ url_for('static','images/fallback.png') }}" alt="Geen afbeelding">
+              {% endif %}
             </div>
 
             <button class="carousel-arrow arrow-right">&#10095;</button>
-        </div>
-        
-        <!-- RIGHT SIDE: A mock “Calculator” box -->
-        <div class="car-right">
-            <!-- Right side calc-box snippet -->
-<!-- RIGHT SIDE: A mock “Calculator” box -->
+          </div>
+
+          <!-- ----------  CALCULATOR CARD ---------- -->
+          <div class="car-right">
             <div class="calc-box">
-                <h3 class="calc-title">Jouw lease-calculator</h3>
-            
-                <!-- 1) Show competitor's monthly payment, e.g. “€496 per 72 months” -->
-                {% if car.financial_lease_price and car.financial_lease_term %}
-                <p style="font-size:1.1rem; margin-bottom:1rem;">
-                    <strong>{{ car.financial_lease_price }} </strong>
-                    per {{ car.financial_lease_term }} maanden
+              <h3 class="calc-title">Jouw lease-calculator</h3>
+
+              {% if car.financial_lease_price and car.financial_lease_term %}
+                <p style="font-size:1.1rem;margin-bottom:1rem;">
+                  <strong>{{ car.financial_lease_price }}</strong> per {{ car.financial_lease_term }} maanden
                 </p>
-                {% else %}
-                <p style="margin-bottom:1rem;">
-                    <em>Geen maandprijs beschikbaar</em>
-                </p>
-                {% endif %}
-                
-                <!-- 2) A short text snippet or explanation -->
-                <p class="calc-desc">
-                Stel hier je maandbedrag af voor financial lease, 
+              {% else %}
+                <p style="margin-bottom:1rem;"><em>Geen maandprijs beschikbaar</em></p>
+              {% endif %}
+
+              <p class="calc-desc">
+                Stel hier je maandbedrag af voor financial lease,
                 <strong>kies looptijd, aanbetaling &amp; slottermijn</strong>.
-                </p>
-            
-                <!-- 3) "Open Calculator" button => link to /calculator/<car_id> -->
-                <p style="margin-top:1rem;">
-                <a href="{{ url_for('calculator', car_id=car.id) }}" class="btn purple">
-                    Open Calculator
-                </a>
-                </p>
-            
-                <hr style="margin:1rem 0;">
-            
-                <p>
-                Wil je deze auto 
-                <strong>favoriet</strong> maken of <strong>opslaan</strong> voor later?
-                </p>
-            
-                <button 
-                class="btn border favorite-btn"
-                data-car-id="{{ car.id }}"
-                data-title="{{ car.title }}"
-                data-image="{{ car.images[0].image_url if car.images and car.images|length > 0 }}"
-                data-monthly="{{ car.financial_lease_price or '' }}"
-                >
-                <i class="fa-regular fa-heart" style="color: #ffffff;"></i>         
-                Favoriet toevoegen
+              </p>
+
+              <p style="margin-top:1rem;">
+                <a href="{{ url_for('calculator', car_id=car.id) }}" class="btn purple">Open Calculator</a>
+              </p>
+
+              <hr style="margin:1rem 0;">
+
+              <p>Wil je deze auto <strong>favoriet</strong> maken of <strong>opslaan</strong> voor later?</p>
+
+              <button class="btn border favorite-btn"
+                      data-car-id="{{ car.id }}"
+                      data-title="{{ car.title }}"
+                      data-image="{{ car.images[0].image_url if car.images }}"
+                      data-monthly="{{ car.financial_lease_price or '' }}">
+                <i class="fa-regular fa-heart" style="color:#fff;"></i> Favoriet toevoegen
               </button>
-              
             </div>
-  
-        </div> <!-- end car-right -->
-    </div>
+          </div><!-- /.car-right -->
+        </div><!-- /.carousel-wrapper -->
 
-      <!-- CAR INFO -->
-     
-     {# 1) Big dictionary for brand icons #}
-     {% set brand_icons = {
-       'skoda': 'https://img.icons8.com/ios/50/skoda.png',
-       'alfa romeo': 'https://img.icons8.com/ios-filled/50/alfa-romeo.png',
-       'audi': 'https://img.icons8.com/ios/50/audi.png',
-       'bmw': '/static/images/bmw1.svg',
-       'citro': 'https://img.icons8.com/ios/50/citroen.png',
-       'cupra': '/static/images/cupra.png',
-       'dodge': 'https://img.icons8.com/color/48/dodge.png',
-       'fiat': 'https://img.icons8.com/color/48/fiat.png',
-       'ford': 'https://img.icons8.com/color/48/ford.png',
-       'honda': 'https://img.icons8.com/?size=100&id=18806&format=png&color=000000',
-       'hyundai': 'https://img.icons8.com/color/48/hyundai.png',
-       'hyndai': 'https://img.icons8.com/color/48/hyundai.svg',  
-       'iveco': 'https://img.icons8.com/?size=100&id=o9lCiF_sbshx&format=png&color=000000',
-       'jaguar': 'https://img.icons8.com/?size=100&id=59014&format=png&color=000000',
-       'kia': 'https://img.icons8.com/color/48/kia.png',
-       'land rover': 'https://img.icons8.com/color/48/land-rover.png',
-       'lexus': 'https://img.icons8.com/color/48/lexus.png',
-       'mazda': 'https://img.icons8.com/color/48/mazda.png',
-       'mercedez': 'https://img.icons8.com/color/48/mercedes-benz.png',
-       'mercedes-benz': 'https://img.icons8.com/color/48/mercedes-benz.png',
-       'mg': '/static/images/mg.png',
-       'mini': '/static/images/mini.png',
-       'mitsubishi': 'https://img.icons8.com/color/48/mitsubishi.png',
-       'nissan': 'https://img.icons8.com/color/48/nissan.png',
-       'opal': 'https://img.icons8.com/ios/50/opel.png',
-       'opel': 'https://img.icons8.com/ios/50/opel.png',
-       'peugeot': 'https://img.icons8.com/ios/50/peugeot.png',
-       'peougeot': 'https://img.icons8.com/ios/50/peugeot.png',
-       'renault': 'https://img.icons8.com/ios/50/renault.png',
-       'porshe': '/static/images/porshe.png',
-       'porsche': '/static/images/porshe.png',   
-       'seat': '/static/images/seat.png',
-       'suzuki': 'https://img.icons8.com/ios/50/suzuki.png',
-       'tesla': 'https://img.icons8.com/ios-glyphs/30/tesla-logo.png',
-       'toyota': 'https://img.icons8.com/ios/50/toyota.png',
-       'volkswagen': 'https://img.icons8.com/ios/50/volkswagen.png',
-       'volswagon': 'https://img.icons8.com/ios/50/volkswagen.png',
-       'volvo': 'https://img.icons8.com/ios/50/volvo.png'
-     } %}
-     
-     {# Fallback if brand name not found #}
-     {% set fallback_icon = "https://img.icons8.com/ios-filled/50/car.png" %}
-     
-     {# 2) Decide which brand icon #}
-     {% if car.merk %}
-       {% set brand_key = car.merk|lower %}
-       {% set brand_icon = brand_icons.get(brand_key, fallback_icon) %}
-     {% else %}
-       {% set brand_icon = fallback_icon %}
-     {% endif %}
-     
-     {# 3) Render the first 8 features in a 2-column grid #}
+        <!-- ==============  SPECS SECTION  ============== -->
+        {% set brand_icons = {
+          'skoda':'https://img.icons8.com/ios/50/skoda.png',
+          'alfa romeo':'https://img.icons8.com/ios-filled/50/alfa-romeo.png',
+          'audi':'https://img.icons8.com/ios/50/audi.png',
+          'bmw':'/static/images/bmw1.svg',
+          'citro':'https://img.icons8.com/ios/50/citroen.png',
+          'cupra':'/static/images/cupra.png',
+          'dodge':'https://img.icons8.com/color/48/dodge.png',
+          'fiat':'https://img.icons8.com/color/48/fiat.png',
+          'ford':'https://img.icons8.com/color/48/ford.png',
+          'honda':'https://img.icons8.com/?size=100&id=18806&format=png',
+          'hyundai':'https://img.icons8.com/color/48/hyundai.png',
+          'iveco':'https://img.icons8.com/?size=100&id=o9lCiF_sbshx&format=png',
+          'jaguar':'https://img.icons8.com/?size=100&id=59014&format=png',
+          'kia':'https://img.icons8.com/color/48/kia.png',
+          'land rover':'https://img.icons8.com/color/48/land-rover.png',
+          'lexus':'https://img.icons8.com/color/48/lexus.png',
+          'mazda':'https://img.icons8.com/color/48/mazda.png',
+          'mercedez':'https://img.icons8.com/color/48/mercedes-benz.png',
+          'mercedes-benz':'https://img.icons8.com/color/48/mercedes-benz.png',
+          'mg':'/static/images/mg.png',
+          'mini':'/static/images/mini.png',
+          'mitsubishi':'https://img.icons8.com/color/48/mitsubishi.png',
+          'nissan':'https://img.icons8.com/color/48/nissan.png',
+          'opel':'https://img.icons8.com/ios/50/opel.png',
+          'peugeot':'https://img.icons8.com/ios/50/peugeot.png',
+          'renault':'https://img.icons8.com/ios/50/renault.png',
+          'porsche':'/static/images/porshe.png',
+          'seat':'/static/images/seat.png',
+          'suzuki':'https://img.icons8.com/ios/50/suzuki.png',
+          'tesla':'https://img.icons8.com/ios-glyphs/30/tesla-logo.png',
+          'toyota':'https://img.icons8.com/ios/50/toyota.png',
+          'volkswagen':'https://img.icons8.com/ios/50/volkswagen.png',
+          'volvo':'https://img.icons8.com/ios/50/volvo.png'
+        } %}
+        {% set brand_icon = brand_icons.get(car.merk|lower, "https://img.icons8.com/ios-filled/50/car.png") if car.merk else "https://img.icons8.com/ios-filled/50/car.png" %}
 
-    <h1 class="car-title">
-        Over deze auto
-    </h1>
+        <h2 class="car-title" style="margin-top:3rem;">Over deze auto</h2>
 
-     <div class="car-info" style="margin-top:2rem;">
-     
-       <div class="car-features" 
-            style="display:grid;  gap:1rem;">
-     
-         <!-- 1) BRAND -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="{{ brand_icon }}" class="icon-img" alt="{{ car.merk }}" 
-                style="width:30px; height:auto;">
-           <span>{{ car.merk or "Onbekend merk" }}</span>
-         </div>
-     
-         <!-- 2) MODEL -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="https://img.icons8.com/ios-filled/50/car.png" class="icon-img" alt="car"
-                style="width:30px; height:auto;">
-           <span>{{ car.model or "Model n/b" }}</span>
-         </div>
-     
-         <!-- 3) YEAR -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/calendar.png" class="icon-img" alt="Bouwjaar"
-                style="width:30px; height:auto;">
-           <span>{{ car.bouwjaar or "N/B" }}</span>
-         </div>
-     
-         <!-- 4) KM STAND -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/speedometer.png" class="icon-img" alt="Kilometerstand"
-                style="width:30px; height:auto;">
-           <span>{{ car.km_stand or "N/B" }} km</span>
-         </div>
-     
-         <!-- 5) TRANSMISSION -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/manual-transmission.png" class="icon-img" alt="Transmissie"
-                style="width:30px; height:auto;">
-           <span>{{ car.transmissie or "Onbekend" }}</span>
-         </div>
-     
-         <!-- 6) BRANDSTOF (fuel) -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/fuel.png" class="icon-img" alt="Brandstof"
-                style="width:30px; height:auto;">
-           <span>{{ car.brandstof or "N/B" }}</span>
-         </div>
-     
-         <!-- 7) BTW/MARGE -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/vat.png" class="icon-img" alt="BTW/Marge"
-                style="width:30px; height:auto;">
-           <span>{{ car.btw_marge or "N/B" }}</span>
-         </div>
-     
-         <!-- 8) PRICE -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/get-money.png" class="icon-img" alt="Prijs"
-                style="width:30px; height:auto;">
-           <span>{{ car.prijs or "Onbekend" }}</span>
-         </div>
-         
-       </div>  <!-- end .car-features (2 columns) -->
-      </div> <!-- end .left-column -->
-      
-              {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block START ---------- ✂︎ #}
-      
-      {# build the list of additional, non-empty fields #}
-      {% set extra_specs = [
-        ("Adres",              car.address),
-        ("Voertuigsoort",      car.voertuigsoort),
-        ("Gebruikt/nieuw",     car.gebruikt_nieuw),
-        ("Incl. btw",          car.inclusief_btw),
-        ("Incl. bpm",          car.inclusief_bpm),
-        ("Type",               car.type),
-        ("Inrichting",         car.inrichting),
-        ("Versnellingen",      car.aantal_versnellingen),
-        ("Carrosserie",        car.carrosserie),
-        ("Bekleding",          car.bekleding),
-        ("Deuren",             car.aantal_deuren),
-        ("Zitplaatsen",        car.aantal_zitplaatsen),
-        ("Kleur",              car.kleur_basis),
-        ("Bovag",              car.bovag),
-        ("NAP",                car.nap),
-        ("Vermogen motor",     car.vermogen_motor),
-        ("Cilinderinhoud",     car.cilinderinhoud),
-        ("Aantal cilinders",   car.aantal_cilinders),
-        ("Wielbasis",          car.wielbasis),
-        ("Gewicht",            car.gewicht),
-        ("Topsnelheid",        car.topsnelheid),
-        ("Energielabel",       car.energielabel),
-        ("Gem. verbruik",      car.gemiddeld_verbruik),
-        ("Tankinhoud",         car.tankinhoud),
-      ] |selectattr(1)|list %}
-      
-      {% if extra_specs %}
-        <div id="spec-grid-extra" class="spec-grid">
-          {% for label,value in extra_specs %}
-            <div class="spec-row extra-spec d-none">
-              <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
-              <span class="spec-label">{{ label }}</span>
-              <span class="spec-value">{{ value }}</span>
-            </div>
-          {% endfor %}
-        </div>
-      
-        <button id="toggle-specs" class="toggle-btn">
-          Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
-        </button>
-      
-        <hr class="section-divider">
-      {% endif %}
-      
-      {# ----------  OPTIES & ACCESSOIRES  ---------- #}
-      {% set all_opts = (car.opties_accessoires or "").split(",") |map("trim") |select|list %}
-      {% set first_opts = all_opts[:5] %}
-      {% set extra_opts = all_opts[5:] %}
-      
-      {% if all_opts %}
-        <h2>Opties & Accessoires</h2>
-      
-        <ul id="access-list" class="opties-list">
-          {% for o in first_opts %}
-            <li><span class="dash">-</span> {{ o }}</li>
-          {% endfor %}
-          {% for o in extra_opts %}
-            <li class="extra-opt d-none"><span class="dash">-</span> {{ o }}</li>
-          {% endfor %}
-        </ul>
-      
-        {% if extra_opts %}
-          <button id="toggle-opts" class="toggle-btn">
-            Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
-          </button>
-        {% endif %}
-      {% endif %}
-      
-      {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block END ---------- ✂︎ #}
+        <div class="car-info" style="margin-top:2rem;">
 
+          {# ---------- PRIMARY GRID ---------- #}
+          {% set primary_specs = [
+            ('Merk',         car.merk,        brand_icon),
+            ('Model',        car.model,       'https://img.icons8.com/ios-filled/50/car.png'),
+            ('Bouwjaar',     car.bouwjaar,    url_for('static','images/calendar.png')),
+            ('Km stand',     car.km_stand ~ ' km', url_for('static','images/speedometer.png')),
+            ('Transmissie',  car.transmissie, url_for('static','images/manual-transmission.png')),
+            ('Brandstof',    car.brandstof,   url_for('static','images/fuel.png')),
+            ('Btw/Marge',    car.btw_marge,   url_for('static','images/vat.png')),
+            ('Prijs',        car.prijs,       url_for('static','images/get-money.png'))
+          ] %}
 
-     
-       {# 4) Show a map for the address #}
-       <div class="map-section" style="margin-top:2rem;">
-         {% if car.address %}
-           <h3 style="margin-bottom:0.5rem;">Locatie:</h3>
-           <div style="width:100%; max-width:90%; height:15vw; min-height: 250px; align-items: center;">
-             <iframe
-               width="100%"
-               height="100%"
-               frameborder="0"
-               style="border:0;"
-               loading="lazy"
-               allowfullscreen
-               referrerpolicy="no-referrer-when-downgrade"
-               src="https://www.google.com/maps?q={{ car.address|urlencode }}&output=embed"
-             >
-             </iframe>
-           </div>
-           <p style="margin-top:0.5rem; color:#555;">
-             {{ car.address }}
-           </p>
-         {% else %}
-           <p style="margin-top:1rem;">
-             <em>Geen adres beschikbaar</em>
-           </p>
-         {% endif %}
-       </div>
-     
-     </div>  <!-- end .car-info -->
-     
-  </div> <!-- end car-detail-wrapper -->
-</div>
-
-</section>
-<div class="container">
-
-{% if random_cars and random_cars|length > 0 %}
-  <section class="featured-cars-marquee-section container" style="padding:2rem 1rem;">
-    <h2 style="text-align:center; color:#4c37c6; margin-bottom:1rem;">
-      Andere interessante deals
-    </h2>
-    <p style="text-align:center; max-width:700px; margin:0 auto 2rem auto; font-size:0.95rem;">
-      Een selectie van auto’s uit onze database &mdash; scroll voor meer!
-    </p>
-  
-    <div class="featured-cars-marquee">
-      {% for car_item in random_cars %}
-        <div class="featured-car-card">
-          <a href="{{ url_for('car_detail', car_id=car_item.id) }}"
-             style="text-decoration:none; color:inherit;">
-            {% if car_item.images and car_item.images|length > 0 %}
-              <img src="{{ car_item.images[0].image_url }}"
-                   alt="{{ car_item.title or 'Auto' }}"
-                   style="width:100%; height:auto;" />
-            {% else %}
-              <div style="background:#ccc; width:100%; height:150px; line-height:150px; text-align:center;">
-                Geen afbeelding
+          <div class="spec-grid">
+            {% for label,val,icon in primary_specs %}
+              <div class="spec-row">
+                <img src="{{ icon }}" class="spec-bullet small" alt="">
+                <span class="spec-label">{{ label }}</span>
+                <span class="spec-value">{{ val|trim if val|trim else 'N/A' }}</span>
               </div>
+            {% endfor %}
+          </div>
+
+          {# ---------- EXTRA GRID (HIDDEN) ---------- #}
+          {% set extra_specs = [
+            ('Adres',              car.address),
+            ('Voertuigsoort',      car.voertuigsoort),
+            ('Gebruikt/nieuw',     car.gebruikt_nieuw),
+            ('Incl. btw',          car.inclusief_btw),
+            ('Incl. bpm',          car.inclusief_bpm),
+            ('Type',               car.type),
+            ('Inrichting',         car.inrichting),
+            ('Versnellingen',      car.aantal_versnellingen),
+            ('Carrosserie',        car.carrosserie),
+            ('Bekleding',          car.bekleding),
+            ('Deuren',             car.aantal_deuren),
+            ('Zitplaatsen',        car.aantal_zitplaatsen),
+            ('Kleur',              car.kleur_basis),
+            ('Bovag',              car.bovag),
+            ('NAP',                car.nap),
+            ('Vermogen motor',     car.vermogen_motor),
+            ('Cilinderinhoud',     car.cilinderinhoud),
+            ('Aantal cilinders',   car.aantal_cilinders),
+            ('Wielbasis',          car.wielbasis),
+            ('Gewicht',            car.gewicht),
+            ('Topsnelheid',        car.topsnelheid),
+            ('Energielabel',       car.energielabel),
+            ('Gem. verbruik',      car.gemiddeld_verbruik),
+            ('Tankinhoud',         car.tankinhoud)
+          ] %}
+
+          <div id="spec-grid-extra" class="spec-grid">
+            {% for label,val in extra_specs %}
+              <div class="spec-row extra-spec d-none">
+                <img src="{{ url_for('static','images/arrow.png') }}" class="spec-bullet small" alt="">
+                <span class="spec-label">{{ label }}</span>
+                <span class="spec-value">{{ val|trim if val|trim else 'N/A' }}</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <button id="toggle-specs" class="toggle-btn">
+            Toon meer <img src="{{ url_for('static','images/arrow.png') }}" alt="">
+          </button>
+
+          <hr class="section-divider">
+
+          {# ----------  OPTIES & ACCESSOIRES ---------- #}
+          {% set all_opts = (car.opties_accessoires or '').split(',')|map('trim')|select|list %}
+          {% if all_opts %}
+            <h2>Opties &amp; Accessoires</h2>
+
+            <ul id="access-list" class="opties-list">
+              {% for o in all_opts[:5] %}
+                <li><span class="dash">-</span> {{ o }}</li>
+              {% endfor %}
+              {% for o in all_opts[5:] %}
+                <li class="extra-opt d-none"><span class="dash">-</span> {{ o }}</li>
+              {% endfor %}
+            </ul>
+
+            {% if all_opts|length > 5 %}
+              <button id="toggle-opts" class="toggle-btn">
+                Toon meer <img src="{{ url_for('static','images/arrow.png') }}" alt="">
+              </button>
             {% endif %}
+          {% endif %}
 
-            <h3 style="color:#4c37c6; margin-top:0.5rem; font-size:1rem;">
-              {{ car_item.title or 'Onbekend Model' }}
-            </h3>
-            <p style="font-size:0.9rem;">
-              {{ car_item.financial_lease_price }} / {{ car_item.financial_lease_term }}
-            </p>
-          </a>
-        </div>
-      {% endfor %}
-    </div>
+        </div><!-- /.car-info -->
+
+        <!-- ==============  MAP  ============== -->
+        {% if car.address %}
+          <div class="map-section" style="margin-top:2rem;">
+            <h3 style="margin-bottom:.5rem;">Locatie:</h3>
+            <div style="width:100%;max-width:90%;height:15vw;min-height:250px;">
+              <iframe width="100%" height="100%" frameborder="0" loading="lazy"
+                      referrerpolicy="no-referrer-when-downgrade"
+                      src="https://www.google.com/maps?q={{ car.address|urlencode }}&output=embed"></iframe>
+            </div>
+            <p style="margin-top:.5rem;color:#555;">{{ car.address }}</p>
+          </div>
+        {% endif %}
+
+      </div><!-- /.left-column -->
+
+    </div><!-- /.car-detail-wrapper -->
+  </div><!-- /.container -->
+</section>
+
+{# ==============  RELATED CARS MARQUEE  ============== #}
+{% if random_cars %}
+  <div class="container">
+    <section class="featured-cars-marquee-section" style="padding:2rem 1rem;">
+      <h2 style="text-align:center;color:#4c37c6;margin-bottom:1rem;">Andere interessante deals</h2>
+      <p style="text-align:center;max-width:700px;margin:0 auto 2rem;font-size:.95rem;">
+        Een selectie van auto’s uit onze database &mdash; scroll voor meer!
+      </p>
+      <div class="featured-cars-marquee">
+        {% for car_item in random_cars %}
+          <div class="featured-car-card">
+            <a href="{{ url_for('car_detail', car_id=car_item.id) }}" style="text-decoration:none;color:inherit;">
+              {% if car_item.images %}
+                <img src="{{ car_item.images[0].image_url }}" alt="{{ car_item.title or 'Auto' }}">
+              {% else %}
+                <div style="background:#ccc;width:100%;height:150px;line-height:150px;text-align:center;">Geen afbeelding</div>
+              {% endif %}
+              <h3 style="color:#4c37c6;margin-top:.5rem;font-size:1rem;">{{ car_item.title or 'Onbekend model' }}</h3>
+              <p style="font-size:.9rem;">{{ car_item.financial_lease_price }} / {{ car_item.financial_lease_term }}</p>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
-
-  </section>
 {% endif %}
-
 {% endblock %}
