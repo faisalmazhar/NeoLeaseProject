@@ -21,7 +21,7 @@
     
     <div class="overlay"></div>
     <div class="hero-content container">
-      <h1>De Nieuwe Standaard in Financial Lease</h1>
+      <h1>De Nieuwe Standaard in Financial Lease</h1> 
       <p>Wij regelen financial lease zoals het hoort: snel, transparant en altijd in jouw voordeel.</p>
 
     <!-- NEW BUTTON: “View Offer” => link to your /listings page -->
@@ -30,7 +30,7 @@
       <form action="{{ url_for('listings') }}" method="get" style="display:flex; flex-direction:column; gap:2rem;">
     
         <!-- 1) Merk & Model => brand dropdown (dynamic) or a text input for model -->
-        <select id="brand" name="brand" style="padding:0.5rem; border-color: #4c37c6;">
+        <select id="brand" name="brand" style="padding:0.5rem; border-color: #4c37c6; text-align:center;">
           <option value="">Merk en model</option>
           {% if brand_choices %}
             {% for b in brand_choices %}
