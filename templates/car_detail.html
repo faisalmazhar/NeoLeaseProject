@@ -170,76 +170,21 @@
      
      {# 3) Render the first 8 features in a 2-column grid #}
 
-    <h1 class="car-title">
-        Over deze auto
-    </h1>
-
-     <div class="car-info" style="margin-top:2rem;">
-     
-       <div class="car-features" 
-            style="display:grid;  gap:1rem;">
-     
-         <!-- 1) BRAND -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="{{ brand_icon }}" class="icon-img" alt="{{ car.merk }}" 
-                style="width:30px; height:auto;">
-           <span>{{ car.merk or "Onbekend merk" }}</span>
-         </div>
-     
-         <!-- 2) MODEL -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="https://img.icons8.com/ios-filled/50/car.png" class="icon-img" alt="car"
-                style="width:30px; height:auto;">
-           <span>{{ car.model or "Model n/b" }}</span>
-         </div>
-     
-         <!-- 3) YEAR -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/calendar.png" class="icon-img" alt="Bouwjaar"
-                style="width:30px; height:auto;">
-           <span>{{ car.bouwjaar or "N/B" }}</span>
-         </div>
-     
-         <!-- 4) KM STAND -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/speedometer.png" class="icon-img" alt="Kilometerstand"
-                style="width:30px; height:auto;">
-           <span>{{ car.km_stand or "N/B" }} km</span>
-         </div>
-     
-         <!-- 5) TRANSMISSION -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/manual-transmission.png" class="icon-img" alt="Transmissie"
-                style="width:30px; height:auto;">
-           <span>{{ car.transmissie or "Onbekend" }}</span>
-         </div>
-     
-         <!-- 6) BRANDSTOF (fuel) -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/fuel.png" class="icon-img" alt="Brandstof"
-                style="width:30px; height:auto;">
-           <span>{{ car.brandstof or "N/B" }}</span>
-         </div>
-     
-         <!-- 7) BTW/MARGE -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/vat.png" class="icon-img" alt="BTW/Marge"
-                style="width:30px; height:auto;">
-           <span>{{ car.btw_marge or "N/B" }}</span>
-         </div>
-     
-         <!-- 8) PRICE -->
-         <div class="car-feature" style="display:flex; align-items:center; gap:0.5rem;">
-           <img src="/static/images/get-money.png" class="icon-img" alt="Prijs"
-                style="width:30px; height:auto;">
-           <span>{{ car.prijs or "Onbekend" }}</span>
-         </div>
-         
-       </div>  <!-- end .car-features (2 columns) -->
+{# --------------------------------  OVER DEZE AUTO  -------------------------------- #}
+      <h2 class="car-title">Over deze auto</h2>
       
-      {# --- EXTRA SPEC grid ---------------------------------------- #}
+      {% set primary_fields = [
+        ("Merk",           car.merk,           brand_icon),
+        ("Model",          car.model,          "https://img.icons8.com/ios-filled/50/car.png"),
+        ("Bouwjaar",       car.bouwjaar,       url_for('static', filename='images/calendar.png')),
+        ("Km stand",       car.km_stand ~ " km", url_for('static', filename='images/speedometer.png')),
+        ("Transmissie",    car.transmissie,    url_for('static', filename='images/manual-transmission.png')),
+        ("Brandstof",      car.brandstof,      url_for('static', filename='images/fuel.png')),
+        ("Btw/marge",      car.btw_marge,      url_for('static', filename='images/vat.png')),
+        ("Prijs",          car.prijs,          url_for('static', filename='images/get-money.png'))
+      ] %}
       
-      {% set extra_specs = [
+      {% set extra_fields = [
         ("Adres",              car.address),
         ("Voertuigsoort",      car.voertuigsoort),
         ("Gebruikt/nieuw",     car.gebruikt_nieuw),
@@ -263,26 +208,33 @@
         ("Topsnelheid",        car.topsnelheid),
         ("Energielabel",       car.energielabel),
         ("Gem. verbruik",      car.gemiddeld_verbruik),
-        ("Tankinhoud",         car.tankinhoud),
-      ] %}      {#  ←   *** removed the  |selectattr(1)|list  filter *** #}
-      {% if extra_specs %}          {# ←  RE-ADD THIS LINE  #}
-      <div id="spec-grid-extra" class="spec-grid">
-        {% for label, value in extra_specs %}
-          <div class="spec-row extra-spec d-none">
-            <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
+        ("Tankinhoud",         car.tankinhoud)
+      ] %}
+      
+      <div id="spec-grid" class="spec-grid">
+        {# --- always-visible rows --- #}
+        {% for label, val, icon in primary_fields %}
+          <div class="spec-row">
+            <img src="{{ icon }}" class="spec-bullet" alt="" />
             <span class="spec-label">{{ label }}</span>
-            <span class="spec-value">{{ value if value else 'N/A' }}</span>
+            <span class="spec-value">{{ val if val else 'N/A' }}</span>
+          </div>
+        {% endfor %}
+      
+        {# --- extra rows (hidden until click) --- #}
+        {% for label, val in extra_fields %}
+          <div class="spec-row extra-spec d-none">
+            <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="" />
+            <span class="spec-label">{{ label }}</span>
+            <span class="spec-value">{{ val if val else 'N/A' }}</span>
           </div>
         {% endfor %}
       </div>
-
       
-        <button id="toggle-specs" class="toggle-btn">
-          Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
-        </button>
-      
-        <hr class="section-divider">
-      {% endif %}
+      <button id="toggle-specs" class="toggle-btn">
+        Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="" />
+      </button>
+            
       
       {# ----------  OPTIES & ACCESSOIRES  ---------- #}
       {% set all_opts = (car.opties_accessoires or "").split(",") |map("trim") |select|list %}
