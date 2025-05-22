@@ -87,10 +87,10 @@
         {% set primary_specs = [
           ('Merk',          clean(car.merk),      brand_icon),
           ('Model',         clean(car.model),     'https://img.icons8.com/ios-filled/50/car.png'),
-          ('Bouwjaar',      clean(car.bouwjaar),  url_for('static', filename='images/calendar.png'),
-          ('Km stand',      clean(car.km_stand~' km' if car.km_stand else None), url_for('static', filename='images/speedometer.png'),
-          ('Transmissie',   clean(car.transmissie), url_for('static', filename='images/manual-transmission.png'),
-          ('Brandstof',     clean(car.brandstof), url_for('static', filename='images/fuel.png'),
+          ('Bouwjaar',      clean(car.bouwjaar),  url_for('static', filename='images/calendar.png')),
+          ('Km stand',      clean(car.km_stand~' km' if car.km_stand else None), url_for('static', filename='images/speedometer.png')),
+          ('Transmissie',   clean(car.transmissie), url_for('static', filename='images/manual-transmission.png')),
+          ('Brandstof',     clean(car.brandstof), url_for('static', filename='images/fuel.png')),
           ('Btw/marge',     clean(car.btw_marge), url_for('static','filename=images/vat.png')),
           ('Prijs',         clean(car.prijs),     url_for('static','filename=images/get-money.png'))
         ] %}
