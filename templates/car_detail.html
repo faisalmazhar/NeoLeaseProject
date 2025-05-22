@@ -237,9 +237,8 @@
          
        </div>  <!-- end .car-features (2 columns) -->
       
-              {# ✂︎ ---------- EXTRA SPEC + ACCESSORIES block START ---------- ✂︎ #}
+      {# --- EXTRA SPEC grid ---------------------------------------- #}
       
-      {# build the list of additional, non-empty fields #}
       {% set extra_specs = [
         ("Adres",              car.address),
         ("Voertuigsoort",      car.voertuigsoort),
@@ -265,18 +264,18 @@
         ("Energielabel",       car.energielabel),
         ("Gem. verbruik",      car.gemiddeld_verbruik),
         ("Tankinhoud",         car.tankinhoud),
-      ] |selectattr(1)|list %}
+      ] %}      {#  ←   *** removed the  |selectattr(1)|list  filter *** #}
       
-      {% if extra_specs %}
-        <div id="spec-grid-extra" class="spec-grid">
-          {% for label,value in extra_specs %}
-            <div class="spec-row extra-spec d-none">
-              <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
-              <span class="spec-label">{{ label }}</span>
-              <span class="spec-value">{{ value }}</span>
-            </div>
-          {% endfor %}
-        </div>
+      <div id="spec-grid-extra" class="spec-grid">
+        {% for label, value in extra_specs %}
+          <div class="spec-row extra-spec d-none">
+            <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
+            <span class="spec-label">{{ label }}</span>
+            <span class="spec-value">{{ value if value else 'N/A' }}</span>
+          </div>
+        {% endfor %}
+      </div>
+
       
         <button id="toggle-specs" class="toggle-btn">
           Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
