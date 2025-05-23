@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, send_from_directory
 from models import db, CarListing
 import logging
 from sqlalchemy import func  # Add this import for random()
