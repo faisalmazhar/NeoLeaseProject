@@ -25,7 +25,7 @@ db.init_app(app)
 
 # ── Configure Flask-Caching ──
 app.config["CACHE_TYPE"] = "simple"       # in-memory; swap for RedisCache in prod
-app.config["CACHE_DEFAULT_TIMEOUT"] = 300 # 5 minutes
+app.config["CACHE_DEFAULT_TIMEOUT"] = 86400 # 5 minutes
 cache = Cache(app)
 
 @app.route('/robots.txt')
