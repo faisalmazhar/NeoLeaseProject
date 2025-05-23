@@ -20,11 +20,18 @@ db.init_app(app)
 # ------------------ Define Routes Below ------------------
 
 
-# @app.route("/")
-# def index():
-#     total_cars = CarListing.query.count()  # Number of all listings
-#     return render_template("index.html", total_cars=total_cars)
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory('static', 'robots.txt')
 
+
+@app.before_request
+def block_bad_bots():
+    user_agent = request.headers.get('User-Agent', '').lower()
+    blocked_bots = ['gptbot', 'ahrefs', 'mj12bot', 'semrush']
+    if any(bot in user_agent for bot in blocked_bots):
+        abort(403)
+        
 @app.route("/")
 def index():
     # 1) total cars count
