@@ -1,10 +1,13 @@
 # app.py
 
 from flask import Flask, render_template, request, abort, send_from_directory
+from flask_compress import Compress
+from flask_caching import Cache
 from models import db, CarListing
 import logging
 from sqlalchemy import func  # Add this import for random()
 app = Flask(__name__)
+Compress(app)
 from utils import parse_price  # or put the function above directly in app.py
 import pprint, sys, logging
 
@@ -20,6 +23,11 @@ db.init_app(app)
 # ------------------ Define Routes Below ------------------
 
 
+# ── Configure Flask-Caching ──
+app.config["CACHE_TYPE"] = "simple"       # in-memory; swap for RedisCache in prod
+app.config["CACHE_DEFAULT_TIMEOUT"] = 300 # 5 minutes
+cache = Cache(app)
+
 @app.route('/robots.txt')
 def robots_txt():
     return send_from_directory('static', 'robots.txt')
@@ -33,7 +41,9 @@ def block_bad_bots():
         abort(403)
         
 @app.route("/")
+@cache.cached()
 def index():
+    
     # 1) total cars count
     total_cars = CarListing.query.count()
 
@@ -124,6 +134,7 @@ def contact():
     return render_template("contact.html")
 
 @app.route("/listings")
+@cache.cached(query_string=True)
 def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
@@ -272,6 +283,7 @@ def submit_quote():
     )
 
 @app.route("/car/<int:car_id>")
+@cache.cached()
 def car_detail(car_id):
     # Grab the CarListing from DB or 404
     car = CarListing.query.get_or_404(car_id)
