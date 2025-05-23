@@ -42,15 +42,34 @@
              you can do name="q" instead. But here we’re copying the approach from listings. -->
         
         <!-- 2) Monthly budget dropdown -->
-        <select name="monthly" class="brandSelect">
-          <option value="">Budget&nbsp;(p/m)</option>
-          <option value="200-300" {% if current_monthly=='200-300' %}selected{% endif %}>€200 – €300</option>
-          <option value="301-400" {% if current_monthly=='301-400' %}selected{% endif %}>€301 – €400</option>
-          <option value="401-500" {% if current_monthly=='401-500' %}selected{% endif %}>€401 – €500</option>
-          <option value="501-600" {% if current_monthly=='501-600' %}selected{% endif %}>€501 – €600</option>
-          <option value="601-700" {% if current_monthly=='601-700' %}selected{% endif %}>€601 – €700</option>
-          <option value="700+"    {% if current_monthly=='700+'    %}selected{% endif %}>&gt; €700</option>
+        <select
+          id="monthly"
+          name="monthly"
+          style="padding:0.5rem; border:1px solid #4c37c6; border-radius:4px; text-align:center;"
+        >
+          <option value="" {% if not current_monthly %}selected{% endif %}>
+            Budget (p/m)
+          </option>
+          <option value="200-300" {% if current_monthly=='200-300' %}selected{% endif %}>
+            €200 – €300
+          </option>
+          <option value="301-400" {% if current_monthly=='301-400' %}selected{% endif %}>
+            €301 – €400
+          </option>
+          <option value="401-500" {% if current_monthly=='401-500' %}selected{% endif %}>
+            €401 – €500
+          </option>
+          <option value="501-600" {% if current_monthly=='501-600' %}selected{% endif %}>
+            €501 – €600
+          </option>
+          <option value="601-700" {% if current_monthly=='601-700' %}selected{% endif %}>
+            €601 – €700
+          </option>
+          <option value="700+" {% if current_monthly=='700+' %}selected{% endif %}>
+            &gt; €700
+          </option>
         </select>
+
 
         <!-- Notice we call the param “monthly” to differentiate from the old “budget” param. -->
     
