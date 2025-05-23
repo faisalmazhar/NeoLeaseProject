@@ -37,7 +37,7 @@ def index():
                         .order_by(CarListing.merk.asc())\
                         .all()
     brand_choices = [b[0] for b in distinct_brands if b[0]]
-    print(brand_choices)
+    # print(brand_choices)
     random_cars = CarListing.query.order_by(func.random()).limit(10).all()
 
     return render_template("index.html", total_cars=total_cars, random_cars=random_cars, brand_choices=brand_choices)
