@@ -34,8 +34,12 @@
 
             <div class="carousel-single-image" data-image-urls="{{ all_urls }}">
               <img id="carousel-big-image"
-                   src="{{ car.images[0].image_url if all_urls else url_for('static', filename='images/fallback.png') }}"
-                   alt="Car image">
+                 src="{{ car.images[0].image_url if all_urls else url_for('static', filename='images/fallback.png') }}"
+                  loading="lazy"   
+                  width="800" height="600"
+
+                  alt="Car image">
+              
               <div id="img-spinner" class="spinner" style="display:none;"></div>
             </div>
 
