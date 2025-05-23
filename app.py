@@ -271,10 +271,10 @@ def car_detail(car_id):
     random_cars = CarListing.query.order_by(func.random()).limit(10).all()
 
 
-    logging.warning("CAR %s DUMP:\n%s",
-                    car_id,
-                    pprint.pformat({k: getattr(car, k) for k in car.__table__.columns.keys()},
-                                   width=120))
+    # logging.warning("CAR %s DUMP:\n%s",
+    #                 car_id,
+    #                 pprint.pformat({k: getattr(car, k) for k in car.__table__.columns.keys()},
+    #                                width=120))
     
     return render_template(
         "car_detail.html",
