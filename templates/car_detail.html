@@ -34,7 +34,7 @@
 
             <div class="carousel-single-image" data-image-urls="{{ all_urls }}">
               <img id="carousel-big-image"
-                 src="{{ car.images[0].image_url if all_urls else url_for('static', filename='images/fallback.png') }}"
+                 src="{{ car.images[0].image_url if all_urls else url_for('static', filename='images/fallback.webp') }}"
                   loading="lazy"   
                   width="800" height="600"
 
@@ -145,7 +145,7 @@
           <div id="spec-extra" class="spec-grid d-none">
             {% for label,val in extra_specs %}
               <div class="spec-row">
-                <img src="{{ url_for('static', filename='images/arrow.png') }}" class="spec-bullet" alt="">
+                <img src="{{ url_for('static', filename='images/arrow.webp') }}" class="spec-bullet" alt="">
                 <span class="spec-label">{{ label }}</span>
                 <span class="spec-value">{{ val }}</span>
               </div>
@@ -154,7 +154,7 @@
         </div>
 
         <button id="toggle-specs" class="toggle-btn">
-          Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
+          Toon meer <img src="{{ url_for('static', filename='images/arrow.webp') }}" alt="">
         </button>
 
         <hr class="section-divider">
@@ -174,7 +174,7 @@
             </ul>
 
           <button id="toggle-opts" class="toggle-btn">
-            Toon meer <img src="{{ url_for('static', filename='images/arrow.png') }}" alt="">
+            Toon meer <img src="{{ url_for('static', filename='images/arrow.webp') }}" alt="">
           </button>
 
           {% endif %}
@@ -208,7 +208,11 @@
         {% for c in random_cars %}
           <div class="featured-car-card">
             <a href="{{ url_for('car_detail',car_id=c.id) }}" style="text-decoration:none;color:inherit;">
-              {% if c.images %}<img src="{{ c.images[0].image_url }}" alt="{{ c.title }}">{% endif %}
+              {% if c.images %}<img src="{{ c.images[0].image_url }}"      
+                                 loading="lazy"
+                                 width="250"
+                                 height="180"
+                                 alt="{{ c.title }}">{% endif %}
               <h3 style="color:#4c37c6;font-size:1rem;margin-top:.5rem;">{{ c.title }}</h3>
               <p style="font-size:.9rem;">{{ c.financial_lease_price }} / {{ c.financial_lease_term }}</p>
             </a>
