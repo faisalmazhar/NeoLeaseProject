@@ -163,13 +163,17 @@
         <img class="listing-thumb"
              data-image-urls="{{ urls }}"
              src="{{ car.images[0].image_url }}"
-             alt="Car Image">
+            loading="lazy" 
+          width="300" height="180"
+            alt="Car Image">
         <div class="thumb-spinner" style="display:none;"></div>
       {% else %}
       <img class="listing-thumb"
            data-image-urls=""
            src="{{ url_for('static', filename='images/fallback.png') }}"
-           alt="Geen afbeelding">
+          loading="lazy" 
+        width="300" height="180"
+          alt="Geen afbeelding">
       {% endif %}
     </a>
 
