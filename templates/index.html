@@ -8,14 +8,17 @@
   <section class="hero">
     <!-- A wrapper that contains your three images for the fade/slider -->
     <div class="hero-slide-wrap">
-      <img src="{{ url_for('static', filename='images/index_header1.png') }}"
+      <img src="{{ url_for('static', filename='images/index_header1.webp') }}"
            alt="Hero Slide 1"
+           loading="lazy"
            class="hero-slide active">
-      <img src="{{ url_for('static', filename='images/index_header2.jpg') }}"
+      <img src="{{ url_for('static', filename='images/index_header2.webp') }}"
            alt="Hero Slide 2"
+          loading="lazy"
            class="hero-slide">
-      <img src="{{ url_for('static', filename='images/index_header3.jpg') }}"
+      <img src="{{ url_for('static', filename='images/index_header3.webp') }}"
            alt="Hero Slide 3"
+          loading="lazy"
            class="hero-slide">
     </div>
     
@@ -95,122 +98,97 @@
     <div class="logo-slider">
       <div>
         <a href="{{ url_for('listings', brand='BMW') }}">
-          <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW">
+          <img src="{{ url_for('static', filename='images/bmw.svg') }}" alt="BMW" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Mercedes') }}">
-          <img src="{{ url_for('static', filename='images/mercedez.png') }}" alt="Mercedes">
+          <img src="{{ url_for('static', filename='images/Mercedez.webp') }}" alt="Mercedes" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Audi') }}">
-          <img src="{{ url_for('static', filename='images/audi.png') }}" alt="Audi">
+          <img src="{{ url_for('static', filename='images/audi.webp') }}" alt="Audi" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Volkswagen') }}">
-          <img src="{{ url_for('static', filename='images/volkswagen.jpg') }}" alt="Volkswagen">
+          <img src="{{ url_for('static', filename='images/volkswagen.webp') }}" alt="Volkswagen" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Hyundai') }}">
-          <img src="{{ url_for('static', filename='images/hyundai.svg') }}" alt="Hyundai">
+          <img src="{{ url_for('static', filename='images/hyundai.svg') }}" alt="Hyundai" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='MG') }}">
-          <img src="{{ url_for('static', filename='images/mg.png') }}" alt="MG">
+          <img src="{{ url_for('static', filename='images/mg.webp') }}" alt="MG" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Seat') }}">
-          <img src="{{ url_for('static', filename='images/seat.png') }}" alt="Seat">
+          <img src="{{ url_for('static', filename='images/seat.png') }}" alt="Seat" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='Cupra') }}">
-          <img src="{{ url_for('static', filename='images/cupra.jpg') }}" alt="Cupra">
+          <img src="{{ url_for('static', filename='images/cupra.webp') }}" alt="Cupra" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='fiat') }}">
-          <img src="{{ url_for('static', filename='images/fiat.png') }}" alt="fiat">
+          <img src="{{ url_for('static', filename='images/fiat.webp') }}" alt="fiat" loading="lazy">
         </a>
       </div>
-      <!-- <div>
-        <a href="{{ url_for('listings', brand='ford') }}">
-          <img src="{{ url_for('static', filename='images/ford.png') }}" alt="ford">
-        </a>
-      </div> -->
-      <!-- <div>
-        <a href="{{ url_for('listings', brand='honda') }}">
-          <img src="{{ url_for('static', filename='images/honda.png') }}" alt="honda">
-        </a>
-      </div> -->
       <div>
         <a href="{{ url_for('listings', brand='iveco') }}">
-          <img src="{{ url_for('static', filename='images/iveco.png') }}" alt="iveco">
+          <img src="{{ url_for('static', filename='images/iveco.png') }}" alt="iveco" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='landrover') }}">
-          <img src="{{ url_for('static', filename='images/landrove.png') }}" alt="landrover">
+          <img src="{{ url_for('static', filename='images/landrove.webp') }}" alt="landrover" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='kia') }}">
-          <img src="{{ url_for('static', filename='images/kia.png') }}" alt="kia">
+          <img src="{{ url_for('static', filename='images/kia.webp') }}" alt="kia" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='lexus') }}">
-          <img src="{{ url_for('static', filename='images/lexus.png') }}" alt="lexus">
+          <img src="{{ url_for('static', filename='images/lexus.webp') }}" alt="lexus" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='peugeot') }}">
-          <img src="{{ url_for('static', filename='images/peugeot.png') }}" alt="peugeot">
+          <img src="{{ url_for('static', filename='images/peugeot (1).webp') }}" alt="peugeot" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='porsche') }}">
-          <img src="{{ url_for('static', filename='images/porsche.png') }}" alt="porsche">
+          <img src="{{ url_for('static', filename='images/porsche.png') }}" alt="porsche" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='renault') }}">
-          <img src="{{ url_for('static', filename='images/renault.png') }}" alt="renault">
+          <img src="{{ url_for('static', filename='images/renault.webp') }}" alt="renault" loading="lazy">
         </a>
       </div>
-      <!-- <div>
-        <a href="{{ url_for('listings', brand='skoda') }}">
-          <img src="{{ url_for('static', filename='images/skoda.png') }}" alt="skoda">
-        </a>
-      </div> -->
       <div>
         <a href="{{ url_for('listings', brand='suzuki') }}">
-          <img src="{{ url_for('static', filename='images/suzuki.png') }}" alt="suzuki">
+          <img src="{{ url_for('static', filename='images/suzuki.png') }}" alt="suzuki" loading="lazy">
         </a>
       </div>
-      <!-- <div>
-        <a href="{{ url_for('listings', brand='tesla') }}">
-          <img src="{{ url_for('static', filename='images/tesla.png') }}" alt="tesla">
-        </a>
-      </div> -->
-      <!-- <div>
-        <a href="{{ url_for('listings', brand='toyota') }}">
-          <img src="{{ url_for('static', filename='images/toyota.png') }}" alt="toyota">
-        </a>
-      </div> -->
       <div>
         <a href="{{ url_for('listings', brand='volvo') }}">
-          <img src="{{ url_for('static', filename='images/volvo.png') }}" alt="volvo">
+          <img src="{{ url_for('static', filename='images/volvo.webp') }}" alt="volvo" loading="lazy">
         </a>
       </div>
       <div>
         <a href="{{ url_for('listings', brand='nissan') }}">
-          <img src="{{ url_for('static', filename='images/nissan.png') }}" alt="nissan">
+          <img src="{{ url_for('static', filename='images/nissan.webp') }}" alt="nissan" loading="lazy">
         </a>
       </div>
       
@@ -226,7 +204,7 @@
       <!-- 1 -->
       <div class="service-item">
         <div class="service-img"
-             style="background-image: url('{{ url_for('static', filename='images/index11.jpg') }}');"></div>
+             style="background-image: url('{{ url_for('static', filename='images/index11.webp') }}');"></div>
         <div class="service-content">
           <h3>Personenauto's</h3>
           <p>Ontdek ons uitgebreide aanbod personenauto’s en lease de perfecte auto voor jouw behoeften!</p>
@@ -239,7 +217,7 @@
       <!-- 2 -->
       <div class="service-item">
         <div class="service-img"
-             style="background-image: url('{{ url_for('static', filename='images/index12.jpg') }}');"></div>
+             style="background-image: url('{{ url_for('static', filename='images/index12.webp') }}');"></div>
         <div class="service-content">
           <h3>Bedrijfswagens</h3>
           <p>Bekijk hier de mogelijkheden voor financial lease van bedrijfswagens en rijd snel weg!</p>
@@ -252,7 +230,7 @@
       <!-- 3 -->
       <div class="service-item">
         <div class="service-img"
-             style="background-image: url('{{ url_for('static', filename='images/index13.jpg') }}');"></div>
+             style="background-image: url('{{ url_for('static', filename='images/index13.webp') }}');"></div>
         <div class="service-content">
           <h3>Equipment</h3>
           <p>Bekijk hier ons ruime aanbod van financial lease voor bedrijfsmiddelen!</p>
@@ -276,13 +254,13 @@
       </div>
       <div class="why-item">
         <div class="why-img"
-             style="background-image: url('{{ url_for('static', filename='images/index22.jpg') }}');"></div>
+             style="background-image: url('{{ url_for('static', filename='images/index22.webp') }}');"></div>
         <h3>Transparant</h3>
         <p>Kies voor ons en profiteer van heldere, transparante voorwaarden afgestemd op jouw behoeften!</p>
       </div>
       <div class="why-item">
         <div class="why-img"
-             style="background-image: url('{{ url_for('static', filename='images/index23.jpg') }}');"></div>
+             style="background-image: url('{{ url_for('static', filename='images/index23.webp') }}');"></div>
         <h3>Simpel</h3>
         <p>Kies voor ons en profiteer van financial lease zonder ingewikkelde processen!</p>
       </div>
@@ -330,7 +308,7 @@
     </div>
 
     <div class="step-item">
-      <img src="{{ url_for('static', filename='images/step4-icon.png') }}"
+      <img src="{{ url_for('static', filename='images/step4-icon.webp') }}"
            alt="Stap 4"
            class="step-icon">
       <h3>Stap 4: Rijd weg</h3>
@@ -395,6 +373,7 @@
             {% if car.images and car.images|length > 0 %}
               <img src="{{ car.images[0].image_url }}"
                    alt="{{ car.title or 'Auto' }}"
+                  loading="lazy"
                    style="width:100%; height:auto;" />
             {% else %}
               <div style="background:#ccc; width:100%; height:150px; line-height:150px; text-align:center;">
