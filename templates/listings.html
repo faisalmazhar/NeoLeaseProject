@@ -39,7 +39,7 @@
       gap: 0.5rem; 
       margin-bottom:1rem;
       ">
-        <select class="brandSelect" name="brand" >
+        <select  name="brand" >
           <option value="">Merk</option>
           <option value="Audi">Audi</option>
           <option value="BMW">BMW</option>
@@ -87,21 +87,21 @@
         
 
         <!-- Type -->
-        <select name="type" class="brandSelect">
+        <select name="type" >
           <option value="">Voertuigsoort</option>
           <option value="auto">Auto</option>
           <option value="motor">Motor</option>
         </select>
 
         <!-- Fuel -->
-        <select name="fuel" class="brandSelect">
+        <select name="fuel" >
           <option value="">Brandstof</option>
           <option value="benzine">Benzine</option>
           <option value="diesel">Diesel</option>
           <option value="electric">Elektrisch</option>
         </select>
 
-        <select name="monthly" class="brandSelect">
+        <select name="monthly" >
           <option value="">Budget&nbsp;(p/m)</option>
           <option value="200-300" {% if current_monthly=='200-300' %}selected{% endif %}>€200 – €300</option>
           <option value="301-400" {% if current_monthly=='301-400' %}selected{% endif %}>€301 – €400</option>
@@ -113,7 +113,7 @@
 
 
         <!-- Sort -->
-        <select name="sort" class="brandSelect">
+        <select name="sort" >
           <option value="">Populariteit</option>
           <option value="price_asc" {% if current_sort == 'price_asc' %} selected {% endif %}>Prijs (Laag - Hoog)</option>
           <option value="price_desc" {% if current_sort == 'price_desc' %} selected {% endif %}>Prijs (Hoog - Laag)</option>
