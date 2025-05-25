@@ -52,7 +52,7 @@
               <h3 class="calc-title">Jouw lease-calculator</h3>
 
               {% if car.financial_lease_price and car.financial_lease_term %}
-                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price }}</strong> per {{ car.financial_lease_term }} maanden</p>
+                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price|euro }}</strong> per {{ car.financial_lease_term }} maanden</p>
               {% else %}
                 <p><em>Geen maandprijs beschikbaar</em></p>
               {% endif %}
@@ -96,7 +96,7 @@
           ('Transmissie', clean(car.transmissie), url_for('static', filename='images/manual-transmission.png')),
           ('Brandstof',   clean(car.brandstof), url_for('static', filename='images/fuel.png')),
           ('Btw/marge',   clean(car.btw_marge), url_for('static', filename='images/vat.png')),
-          ('Prijs',       clean(car.prijs),     url_for('static', filename='images/get-money.png'))
+          ('Prijs',       car.prijs,     url_for('static', filename='images/get-money.png'))
         ] %}
 
 
