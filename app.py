@@ -236,6 +236,9 @@ def listings():
         query = query.order_by(
             db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).desc()
         )
+    elif sort is None:
+    # no explicit sort → shuffle results every request
+        query = query.order_by(func.random())
 
     # Paginate
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
