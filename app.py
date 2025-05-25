@@ -10,6 +10,8 @@ app = Flask(__name__)
 Compress(app)
 from utils import parse_price  # or put the function above directly in app.py
 import pprint, sys, logging
+from decimal import Decimal, ROUND_HALF_UP
+import re
 
 # Use the same connection style as your CSV script
 # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/neolease_db"
@@ -27,6 +29,33 @@ db.init_app(app)
 app.config["CACHE_TYPE"] = "simple"       # in-memory; swap for RedisCache in prod
 app.config["CACHE_DEFAULT_TIMEOUT"] = 86400 # 5 minutes
 cache = Cache(app)
+
+
+@app.template_filter("euro")                 # {{ value|euro }}
+def format_euro(value):
+    """
+    Render anything that looks like a price as:
+        €12.345,67   or   €12.345,-   (if no cents)
+    – thousands = dot,  decimals = comma
+    – accepts:  '20950', '20.950,-', 20950.0, Decimal, None
+    """
+    if value in (None, ""):
+        return ""
+
+    # keep digits & dots only  →  "€20.950,-" → "20.950"
+    cleaned = re.sub(r"[^\d.]", "", str(value))
+    if cleaned == "":
+        return ""
+
+    amount = Decimal(cleaned).quantize(Decimal("0.01"), ROUND_HALF_UP)
+
+    euros      = int(amount)
+    cents_part = int((amount - euros) * 100)
+
+    euros_str = f"{euros:,}".replace(",", ".")     # 12345 -> '12.345'
+
+    return f"€{euros_str},-" if cents_part == 0 else f"€{euros_str},{cents_part:02d}"
+
 
 @app.route('/robots.txt')
 def robots_txt():
