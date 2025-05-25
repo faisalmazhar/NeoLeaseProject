@@ -70,7 +70,7 @@
                       data-car-id="{{ car.id }}"
                       data-title="{{ car.title }}"
                       data-image="{{ car.images[0].image_url if car.images }}"
-                      data-monthly="{{ car.financial_lease_price or '' }}">
+                      data-monthly="{{ car.financial_lease_price|euro or '' }}">
                 <i class="fa-regular fa-heart" style="color:#fff;"></i> Favoriet toevoegen
               </button>
             </div>
@@ -214,7 +214,7 @@
                                  height="180"
                                  alt="{{ c.title }}">{% endif %}
               <h3 style="color:#4c37c6;font-size:1rem;margin-top:.5rem;">{{ c.title }}</h3>
-              <p style="font-size:.9rem;">{{ c.financial_lease_price }} / {{ c.financial_lease_term }}</p>
+              <p style="font-size:.9rem;">{{ c.financial_lease_price|euro }} / {{ c.financial_lease_term }}</p>
             </a>
           </div>
         {% endfor %}
