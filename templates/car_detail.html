@@ -96,7 +96,7 @@
           ('Transmissie', clean(car.transmissie), url_for('static', filename='images/manual-transmission.png')),
           ('Brandstof',   clean(car.brandstof), url_for('static', filename='images/fuel.png')),
           ('Btw/marge',   clean(car.btw_marge), url_for('static', filename='images/vat.png')),
-          ('Prijs',       car.prijs,     url_for('static', filename='images/get-money.png'))
+          ('Prijs',       clean(car.prijs,|euro),     url_for('static', filename='images/get-money.png'))
         ] %}
 
 
