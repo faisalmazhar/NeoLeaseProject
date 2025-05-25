@@ -194,7 +194,7 @@
           {{ car.brandstof }} | {{ car.km_stand }} km | {{ car.bouwjaar }}
         </p>
         <p>
-          Prijs: €{{ car.prijs|euro }}
+          Prijs: {{ car.prijs|euro }}
         </p>
         <a href="{{ url_for('car_detail', car_id=car.id) }}"
            class="btn border"
