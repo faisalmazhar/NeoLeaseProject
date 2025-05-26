@@ -1,200 +1,152 @@
+{# templates/calculator_general.html #}
 {% extends "base.html" %}
-{% block title %}Bereken je maandbedrag | Neo Lease{% endblock %}
+{% block title %}Calculator | Neo Lease{% endblock %}
 
 {% block content %}
-<div class="container my-4" style="max-width: 900px;">
-  <div class="mb-4">
-    <h2 style="color: #4c37c6;">Bereken je maandbedrag</h2>
-
-    {% if car %}
-      <h4>{{ car.title }}</h4>
-      <p><strong>Catalogusprijs:</strong> 
-         {{ car.prijs|euro if car.prijs else "Onbekend" }}</p>
-    {% endif %}
+<section class="container" style="padding:2rem 1rem;">
+  
+  <h1 style="color: #4c37c6; margin-bottom:1rem;">
+    Bereken hieronder jouw maandbedrag
+  </h1>
+  
+  <!-- Main wrapper: left = form, right = results box -->
+  <div style="display:flex; flex-wrap:wrap; gap:2rem;">
     
-    <!-- Debug print: show what numeric price ended up being -->
-    <!-- <p style="color:red;">DEBUG: finalPrice => {{ thePrice }}</p> -->
-  </div>
+    <!-- LEFT: Input fields -->
+    <div style="flex:1; min-width:300px;">
+      <!-- Aanschafprijs -->
+      <label for="purchasePrice" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Aanschafprijs
+      </label>
+      <input
+        type="number"
+        id="purchasePrice"
+        placeholder="30.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Vul de totale aanschafprijs van het object in (excl. btw)
+      </p>
 
-  <div class="row">
-    <div class="col-md-7">
+      <!-- Aanbetaling -->
+      <label for="downPayment" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Aanbetaling
+      </label>
+      <input
+        type="number"
+        id="downPayment"
+        placeholder="5.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Voer het bedrag van de aanbetaling in.
+      </p>
 
-      {% set finalPrice = thePrice|float %}
-      
-      <!-- DOWN PAYMENT SLIDER -->
-      <label for="downPaymentSlider" style="font-weight: 600;">Aanbetaling</label>
-      <input 
-        type="range" class="form-range"
-        id="downPaymentSlider"
-        min="0"
-        max="{{ finalPrice|int }}" 
-        step="100"
-        value="0"
+      <!-- Slottermijn -->
+      <label for="balloon" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Slottermijn
+      </label>
+      <input
+        type="number"
+        id="balloon"
+        placeholder="10.000"
+        style="width:100%; margin-bottom:0.5rem; padding:0.5rem;"
+      />
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Voer het bedrag van de slottermijn in.
+      </p>
+
+      <!-- Looptijd Slider -->
+      <label for="monthsRange" style="display:block; margin-bottom:0.3rem; font-weight:600;">
+        Looptijd in maanden
+      </label>
+      <input
+        type="range"
+        id="monthsRange"
+        min="12"
+        max="72"
+        value="60"
+        step="12"
+        style="width:100%"
+      />
+      <div style="
+        display:flex; 
+        justify-content:space-between; 
+        margin-top:0.5rem; 
+        font-size:0.85rem;"
       >
-      <p class="mt-1">
-        Je aanbetaling is: 
-        <strong><span id="dpValue">€0,-</span></strong>
-      </p>
-
-      <!-- FINANCED AMOUNT -->
-      <p class="text-muted">Te financieren bedrag: 
-        <strong id="loanAmountDisplay">€0,-</strong>
-      </p>
-
-      <!-- BALLOON (READ-ONLY) -->
-      <p>Balloon (15%):
-        <strong id="balloonValue">€0,-</strong>
-      </p>
-
-      <!-- MULTIPLE TERMS -->
-      <h5>Maandbedragen (zonder balloon in de maandlast):</h5>
-      <ul style="list-style:none;">
-        <li>12 maanden: <strong id="m12">€0,-</strong>/mnd</li>
-        <li>24 maanden: <strong id="m24">€0,-</strong>/mnd</li>
-        <li>36 maanden: <strong id="m36">€0,-</strong>/mnd</li>
-        <li>48 maanden: <strong id="m48">€0,-</strong>/mnd</li>
-        <li>60 maanden: <strong id="m60">€0,-</strong>/mnd</li>
-        <li>72 maanden: <strong id="m72">€0,-</strong>/mnd</li>
-      </ul>
-
-      <div class="mt-4">
-        <a 
-          href="{{ url_for('request_quote', car_id=car.id) }}" 
-          class="btn border"
-          style="background: #4c37c6;
-          color:white;"
-        >
-          Request a Quote
-        </a>
+        <span>12</span>
+        <span id="monthsValue">60</span>
+        <span>72</span>
       </div>
+      <p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">
+        Selecteer de looptijd van de leaseovereenkomst.
+      </p>
+
     </div>
-    <div class="col-md-5">
-      {% if car.financial_lease_price and car.financial_lease_term %}
-      <div class="border p-3 mb-3">
-        <p>Concurrent maandprijs:</p>
-        <h4 style="color: green;">
-          {{ car.financial_lease_price|euro }} / 
-          {{ car.financial_lease_term }} mnd
-        </h4>
-      </div>
-      {% endif %}
+    
+    <!-- RIGHT: Big result box -->
+    <div style="
+      flex:1; 
+      min-width:250px; 
+      background:#4c37c6; 
+      color:#fff; 
+      border-radius:8px; 
+      padding:1.5rem;
+    ">
+      <h3 style="font-size:1.2rem; margin-bottom:1rem;">
+        Maandbedrag
+        <span id="monthlyPayment" style="font-size:1.5rem; display:block;">
+          €250
+        </span>
+      </h3>
+      <p style="margin-bottom:2rem;">
+        Jouw maandelijkse leasebedrag.
+      </p>
       
-      {% if car.images and car.images|length > 0 %}
-        <img src="{{ car.images[0].image_url }}"
-             alt="Car image"
-             class="img-fluid rounded">
-      {% endif %}
+      <p style="margin-bottom:1rem;">
+        <strong>Start met leasen!</strong><br>
+        Neem contact op voor een offerte op maat.
+      </p>
+
+            <!-- =============================================== -->
+      <!-- NEW ERROR BOX DIV: put it right here, so it shows above the button -->
+      <div 
+        id="errorBox" 
+        style="
+          display: none; 
+          background: #f44336; /* typical red color */
+          color: #fff; 
+          padding: 1rem;
+          margin: 1rem 0; 
+          border-radius: 4px;
+        "
+      >
+        <!-- We will fill this text dynamically in JS -->
+      </div>
+      <!-- =============================================== -->
+      
+      <button 
+        id="applyNowBtn"
+        style="
+          background:#000; 
+          color:#fff; 
+          border:none; 
+          padding:0.8rem 1.2rem; 
+          border-radius:4px; 
+          cursor:pointer; 
+          font-weight:600;
+        "
+      >
+        Nu aanvragen
+      </button>
     </div>
+    
   </div>
-</div>
+
+</section>
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  console.log("[DEBUG] Calculator DOMContentLoaded triggered.");
 
-  const basePrice = parseFloat("{{ finalPrice }}") || 30000;
-  console.log("[DEBUG] basePrice =>", basePrice);
-
-  const downSlider = document.getElementById("downPaymentSlider");
-  const dpValueEl  = document.getElementById("dpValue");
-  const loanEl     = document.getElementById("loanAmountDisplay");
-  const balloonEl  = document.getElementById("balloonValue");
-
-  const m12 = document.getElementById("m12");
-  const m24 = document.getElementById("m24");
-  const m36 = document.getElementById("m36");
-  const m48 = document.getElementById("m48");
-  const m60 = document.getElementById("m60");
-  const m72 = document.getElementById("m72");
-
-  const errorBox = document.getElementById("errorBox");
-  const applyBtn = document.getElementById("applyNowBtn");
-  const monthlyPaymentEl = document.getElementById("monthlyPayment");
-  const monthsValueLabel = document.getElementById("monthsValue");
-
-  // Helper: format number to Dutch Euro style (e.g., €12.345,67 or €12.345,-)
-  function formatEuro(value) {
-    if (isNaN(value)) return "€0,-";
-
-    const euros = Math.floor(value);
-    const cents = Math.round((value - euros) * 100);
-    const eurosStr = euros.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-    if (cents === 0) {
-      return `€${eurosStr},-`;
-    } else {
-      return `€${eurosStr},${cents.toString().padStart(2, "0")}`;
-    }
-  }
-
-  function recalcAll() {
-    const downPay = parseFloat(downSlider.value) || 0;
-    const financed = basePrice - downPay;
-
-    dpValueEl.textContent = formatEuro(downPay);
-    loanEl.textContent = formatEuro(financed);
-
-    // Balloon is 15% of base price
-    const balloon = 0.15 * basePrice;
-    balloonEl.textContent = formatEuro(balloon);
-
-    function monthlyPayment(term) {
-      const annualRate = 0.1149;
-      const monthlyRate = annualRate / 12;
-      const interest = financed * monthlyRate;
-      const principal = financed / term;
-      return interest + principal;
-    }
-
-    m12.textContent = formatEuro(monthlyPayment(12));
-    m24.textContent = formatEuro(monthlyPayment(24));
-    m36.textContent = formatEuro(monthlyPayment(36));
-    m48.textContent = formatEuro(monthlyPayment(48));
-    m60.textContent = formatEuro(monthlyPayment(60));
-    m72.textContent = formatEuro(monthlyPayment(72));
-
-    // ERROR LOGIC to prevent negative or invalid balloon vs financed amounts
-    if (balloon > financed) {
-      showError("De slottermijn mag niet hoger zijn dan het te financieren bedrag!");
-      return;
-    } else {
-      hideError();
-    }
-
-    // Prevent negative monthly payment (for safety)
-    const months = 60; // default months or you can add a slider for months as well if you want
-    if (monthlyPayment(months) < 0) {
-      showError("Ongeldige invoer: maandbedrag kan niet negatief zijn!");
-      return;
-    } else {
-      hideError();
-    }
-  }
-
-  function showError(msg) {
-    if (!errorBox) return;
-    errorBox.style.display = "block";
-    errorBox.textContent = msg;
-    if (applyBtn) applyBtn.disabled = true;
-  }
-
-  function hideError() {
-    if (!errorBox) return;
-    errorBox.style.display = "none";
-    if (applyBtn) applyBtn.disabled = false;
-  }
-
-  downSlider.addEventListener("input", recalcAll);
-
-  // If you want to add a calculate button, you can add listener here:
-  if (applyBtn) {
-    applyBtn.addEventListener("click", recalcAll);
-  }
-
-  // Run the first calculation on page load
-  recalcAll();
-});
-</script>
 {% endblock %}
