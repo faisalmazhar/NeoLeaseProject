@@ -426,27 +426,6 @@ document.querySelectorAll('.listing-thumb').forEach(img => {
   });
 
 
-  function formatEuro(value) {
-  // value is a number (float or int)
-  if (isNaN(value)) return "€0,-";
-
-  const euros = Math.floor(value);
-  const cents = Math.round((value - euros) * 100);
-
-  // Format thousands with dot, like 12.345
-  const eurosStr = euros.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-  // If cents are 0 → "€12.345,-"
-  if (cents === 0) {
-    return `€${eurosStr},-`;
-  } else {
-    // Else "€12.345,67"
-    return `€${eurosStr},${cents.toString().padStart(2, "0")}`;
-  }
-}
-
-
-
 
 
 });
