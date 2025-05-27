@@ -168,38 +168,71 @@ def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
 
-    # distinct brand list
-    distinct_brands = db.session.query(CarListing.merk)\
-                        .filter(CarListing.merk.isnot(None))\
-                        .distinct()\
-                        .order_by(CarListing.merk.asc())\
-                        .all()
+    # distinct brand list    # ─── distinct BRAND list (already there) ─────────────────────────
+    distinct_brands = (
+        db.session
+          .query(CarListing.merk)
+          .filter(CarListing.merk.isnot(None))
+          .distinct()
+          .order_by(CarListing.merk.asc())
+          .all()
+    )
     brand_choices = [b[0] for b in distinct_brands if b[0]]
 
-    # Gather filters
-    brand_filter   = request.args.get("brand")
-    search_query   = request.args.get("q")
-    
-    # The new monthly range string, e.g. "200-299" or "1000+"
-    monthly_param  = request.args.get("monthly")
+    # ─── distinct TYPE (voertuigsoort) list ─────────────────────────
+    distinct_types = (
+        db.session
+          .query(CarListing.voertuigsoort)
+          .filter(CarListing.voertuigsoort.isnot(None))
+          .distinct()
+          .order_by(CarListing.voertuigsoort.asc())
+          .all()
+    )
+    type_choices = [t[0] for t in distinct_types if t[0]]
+
+    # ─── distinct FUEL list ─────────────────────────
+    distinct_fuels = (
+        db.session
+          .query(CarListing.brandstof)
+          .filter(CarListing.brandstof.isnot(None))
+          .distinct()
+          .order_by(CarListing.brandstof.asc())
+          .all()
+    )
+    fuel_choices = [f[0] for f in distinct_fuels if f[0]]
+
+    # ─── read query‐string filters ─────────────────────────
+    brand_filter      = request.args.get("brand")
+    type_filter       = request.args.get("voertuigsoort")
+    fuel_filter       = request.args.get("brandstof")
+    search_query      = request.args.get("q")
+    monthly_param     = request.args.get("monthly")
+    sort              = request.args.get("sort")
 
     query = CarListing.query
     
-    # brand
+    
+    # brand filter
     if brand_filter:
         query = query.filter(CarListing.merk.ilike(f"%{brand_filter}%"))
+    # type filter
+    if type_filter:
+        query = query.filter(CarListing.voertuigsoort == type_filter)
+    # fuel filter
+    if fuel_filter:
+        query = query.filter(CarListing.brandstof == fuel_filter)
 
-    # If the user typed a free-text search
+    # free‐text search
     if search_query:
         from sqlalchemy import or_
         query = query.filter(
             or_(
-                CarListing.title.ilike(f"%{search_query}%"),
-                CarListing.subtitle.ilike(f"%{search_query}%"),
-                CarListing.model.ilike(f"%{search_query}%")
+              CarListing.title.ilike(f"%{search_query}%"),
+              CarListing.subtitle.ilike(f"%{search_query}%"),
+              CarListing.model.ilike(f"%{search_query}%")
             )
         )
-
+        
     # If we got a monthly param (like "200-299", "1-99", or "1000+"), 
     # convert that to total price range:
     if monthly_param:
@@ -227,7 +260,7 @@ def listings():
                 pass   # ignore malformed input
 
     # (Optional) if you still want sorting logic
-    sort = request.args.get("sort")
+    
     if sort == "price_asc":
         query = query.order_by(
             db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).asc()
@@ -236,7 +269,7 @@ def listings():
         query = query.order_by(
             db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).desc()
         )
-    elif sort is None:
+    else:
     # no explicit sort → shuffle results every request
         query = query.order_by(func.random())
 
@@ -274,13 +307,17 @@ def listings():
         cars=pagination.items,
         page=page,
         total_pages=pagination.pages,
-        start_page=start_page,     # <--- ADD THIS
+        start_page=start_page,     
         end_page=end_page,         # <--- AND THIS
+        current_voertuigsoort=type_filter,         
+        current_brandstof=fuel_filter,     
+        type_choices=type_choices,                
+        fuel_choices=fuel_choices,    
         brand_choices=brand_choices,
         current_brand=brand_filter,
         current_q=search_query,
         current_sort=sort,
-        current_monthly=monthly_param,     # <--- Add this line
+        current_monthly=monthly_param,     
         pagination=pagination
     )
 
