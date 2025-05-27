@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% set basePrice = thePrice|int %}
+
 {% block title %}Bereken je maandbedrag | Neo Lease{% endblock %}
 
 {% block content %}
@@ -17,16 +19,13 @@
   <div class="row">
     <!-- LEFT: sliders & outputs -->
     <div class="col-md-7">
-      {# Use thePrice passed from the view #}
-      {% set basePrice = thePrice|float %}
-
       <label for="downPaymentSlider" style="font-weight:600;">Aanbetaling</label>
       <input
         type="range"
         class="form-range"
         id="downPaymentSlider"
         min="0"
-        max="{{ basePrice|int }}"
+        max="{{ basePrice }}"
         step="100"
         value="0"
       >
@@ -93,14 +92,13 @@
 </div>
 {% endblock %}
 
-
 {% block extra_scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // 1) Grab the Jinja-provided base price
-  const basePrice = {{ basePrice|int }};
+  // basePrice is now defined at top
+  const basePrice = {{ basePrice }};
 
-  // 2) DOM refs
+  // DOM refs
   const downSlider = document.getElementById("downPaymentSlider");
   const dpValueEl  = document.getElementById("dpValue");
   const loanEl     = document.getElementById("loanAmountDisplay");
@@ -114,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     72: document.getElementById("m72"),
   };
 
-  // 3) Euro formatter
+  // Euro formatter
   function formatEuro(value, cents = 2) {
     const n = Number(value) || 0;
     return n.toLocaleString("nl-NL", {
@@ -124,9 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 4) Main recalculation
+  // Recalc function
   function recalcAll() {
-    // clamp deposit to [0, basePrice]
+    // clamp deposit
     const deposit = Math.min(Number(downSlider.value), basePrice);
     downSlider.max = basePrice;
 
@@ -149,10 +147,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 5) Wire up slider
+  // Hook slider
   downSlider.addEventListener("input", recalcAll);
 
-  // 6) Initial
+  // Initial render
   recalcAll();
 });
 </script>
