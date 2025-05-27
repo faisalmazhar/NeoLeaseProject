@@ -201,10 +201,15 @@ def listings():
     )
     fuel_choices = [f[0] for f in distinct_fuels if f[0]]
 
+
+    # ─── static BTW/Marge list ───────────────────────
+    btw_marge_choices = ["Btw", "Marge"]
+
     # ─── read query‐string filters ─────────────────────────
     brand_filter      = request.args.get("brand")
     type_filter       = request.args.get("voertuigsoort")
     fuel_filter       = request.args.get("brandstof")
+    btw_marge_filter  = request.args.get("btw_marge")
     search_query      = request.args.get("q")
     monthly_param     = request.args.get("monthly")
     sort              = request.args.get("sort")
@@ -221,7 +226,11 @@ def listings():
     # fuel filter
     if fuel_filter:
         query = query.filter(CarListing.brandstof == fuel_filter)
+   # btw/marge filter
+    if btw_marge_filter:
+        query = query.filter(CarListing.btw_marge == btw_marge_filter)
 
+    
     # free‐text search
     if search_query:
         from sqlalchemy import or_
@@ -310,9 +319,11 @@ def listings():
         start_page=start_page,     
         end_page=end_page,         # <--- AND THIS
         current_voertuigsoort=type_filter,         
-        current_brandstof=fuel_filter,     
+        current_brandstof=fuel_filter,  
+        current_btw_marge=btw_marge_filter,
         type_choices=type_choices,                
         fuel_choices=fuel_choices,    
+        btw_marge_choices=btw_marge_choices,
         brand_choices=brand_choices,
         current_brand=brand_filter,
         current_q=search_query,
