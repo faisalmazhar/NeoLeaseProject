@@ -40,66 +40,32 @@
       margin-bottom:1rem;"
       class="filter-box"
       >
-        <select  name="brand" >
-          <option value="">Merk</option>
-          <option value="Audi">Audi</option>
-          <option value="BMW">BMW</option>
-          <option value="Bürstner">Bürstner</option>
-          <option value="BYD">BYD</option>
-          <option value="Cenntro">Cenntro</option>
-          <option value="Chevrolet">Chevrolet</option>
-          <option value="Citroën">Citroën</option>
-          <option value="CUPRA">CUPRA</option>
-          <option value="Dacia">Dacia</option>
-          <option value="Dodge">Dodge</option>
-          <option value="DS">DS</option>
-          <option value="Ducati">Ducati</option>
-          <option value="Fiat">Fiat</option>
-          <option value="Ford">Ford</option>
-          <option value="Honda">Honda</option>
-          <option value="Hyundai">Hyundai</option>
-          <option value="Jeep">Jeep</option>
-          <option value="Kawasaki">Kawasaki</option>
-          <option value="Kia">Kia</option>
-          <option value="KTM">KTM</option>
-          <option value="Land Rover">Land Rover</option>
-          <option value="Lynk &amp; Co">Lynk &amp; Co</option>
-          <option value="Mazda">Mazda</option>
-          <option value="Mercedes-Benz">Mercedes-Benz</option>
-          <option value="MINI">MINI</option>
-          <option value="Mitsubishi">Mitsubishi</option>
-          <option value="Nissan">Nissan</option>
-          <option value="Opel">Opel</option>
-          <option value="Peugeot">Peugeot</option>
-          <option value="Renault">Renault</option>
-          <option value="SEAT">SEAT</option>
-          <option value="Škoda">Škoda</option>
-          <option value="Smart">Smart</option>
-          <option value="Suzuki">Suzuki</option>
-          <option value="Tesla">Tesla</option>
-          <option value="Toyota">Toyota</option>
-          <option value="Volkswagen">Volkswagen</option>
-          <option value="Volvo">Volvo</option>
-          <option value="Yamaha">Yamaha</option>
+      <select name="brand">
+        <option value="">Merk</option>
+        {% for b in brand_choices %}
+          <option value="{{ b }}" {% if b == current_brand %}selected{% endif %}>
+            {{ b }}
+          </option>
+        {% endfor %}
         </select>
-        
-
-
-        
-
-        <!-- Type -->
-        <select name="type" >
+                  <!-- DYNAMIC TYPE -->
+        <select name="voertuigsoort">
           <option value="">Voertuigsoort</option>
-          <option value="auto">Auto</option>
-          <option value="motor">Motor</option>
+          {% for t in type_choices %}
+            <option value="{{ t }}" {% if t == current_voertuigsoort %}selected{% endif %}>
+              {{ t }}
+            </option>
+          {% endfor %}
         </select>
-
-        <!-- Fuel -->
-        <select name="fuel" >
+      
+        <!-- DYNAMIC FUEL -->
+        <select name="brandstof">
           <option value="">Brandstof</option>
-          <option value="benzine">Benzine</option>
-          <option value="diesel">Diesel</option>
-          <option value="electric">Elektrisch</option>
+          {% for f in fuel_choices %}
+            <option value="{{ f }}" {% if f == current_brandstof %}selected{% endif %}>
+              {{ f }}
+            </option>
+          {% endfor %}
         </select>
 
         <select name="monthly" >
