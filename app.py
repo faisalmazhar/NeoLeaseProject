@@ -203,7 +203,7 @@ def listings():
 
 
     # ─── static BTW/Marge list ───────────────────────
-    btw_marge_choices = ["Btw", "Marge"]
+    btw_marge_choices = ["BTW", "Marge"]
 
     # ─── read query‐string filters ─────────────────────────
     brand_filter      = request.args.get("brand")
@@ -228,8 +228,7 @@ def listings():
         query = query.filter(CarListing.brandstof == fuel_filter)
    # btw/marge filter
     if btw_marge_filter:
-        query = query.filter(CarListing.btw_marge == btw_marge_filter)
-
+        query = query.filter(CarListing.btw_marge.ilike(btw_marge_filter))
     
     # free‐text search
     if search_query:
