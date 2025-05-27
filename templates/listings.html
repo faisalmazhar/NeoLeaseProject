@@ -68,6 +68,16 @@
           {% endfor %}
         </select>
 
+
+        <select name="btw_marge">
+          <option value="">Btw / Marge</option>
+          {% for bm in btw_marge_choices %}
+          <option value="{{ bm }}" {% if bm==current_btw_marge %}selected{% endif %}>
+            {{ bm }}
+          </option>
+            {% endfor %}
+        </select>
+
         <select name="monthly" >
           <option value="">Budget&nbsp;(p/m)</option>
           <option value="200-300" {% if current_monthly=='200-300' %}selected{% endif %}>€200 – €300</option>
@@ -99,6 +109,7 @@
         >
           Filter
         </button>
+        
       </div>
     </form>
   </div>
