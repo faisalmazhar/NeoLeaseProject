@@ -12,8 +12,6 @@
          {{ car.prijs|euro if car.prijs else "Onbekend" }}</p>
     {% endif %}
     
-    <!-- Debug print: show what numeric price ended up being -->
-    <!-- <p style="color:red;">DEBUG: finalPrice => {{ thePrice }}</p> -->
   </div>
 
   <div class="row">
@@ -68,6 +66,7 @@
         </a>
       </div>
     </div>
+
     <div class="col-md-5">
       {% if car.financial_lease_price and car.financial_lease_term %}
       <div class="border p-3 mb-3">
@@ -87,6 +86,21 @@
     </div>
   </div>
 </div>
+
+<div 
+  id="errorBox" 
+  style="
+    display: none; 
+    background: #f44336; /* red color */
+    color: #fff; 
+    padding: 1rem;
+    margin: 1rem 0; 
+    border-radius: 4px;
+  "
+>
+  <!-- Error message will be displayed here -->
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -111,10 +125,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const errorBox = document.getElementById("errorBox");
   const applyBtn = document.getElementById("applyNowBtn");
-  const monthlyPaymentEl = document.getElementById("monthlyPayment");
-  const monthsValueLabel = document.getElementById("monthsValue");
 
-  // Helper: format number to Dutch Euro style (e.g., €12.345,67 or €12.345,-)
+  // Helper function to format values to Euro
   function formatEuro(value) {
     if (isNaN(value)) return "€0,-";
 
