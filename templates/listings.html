@@ -63,20 +63,23 @@
           <option value="">Brandstof</option>
           {% for f in fuel_choices %}
             <option value="{{ f }}" {% if f == current_brandstof %}selected{% endif %}>
-              {{ f }}
+              {{ f|title }}
             </option>
           {% endfor %}
         </select>
 
 
+        <!-- BTW / Marge -->
         <select name="btw_marge">
           <option value="">Btw / Marge</option>
           {% for bm in btw_marge_choices %}
-          <option value="{{ bm }}" {% if bm==current_btw_marge %}selected{% endif %}>
-            {{ bm }}
-          </option>
-            {% endfor %}
+            <option value="{{ bm }}"
+                    {% if bm == current_btw_marge %}selected{% endif %}>
+              {{ bm }}  {# bm is now "BTW" or "Marge" #}
+            </option>
+          {% endfor %}
         </select>
+
 
         <select name="monthly" >
           <option value="">Budget&nbsp;(p/m)</option>
