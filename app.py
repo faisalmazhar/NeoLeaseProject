@@ -208,6 +208,8 @@ def listings():
           .all()
     )
     fuel_choices = [f[0] for f in distinct_fuels if f[0]]
+    fuel_choices = [f for f in fuel_choices if f.lower() != "hybride"]
+
 
 
     # ─── static BTW/Marge list ───────────────────────
