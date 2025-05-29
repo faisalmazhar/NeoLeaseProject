@@ -178,6 +178,22 @@ def listings():
           .all()
     )
     brand_choices = [b[0] for b in distinct_brands if b[0]]
+    # ─── distinct MODEL list grouped by brand ─────────────────────────
+    
+    rows = (
+        db.session
+          .query(CarListing.merk, CarListing.model)
+          .filter(
+            CarListing.merk.isnot(None),
+            CarListing.model.isnot(None)
+          )
+          .distinct()
+          .order_by(CarListing.merk.asc(), CarListing.model.asc())
+          .all()
+    )
+    models_by_brand = {}
+    for brand, model in rows:
+        models_by_brand.setdefault(brand, []).append(model)
 
     # ─── distinct TYPE (voertuigsoort) list ─────────────────────────
     distinct_types = (
@@ -217,6 +233,7 @@ def listings():
 
     # ─── read query‐string filters ─────────────────────────
     brand_filter      = request.args.get("brand")
+    model_filter      = request.args.get("model")
     type_filter       = request.args.get("voertuigsoort")
     fuel_filter       = request.args.get("brandstof")
     btw_marge_filter  = request.args.get("btw_marge")
@@ -236,6 +253,8 @@ def listings():
     # fuel filter
     if fuel_filter:
         query = query.filter(CarListing.brandstof == fuel_filter)
+    if model_filter:
+        query = query.filter(CarListing.model == model_filter)
    # btw/marge filter
     if btw_marge_filter:
         query = query.filter(CarListing.btw_marge.ilike(btw_marge_filter))
@@ -328,13 +347,15 @@ def listings():
         start_page=start_page,     
         end_page=end_page,         # <--- AND THIS
         current_voertuigsoort=type_filter,         
+        current_model=model_filter,
+        models_by_brand=models_by_brand,
+        current_brand=brand_filter,
         current_brandstof=fuel_filter,  
         current_btw_marge=btw_marge_filter,
         type_choices=type_choices,                
         fuel_choices=fuel_choices,    
         btw_marge_choices=btw_marge_choices,
         brand_choices=brand_choices,
-        current_brand=brand_filter,
         current_q=search_query,
         current_sort=sort,
         current_monthly=monthly_param,     
