@@ -40,7 +40,7 @@
       margin-bottom:1rem;"
       class="filter-box"
       >
-      <select name="brand">
+      <select name="brand" id="brandSelect">
         <option value="">Merk</option>
         {% for b in brand_choices %}
           <option value="{{ b }}" {% if b == current_brand %}selected{% endif %}>
@@ -48,7 +48,23 @@
           </option>
         {% endfor %}
         </select>
-                  <!-- DYNAMIC TYPE -->
+
+      <!-- MODEL (starts disabled) -->
+        <select name="model" id="modelSelect" disabled>
+          <option value="">Model</option>
+          {% for brand, models in models_by_brand.items() %}
+          <optgroup label="{{ brand }}">
+          {% for m in models %}
+          <option value="{{ m }}" 
+            {% if m == current_model %}selected{% endif %}>
+            {{ m }}
+          </option>
+          {% endfor %}
+          </optgroup>
+          {% endfor %}
+        </select>
+          
+        <!-- DYNAMIC TYPE -->
         <select name="voertuigsoort">
           <option value="">Voertuigsoort</option>
           {% for t in type_choices %}
@@ -326,4 +342,32 @@
 </div>
 </section>
 
+{% endblock %}
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const brandSelect = document.getElementById('brandSelect');
+  const modelSelect = document.getElementById('modelSelect');
+  // cache all optgroup HTML by brand
+  const groupMap = {};
+  modelSelect.querySelectorAll('optgroup').forEach(og => {
+    groupMap[og.label] = og.outerHTML;
+  });
+
+  brandSelect.addEventListener('change', () => {
+    const brand = brandSelect.value;
+    // reset models dropdown
+    modelSelect.innerHTML = '<option value="">Model</option>';
+    if (brand && groupMap[brand]) {
+      modelSelect.insertAdjacentHTML('beforeend', groupMap[brand]);
+      modelSelect.disabled = false;
+    } else {
+      modelSelect.disabled = true;
+    }
+  });
+
+  // if someone bookmarked a brand+model URL, re-enable on load
+  if (brandSelect.value) brandSelect.dispatchEvent(new Event('change'));
+});
+</script>
 {% endblock %}
