@@ -190,6 +190,14 @@ def listings():
     )
     type_choices = [t[0] for t in distinct_types if t[0]]
 
+    # ─── enforce client’s desired order ────────────────────────────
+    desired_order = ["Personenauto","Bedrijfswagen","Motor","Camper","Machines"]
+    # First, the ones in the desired list (in that order), but only if they exist:
+    ordered = [t for t in desired_order if t in type_choices]
+    # Then any others (if you still want them) afterwards, alphabetically:
+    extras  = sorted([t for t in type_choices if t not in desired_order])
+    type_choices = ordered + extras
+
     # ─── distinct FUEL list ─────────────────────────
     distinct_fuels = (
         db.session
