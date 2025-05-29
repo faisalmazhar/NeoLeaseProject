@@ -19,6 +19,7 @@
   <div class="row">
     <!-- LEFT: sliders & outputs -->
     <div class="col-md-7">
+      <!-- 1) Aanbetaling -->
       <label for="downPaymentSlider" style="font-weight:600;">Aanbetaling</label>
       <input
         type="range"
@@ -34,17 +35,30 @@
         <strong><span id="dpValue">€0,-</span></strong>
       </p>
 
+      <!-- 2) Te financieren bedrag -->
       <p class="text-muted">
         Te financieren bedrag:
         <strong id="loanAmountDisplay">€0,-</strong>
       </p>
 
-      <p>
-        Balloon (15%):
-        <strong id="balloonValue">€0,-</strong>
+      <!-- 3) Slottermijn -->
+      <label for="balloonSlider" style="font-weight:600;">Slottermijn</label>
+      <input
+        type="range"
+        class="form-range"
+        id="balloonSlider"
+        min="0"
+        max="{{ (basePrice * 0.15)|int }}"
+        step="100"
+        value="{{ (basePrice * 0.15)|int }}"
+      >
+      <p class="mt-1">
+        Je slottermijn is:
+        <strong><span id="balloonValue">€0,-</span></strong>
       </p>
 
-      <h5>Maandbedragen (zonder balloon in de maandlast):</h5>
+      <!-- 4) Maandbedragen (zonder slottermijn in de maandlast) -->
+      <h5>Maandbedragen (zonder slottermijn in de maandlast):</h5>
       <ul style="list-style:none; padding-left:0;">
         <li>12 maanden: <strong id="m12">€0,-</strong>/mnd</li>
         <li>24 maanden: <strong id="m24">€0,-</strong>/mnd</li>
@@ -66,7 +80,7 @@
       </div>
     </div>
 
-    <!-- RIGHT: competitor price + image -->
+    <!-- RIGHT: concurrent prijs + afbeelding -->
     <div class="col-md-5">
       {% if car.financial_lease_price and car.financial_lease_term %}
         <div class="border p-3 mb-3">
@@ -95,15 +109,14 @@
 {% block extra_scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // basePrice is now defined at top
-  const basePrice = {{ basePrice }};
+  const basePrice      = {{ basePrice }};
+  const downSlider     = document.getElementById("downPaymentSlider");
+  const balloonSlider  = document.getElementById("balloonSlider");
+  const dpValueEl      = document.getElementById("dpValue");
+  const loanEl         = document.getElementById("loanAmountDisplay");
+  const balloonValueEl = document.getElementById("balloonValue");
 
-  // DOM refs
-  const downSlider = document.getElementById("downPaymentSlider");
-  const dpValueEl  = document.getElementById("dpValue");
-  const loanEl     = document.getElementById("loanAmountDisplay");
-  const balloonEl  = document.getElementById("balloonValue");
-  const termEls    = {
+  const terms = {
     12: document.getElementById("m12"),
     24: document.getElementById("m24"),
     36: document.getElementById("m36"),
@@ -112,45 +125,46 @@ document.addEventListener("DOMContentLoaded", () => {
     72: document.getElementById("m72"),
   };
 
-  // Euro formatter
-  function formatEuro(value, cents = 2) {
-    const n = Number(value) || 0;
-    return n.toLocaleString("nl-NL", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: cents
-    });
+  function formatEuro(amount, decimals=0) {
+    return Number(amount || 0)
+      .toLocaleString("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: decimals
+      });
   }
 
-  // Recalc function
   function recalcAll() {
-    // clamp deposit
-    const deposit = Math.min(Number(downSlider.value), basePrice);
-    downSlider.max = basePrice;
-
-    // financed never negative
+    // 1) clamp deposit between 0 and basePrice
+    const deposit = Math.min(Math.max(Number(downSlider.value), 0), basePrice);
+    // 2) financed = basePrice - deposit, not below 0
     const financed = Math.max(basePrice - deposit, 0);
 
-    // balloon = 15% of financed
-    const balloon = financed * 0.15;
+    // 3) update deposit & financed in UI
+    dpValueEl.textContent  = formatEuro(deposit);
+    loanEl.textContent     = formatEuro(financed);
 
-    // update UI
-    dpValueEl.textContent     = formatEuro(deposit, 0);
-    loanEl.textContent        = formatEuro(financed, 0);
-    balloonEl.textContent     = formatEuro(balloon, 0);
+    // 4) adjust slottermijn slider max to match financed
+    balloonSlider.max      = financed;
+    // clamp balloon value
+    const balloon = Math.min(Number(balloonSlider.value), financed);
+    balloonValueEl.textContent = formatEuro(balloon);
 
-    // monthly = (financed – balloon) / term
+    // 5) compute principal = financed - balloon
     const principal = Math.max(financed - balloon, 0);
+
+    // 6) recompute each monthly
     [12,24,36,48,60,72].forEach(term => {
       const monthly = principal / term;
-      termEls[term].textContent = formatEuro(monthly);
+      terms[term].textContent = formatEuro(monthly, 2);
     });
   }
 
-  // Hook slider
+  // re-calc on either slider change
   downSlider.addEventListener("input", recalcAll);
+  balloonSlider.addEventListener("input", recalcAll);
 
-  // Initial render
+  // initial draw
   recalcAll();
 });
 </script>
