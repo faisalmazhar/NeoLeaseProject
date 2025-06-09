@@ -31,17 +31,17 @@ app.config["CACHE_TYPE"] = "simple"       # in-memory; swap for RedisCache in pr
 app.config["CACHE_DEFAULT_TIMEOUT"] = 86400 # 5 minutes
 cache = Cache(app)
 
-
+# ✱ add this right after Cache(app) is created
+with app.app_context():
+    cache.delete('_all_car_ids')   # drop any stale shoestring list
+    
 @cache.cached(timeout=300)
 def _all_car_ids():
     # insist on numeric IDs only
     rows = db.session.query(CarListing.id).all()
     return [int(r[0]) for r in rows if str(r[0]).isdigit()]
 
-# ✱ add this right after Cache(app) is created
-with app.app_context():
-    cache.delete('_all_car_ids')   # drop any stale shoestring list
-    
+
 def random_subset(limit=10):
     ids = _all_car_ids()
     return random.sample(ids, min(limit, len(ids)))
