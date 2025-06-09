@@ -1,6 +1,7 @@
 # models.py
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Numeric, Computed
 
 db = SQLAlchemy()
 
@@ -50,6 +51,11 @@ class CarListing(db.Model):
     energielabel        = db.Column(db.String(20))
     gemiddeld_verbruik  = db.Column(db.String(100))
     tankinhoud          = db.Column(db.String(100))
+    prijs_num = db.Column(
+        Numeric,
+        Computed("regexp_replace(prijs, '[^0-9]', '', 'g')::numeric"),
+        nullable=True
+    )
     
     # Here’s the relationship to multiple images
     images = db.relationship(
