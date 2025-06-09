@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, request, abort, send_from_directory
 from flask_compress import Compress
+from sqlalchemy import cast, String   # add at top with other imports
 from flask_caching import Cache
 from models import db, CarListing
 import logging
@@ -37,13 +38,12 @@ with app.app_context():
     
 CACHE_VERSION = "v2"                # bump whenever you change the function
 
-@cache.cached(timeout=300,
-              key_prefix=f"all_ids_{CACHE_VERSION}")   # << new stable key
+@cache.cached(timeout=300, key_prefix=f"all_ids_{CACHE_VERSION}")
 def _all_car_ids():
-    # insist on numeric IDs only
-    rows = db.session.query(CarListing.id).all()
+    rows = (db.session.query(CarListing.id)
+            .filter(cast(CarListing.id, String).op('~')('^[0-9]+$'))  # ⬅ keep digits only
+            .all())
     return [int(r[0]) for r in rows]
-
 
 def random_subset(limit=10):
     ids = _all_car_ids()
