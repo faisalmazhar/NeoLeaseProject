@@ -52,7 +52,7 @@
               <h3 class="calc-title">Jouw lease-calculator</h3>
 
               {% if car.financial_lease_price and car.financial_lease_term %}
-                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price|euro }}</strong> per {{ car.financial_lease_term }} maanden</p>
+                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price|euro }}</strong> per {{ car.financial_lease_term }}</p>
               {% else %}
                 <p><em>Geen maandprijs beschikbaar</em></p>
               {% endif %}
@@ -78,7 +78,9 @@
         </div><!-- /.carousel-wrapper -->
 
         <!-- ╔═════════════  OVER DEZE AUTO  ══════════════╗ -->
-        <h2 class="car-title">Over deze auto</h2>
+<!--         <h2 class="car-title">Over deze auto</h2> -->
+        <h2 class="car-title" style="font-size: clamp(1.25rem, 2vw + 0.5rem, 2rem);">Over deze auto</h2>
+
 
         {# decide brand icon #}
         {% set brand_icons = {
