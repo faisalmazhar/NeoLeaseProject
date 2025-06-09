@@ -5,6 +5,7 @@ from flask_compress import Compress
 from flask_caching import Cache
 from models import db, CarListing
 import logging
+import random
 from sqlalchemy import func  # Add this import for random()
 app = Flask(__name__)
 Compress(app)
@@ -29,6 +30,15 @@ db.init_app(app)
 app.config["CACHE_TYPE"] = "simple"       # in-memory; swap for RedisCache in prod
 app.config["CACHE_DEFAULT_TIMEOUT"] = 86400 # 5 minutes
 cache = Cache(app)
+
+
+@cache.cached(timeout=300)
+def _all_car_ids():
+    return [r[0] for r in db.session.query(CarListing.id).all()]
+
+def random_subset(limit=10):
+    ids = _all_car_ids()
+    return random.sample(ids, min(limit, len(ids)))
 
 
 @app.template_filter("euro")                 # {{ value|euro }}
@@ -77,14 +87,13 @@ def index():
     total_cars = CarListing.query.count()
 
     # 2) distinct brand list
-    distinct_brands = db.session.query(CarListing.merk)\
-                        .filter(CarListing.merk.isnot(None))\
-                        .distinct()\
-                        .order_by(CarListing.merk.asc())\
-                        .all()
-    brand_choices = [b[0] for b in distinct_brands if b[0]]
+    brand_choices = cached_brands()
+
+
     # print(brand_choices)
-    random_cars = CarListing.query.order_by(func.random()).limit(10).all()
+    random_cars = (CarListing.query
+               .filter(CarListing.id.in_(random_subset()))
+               .all())
 
     return render_template("index.html", total_cars=total_cars, random_cars=random_cars, brand_choices=brand_choices)
 
@@ -162,30 +171,52 @@ def favorites():
 def contact():
     return render_template("contact.html")
 
+@cache.cached(timeout=86400)           # 24 h
+def cached_brands():
+    return [b[0] for b in (
+        db.session.query(CarListing.merk)
+        .filter(CarListing.merk.isnot(None))
+        .distinct()
+        .order_by(CarListing.merk.asc())
+        .all()
+    )]
+
+@cache.cached(timeout=86400)
+def cached_types():
+    return [t[0] for t in (
+        db.session.query(CarListing.voertuigsoort)
+        .filter(CarListing.voertuigsoort.isnot(None))
+        .distinct()
+        .order_by(CarListing.voertuigsoort.asc())
+        .all()
+    )]
+
+@cache.cached(timeout=86400)
+def cached_fuels():
+    return [f[0] for f in (
+        db.session.query(CarListing.brandstof)
+        .filter(CarListing.brandstof.isnot(None))
+        .distinct()
+        .order_by(CarListing.brandstof.asc())
+        .all()
+    )]
+
+
 @app.route("/listings")
 @cache.cached(query_string=True)
 def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
 
-    # distinct brand list    # ─── distinct BRAND list (already there) ─────────────────────────
-    distinct_brands = (
-        db.session
-          .query(CarListing.merk)
-          .filter(CarListing.merk.isnot(None))
-          .distinct()
-          .order_by(CarListing.merk.asc())
-          .all()
-    )
-    brand_choices = [b[0] for b in distinct_brands if b[0]]
-    # ─── distinct MODEL list grouped by brand ─────────────────────────
+    brand_choices = cached_brands()
     
+    # Build brand → [models] once per request (required for Ajax fallback)
     rows = (
         db.session
           .query(CarListing.merk, CarListing.model)
           .filter(
-            CarListing.merk.isnot(None),
-            CarListing.model.isnot(None)
+              CarListing.merk.isnot(None),
+              CarListing.model.isnot(None)
           )
           .distinct()
           .order_by(CarListing.merk.asc(), CarListing.model.asc())
@@ -195,18 +226,8 @@ def listings():
     for brand, model in rows:
         models_by_brand.setdefault(brand, []).append(model)
 
-    # ─── distinct TYPE (voertuigsoort) list ─────────────────────────
-    distinct_types = (
-        db.session
-          .query(CarListing.voertuigsoort)
-          .filter(CarListing.voertuigsoort.isnot(None))
-          .distinct()
-          .order_by(CarListing.voertuigsoort.asc())
-          .all()
-    )
-    type_choices = [t[0] for t in distinct_types if t[0]]
+    type_choices  = cached_types()
 
-    # ─── enforce client’s desired order ────────────────────────────
     desired_order = ["Personenauto","Bedrijfswagen","Motor","Camper","Machines"]
     # First, the ones in the desired list (in that order), but only if they exist:
     ordered = [t for t in desired_order if t in type_choices]
@@ -214,17 +235,8 @@ def listings():
     extras  = sorted([t for t in type_choices if t not in desired_order])
     type_choices = ordered + extras
 
-    # ─── distinct FUEL list ─────────────────────────
-    distinct_fuels = (
-        db.session
-          .query(CarListing.brandstof)
-          .filter(CarListing.brandstof.isnot(None))
-          .distinct()
-          .order_by(CarListing.brandstof.asc())
-          .all()
-    )
-    fuel_choices = [f[0] for f in distinct_fuels if f[0]]
-    fuel_choices = [f for f in fuel_choices if f.lower() != "hybride"]
+    fuel_choices  = [f for f in cached_fuels() if f.lower() != "hybride"]
+
 
 
 
@@ -270,42 +282,27 @@ def listings():
             )
         )
         
-    # If we got a monthly param (like "200-299", "1-99", or "1000+"), 
-    # convert that to total price range:
+    # Budget → convert €/mnd → total price
     if monthly_param:
-        if monthly_param.endswith("+"):                      # "> 700"
-            min_monthly = float(monthly_param.rstrip("+"))   # 700
-            total_min   = (min_monthly + 1) * 60             # >= 701 €/mnd
-            query = query.filter(
-                db.func.cast(
-                    db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
-                    db.Float
-                ) >= total_min
-            )
+        if monthly_param.endswith("+"):
+            min_monthly = float(monthly_param.rstrip("+"))
+            query = query.filter(CarListing.prijs_num >= (min_monthly + 1) * 60)
         else:
             try:
-                lo, hi = map(float, monthly_param.split("-"))   # e.g. 301-400
-                total_lo = lo * 60
-                total_hi = hi * 60
+                lo, hi = map(float, monthly_param.split("-"))
                 query = query.filter(
-                    db.func.cast(
-                        db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'),
-                        db.Float
-                    ).between(total_lo, total_hi)
+                    CarListing.prijs_num.between(lo * 60, hi * 60)
                 )
             except ValueError:
-                pass   # ignore malformed input
-
+                pass  # malformed value -> ignore
+    
     # (Optional) if you still want sorting logic
     
     if sort == "price_asc":
-        query = query.order_by(
-            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).asc()
-        )
+        query = query.order_by(CarListing.prijs_num.asc())
     elif sort == "price_desc":
-        query = query.order_by(
-            db.func.cast(db.func.regexp_replace(CarListing.prijs, '[^0-9]', '', 'g'), db.Float).desc()
-        )
+        query = query.order_by(CarListing.prijs_num.desc())
+
     else:
     # no explicit sort → shuffle results every request
         query = query.order_by(func.random())
@@ -413,7 +410,9 @@ def submit_quote():
 def car_detail(car_id):
     # Grab the CarListing from DB or 404
     car = CarListing.query.get_or_404(car_id)
-    random_cars = CarListing.query.order_by(func.random()).limit(10).all()
+    random_cars = (CarListing.query
+               .filter(CarListing.id.in_(random_subset()))
+               .all())
 
 
     # logging.warning("CAR %s DUMP:\n%s",
