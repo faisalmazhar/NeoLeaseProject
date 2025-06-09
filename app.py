@@ -35,11 +35,14 @@ cache = Cache(app)
 with app.app_context():
     cache.delete('_all_car_ids')   # drop any stale shoestring list
     
-@cache.cached(timeout=300)
+CACHE_VERSION = "v2"                # bump whenever you change the function
+
+@cache.cached(timeout=300,
+              key_prefix=f"all_ids_{CACHE_VERSION}")   # << new stable key
 def _all_car_ids():
     # insist on numeric IDs only
     rows = db.session.query(CarListing.id).all()
-    return [int(r[0]) for r in rows if str(r[0]).isdigit()]
+    return [int(r[0]) for r in rows]
 
 
 def random_subset(limit=10):
