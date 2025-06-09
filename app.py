@@ -363,6 +363,22 @@ def listings():
     )
 
 
+@app.get("/api/models")
+@cache.cached(query_string=True, timeout=86400)
+def api_models_for_brand():
+    brand = request.args.get("brand")
+    if not brand:
+        return []
+    rows = (
+        db.session.query(CarListing.model)
+        .filter(CarListing.merk == brand, CarListing.model.isnot(None))
+        .distinct()
+        .order_by(CarListing.model.asc())
+        .all()
+    )
+    return [r[0] for r in rows]
+
+
 
 @app.route("/submit-quote", methods=["POST"])
 def submit_quote():
