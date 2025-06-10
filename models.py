@@ -13,6 +13,11 @@ class CarListing(db.Model):
     title = db.Column(db.String(200))
     subtitle = db.Column(db.String(200))
     financial_lease_price = db.Column(db.String(100))
+    financial_lease_price_num = db.Column(
+        Numeric,
+        Computed("regexp_replace(financial_lease_price, '[^0-9]', '', 'g')::numeric"),
+        nullable=True
+    )
     financial_lease_term = db.Column(db.String(100))
     advertentienummer = db.Column(db.String(100))
     merk = db.Column(db.String(100))
