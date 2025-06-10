@@ -239,14 +239,10 @@ def listings():
     ordered = [t for t in desired_order if t in type_choices]
 
     desired_order = ["Personenauto", "Bedrijfswagen", "Motor", "Camper", "Machines"]
-    ordered = [t for t in desired_order if t in type_choices]
-    type_choices = ordered          
-
-    fuel_choices  = [f for f in cached_fuels() if f.lower() != "hybride"]
-
-    allowed_fuels = {"Benzine", "Diesel", "Elektrisch", "LPG", "CNG"}
-    fuel_choices  = [f for f in fuel_choices if f in allowed_fuels]
-
+    type_choices  = desired_order          # always show the full set
+    
+    allowed_fuels = ["Benzine", "Diesel", "Elektrisch", "LPG", "CNG"]
+    fuel_choices  = allowed_fuels          # show every allowed fuel
 
 
     # ─── static BTW/Marge list ───────────────────────
