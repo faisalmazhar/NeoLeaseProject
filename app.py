@@ -209,7 +209,6 @@ def cached_fuels():
 
 
 @app.route("/listings")
-@cache.cached(query_string=True)
 def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 16
