@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, abort, send_from_directory
 from flask_compress import Compress
 from sqlalchemy import cast, String   # add at top with other imports
 from flask_caching import Cache
+from sqlalchemy import cast, String, Numeric, func
 from models import db, CarListing
 import logging
 import random
@@ -287,19 +288,21 @@ def listings():
         )
         
     # Budget → convert €/mnd → total price
+    # ─── Budget p/m filter ──────────────────────────────────────────
     if monthly_param:
+        lease_col = CarListing.financial_lease_price_num
+
         if monthly_param.endswith("+"):
-            min_monthly = float(monthly_param.rstrip("+"))
-            query = query.filter(CarListing.prijs_num >= (min_monthly + 1) * 60)
+            min_pm = float(monthly_param.rstrip("+"))
+            query = query.filter(lease_col >= min_pm)
         else:
             try:
                 lo, hi = map(float, monthly_param.split("-"))
-                query = query.filter(
-                    CarListing.prijs_num.between(lo * 60, hi * 60)
-                )
+                query = query.filter(lease_col.between(lo, hi))
             except ValueError:
-                pass  # malformed value -> ignore
-    
+                pass  # ignore malformed value
+    # ────────────────────────────────────────────────────────────────
+
     # (Optional) if you still want sorting logic
     
     if sort == "price_asc":
