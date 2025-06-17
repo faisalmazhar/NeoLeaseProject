@@ -52,7 +52,7 @@
               <h3 class="calc-title">Jouw lease-calculator</h3>
 
               {% if car.financial_lease_price and car.financial_lease_term %}
-                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price|euro }}</strong> per {{ car.financial_lease_term }}</p>
+                <p style="font-size:1.1rem;margin-bottom:1rem;"><strong>{{ car.financial_lease_price|euro }}</strong> per maand {{ car.financial_lease_term }}</p>
               {% else %}
                 <p><em>Geen maandprijs beschikbaar</em></p>
               {% endif %}
