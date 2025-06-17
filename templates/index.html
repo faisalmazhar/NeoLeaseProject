@@ -43,6 +43,11 @@
         </select>
         <!-- Alternatively, if you want “Merk en model” to be a text input for free search, 
              you can do name="q" instead. But here we’re copying the approach from listings. -->
+
+        <!-- 2) Model Dropdown (starts disabled) -->
+        <select name="model" id="modelSelect" disabled>
+          <option value="">Model</option>
+        </select>
         
         <!-- 2) Monthly budget dropdown -->
         <select
@@ -409,4 +414,42 @@
   </section>
   
 
+{% endblock %}
+
+
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const brandSelect = document.getElementById('brand');
+  const modelSelect = document.getElementById('modelSelect');
+
+  async function loadModels(brand) {
+    modelSelect.disabled = true;
+    modelSelect.innerHTML = '<option value="">Model</option>';
+    if (!brand) return;
+
+    // Fetch models for the selected brand from the API endpoint
+    const res = await fetch(`/api/models?brand=${encodeURIComponent(brand)}`);
+    const models = await res.json();
+
+    models.forEach(model => {
+      const option = document.createElement("option");
+      option.value = model;
+      option.textContent = model;
+      modelSelect.appendChild(option);
+    });
+
+    modelSelect.disabled = false;
+  }
+
+  // When the brand is changed, load the models
+  brandSelect.addEventListener('change', function (e) {
+    loadModels(e.target.value);
+  });
+
+  // Automatically load models if a brand is pre-selected when the page loads
+  if (brandSelect.value) loadModels(brandSelect.value);
+});
+</script>
 {% endblock %}
