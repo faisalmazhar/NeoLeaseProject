@@ -269,7 +269,8 @@ def listings():
         query = query.filter(CarListing.voertuigsoort == type_filter)
     # fuel filter
     if fuel_filter:
-        query = query.filter(CarListing.brandstof == fuel_filter)
+         # query = query.filter(CarListing.brandstof == fuel_filter)
+         query = query.filter(func.lower(func.trim(CarListing.brandstof)) == fuel_filter.lower().strip())
     if model_filter:
         query = query.filter(CarListing.model == model_filter)
    # btw/marge filter
