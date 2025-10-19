@@ -42,7 +42,7 @@
         {% endfor %}
       </select>
 
-      <select name="model" id="modelSelect" disabled>
+      <select name="model" id="modelSelect">
         <option value="">Model</option>
       </select>
           
@@ -116,7 +116,71 @@
 </div>
 
 <section class="container" style="padding-top: 1rem;">
-  <div class="car-grid"
+
+<div class="car-grid"
+     style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+
+  {% if cars|length > 0 %}
+    {% for car in cars %}
+      <div class="car-card">
+        <a href="{{ url_for('car_detail', car_id=car.id) }}"
+           class="thumb-wrapper">
+        
+          {% if car.images and car.images|length > 0 %}
+            {% set urls = car.images|map(attribute='image_url')|join(',') %}
+            <img class="listing-thumb"
+                 data-image-urls="{{ urls }}"
+                 src="{{ car.images[0].image_url }}"
+                 loading="lazy" 
+                 width="300" height="180"
+                 alt="Car Image">
+            <div class="thumb-spinner" style="display:none;"></div>
+          {% else %}
+            <img class="listing-thumb"
+                 data-image-urls=""
+                 src="{{ url_for('static', filename='images/fallback.png') }}"
+                 loading="lazy" 
+                 width="300" height="180"
+                 alt="Geen afbeelding">
+          {% endif %}
+        </a>
+
+        <h3>
+          <a href="{{ url_for('car_detail', car_id=car.id) }}">
+            {{ car.title or 'Onbekend' }}
+          </a>
+        </h3>
+        <p style="color:#999; margin-bottom:0.5rem;">
+          {{ car.subtitle }}
+        </p>
+        <p>
+          <strong>{{ car.financial_lease_price|euro }}</strong> / {{ car.financial_lease_term }}
+        </p>
+        <p>
+          {{ car.brandstof }} | {{ car.km_stand }} km | {{ car.bouwjaar }}
+        </p>
+        <p>
+          Prijs: {{ car.prijs|euro }}
+        </p>
+        <a href="{{ url_for('car_detail', car_id=car.id) }}"
+           class="btn border"
+           style="margin-top:1rem;">
+          Meer info
+        </a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; font-size: 1.3rem; color: #666;">
+       No Data Found 😔 Try Again.
+    </div>
+  {% endif %}
+</div>
+
+
+
+
+
+  <!-- <div class="car-grid"
        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
     {% for car in cars %}
       <div class="car-card">
@@ -166,7 +230,7 @@
         </a>
       </div>
     {% endfor %}
-  </div>
+  </div> -->
 
 <!-- PAGINATION FOR DESKTOP -->
 <div class="d-none d-md-block" style="text-align:center; margin-top:2rem; margin-bottom:3rem;">
@@ -248,7 +312,77 @@
 {% endblock %}
 
 {% block extra_scripts %}
+
+
+
+
+
+
+
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const brandSelect = document.getElementById('brandSelect');
+    const modelSelect = document.getElementById('modelSelect');
+
+    const currentBrand = "{{ current_brand or '' }}";
+    const currentModel = "{{ current_model or '' }}";
+
+    // Function to populate model dropdown
+    function loadModels(brand, selectedModel) {
+        modelSelect.innerHTML = '<option value="">Model</option>';
+        if (!brand) return;
+
+        fetch(`/api/models?brand=${encodeURIComponent(brand)}`)
+            .then(res => res.json())
+            .then(models => {
+                models.forEach(model => {
+                    const opt = document.createElement('option');
+                    opt.value = model;
+                    opt.textContent = model;
+                    if (selectedModel && model.trim().toLowerCase() === selectedModel.trim().toLowerCase()) {
+                        opt.selected = true; // ✅ preselect current model
+                    }
+                    modelSelect.appendChild(opt);
+                });
+            });
+    }
+
+    // Run once on page load if brand already selected
+    if (currentBrand) {
+        loadModels(currentBrand, currentModel);
+    }
+
+    // Reload models when user changes brand
+    brandSelect.addEventListener('change', function() {
+        loadModels(this.value, "");
+    });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <script>
 document.addEventListener('DOMContentLoaded', () => {
   const brandSelect  = document.getElementById('brandSelect');
   const modelSelect  = document.getElementById('modelSelect');
@@ -273,5 +407,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // if page was loaded with ?brand=… then auto-populate
   if (brandSelect.value) loadModels(brandSelect.value);
 });
-</script>
+</script> -->
+
+
+
+
+
 {% endblock %}
