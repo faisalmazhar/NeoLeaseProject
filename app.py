@@ -241,7 +241,7 @@ def listings():
     desired_order = ["Personenauto", "Bedrijfswagen", "Motor", "Camper", "Machines"]
     type_choices  = desired_order          # always show the full set
     
-    allowed_fuels = ["Benzine", "Diesel", "Elektrisch", "LPG", "CNG"]
+    allowed_fuels = ["Benzine", "Diesel", "Hybride", "Elektrisch", "LPG", "CNG"]
     fuel_choices  = allowed_fuels          # show every allowed fuel
 
 
